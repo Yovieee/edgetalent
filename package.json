@@ -1,0 +1,12 @@
+{
+  "name": "edgetalent-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --filter frontend dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test:e2e": "pnpm --filter database test:e2e",
+    "test:browser": "pnpm --filter frontend test:browser"
+  }
+}

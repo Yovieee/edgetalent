@@ -1,0 +1,12 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:e2e": "npx tsx test/e2e-test.ts"
+  },
+  "dependencies": {
+    "@edgetalent/shared": "workspace:*",
+    "@supabase/supabase-js": "^2.110.0"
+  }
+}

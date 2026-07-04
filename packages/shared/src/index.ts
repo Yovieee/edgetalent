@@ -1,0 +1,67 @@
+import { z } from "zod";
+
+// 1. Auth Schemas
+export const LoginSchema = z.object({
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(6, "Password must be at least 6 characters long.")
+});
+
+export type LoginInput = z.infer<typeof LoginSchema>;
+
+export const RegisterSchema = z.object({
+  email: z.string().email("Please enter a valid email address."),
+  password: z.string().min(6, "Password must be at least 6 characters long."),
+  fullName: z.string().min(2, "Full name must be at least 2 characters long.")
+});
+
+export type RegisterInput = z.infer<typeof RegisterSchema>;
+
+// 2. Profile Schemas
+export const PortfolioLinksSchema = z.object({
+  github: z.string().url("Must be a valid URL").or(z.literal("")),
+  linkedin: z.string().url("Must be a valid URL").or(z.literal("")),
+  website: z.string().url("Must be a valid URL").or(z.literal(""))
+}).default({ github: "", linkedin: "", website: "" });
+
+export const ProfileSchema = z.object({
+  id: z.string().uuid(),
+  updated_at: z.string().optional(),
+  full_name: z.string().min(1, "Name cannot be empty"),
+  email: z.string().email(),
+  avatar_url: z.string().nullable().optional(),
+  role: z.enum(["talent", "partner", "admin"]).nullable().optional(),
+  bio: z.string().nullable().optional(),
+  portfolio_links: PortfolioLinksSchema.optional(),
+  skills: z.array(z.string()).default([]),
+  skill_gaps: z.array(z.string()).default([]),
+  skills_embedding: z.array(z.number()).nullable().optional()
+});
+
+export type Profile = z.infer<typeof ProfileSchema>;
+
+// 3. Project Schemas
+export const ProjectSchema = z.object({
+  id: z.string().uuid().optional(),
+  partner_id: z.string().uuid(),
+  title: z.string().min(3, "Title must be at least 3 characters long"),
+  description: z.string().min(10, "Description must be at least 10 characters long"),
+  required_skills: z.array(z.string()).min(1, "Specify at least one required skill"),
+  budget: z.number().nullable().optional(),
+  scope: z.enum(["short-term", "medium-term", "long-term"]),
+  created_at: z.string().optional()
+});
+
+export type Project = z.infer<typeof ProjectSchema>;
+
+// 4. Application Schemas
+export const ApplicationSchema = z.object({
+  id: z.string().uuid().optional(),
+  project_id: z.string().uuid(),
+  talent_id: z.string().uuid(),
+  status: z.enum(["applied", "reviewing", "shortlisted", "accepted", "rejected"]),
+  match_percentage: z.number().nullable().optional(),
+  match_breakdown: z.any().optional(),
+  applied_at: z.string().optional()
+});
+
+export type Application = z.infer<typeof ApplicationSchema>;
