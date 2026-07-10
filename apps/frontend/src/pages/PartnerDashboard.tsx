@@ -139,7 +139,7 @@ export default function PartnerDashboard(): React.ReactElement {
 
       if (insertErr) throw insertErr;
 
-      setPortalMsg("Project posted successfully! Asynchronously generating vector embeddings...");
+      setPortalMsg("Project posted successfully with vector embeddings!");
       setTitle("");
       setDescription("");
       setRequiredSkills("");
@@ -272,7 +272,7 @@ export default function PartnerDashboard(): React.ReactElement {
             </h2>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }} className="user-profile-menu">
             <div style={{ textAlign: "right" }} className="header-user-info">
               <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>{profile?.full_name || "Enterprise Partner"}</div>
               <span className="badge badge-cyan" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Partner</span>

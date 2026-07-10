@@ -9,11 +9,17 @@ const corsHeaders = {
 
 // Enforce incoming request schema using Zod
 const RequestSchema = z.object({
-  cvText: z.string().optional().default(""),
-  targetRole: z.string().optional().default("Fullstack Developer"),
-  quizAnswers: z.string().optional().default("")
-}).refine(data => data.cvText.trim() !== "" || data.quizAnswers.trim() !== "", {
-  message: "Provide either cvText or quizAnswers to analyze."
+  quizResults: z.object({
+    frontend: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional(),
+    backend: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional(),
+    ai: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional()
+  }).optional().default({}),
+  interests: z.object({
+    role: z.string().optional().default("Fullstack Developer"),
+    workArrangement: z.string().optional().default("Remote"),
+    experienceLevel: z.string().optional().default("Mid-level"),
+    goals: z.string().optional().default("")
+  }).optional().default({})
 });
 
 serve(async (req) => {
@@ -66,11 +72,12 @@ serve(async (req) => {
       });
     }
 
-    const { cvText, targetRole, quizAnswers } = validation.data;
+    const { quizResults, interests } = validation.data;
+    const targetRole = interests?.role || "Fullstack Developer";
 
     // 1. Call OpenRouter to analyze skill gaps
     const promptSystem = `You are an expert AI Career Coach and Technical Recruiter.
-Analyze the user's technical profile (CV/Resume and/or Quiz Answers) against industry standards for the target role: "${targetRole}".
+Analyze the user's technical quiz results and career interests against industry standards for the target role: "${targetRole}".
 Identify verified skills, clear skill gaps, and write a summary bio for semantic search mapping.
 You MUST output your response strictly as a JSON object with this exact structure:
 {
@@ -80,12 +87,16 @@ You MUST output your response strictly as a JSON object with this exact structur
 }
 Return ONLY valid JSON. No markdown wrappers.`;
 
-    const promptUser = `User Technical Details:
-CV/Resume Text:
-${cvText}
+    const promptUser = `User Technical Quiz Results:
+- Frontend Development Quiz Score: ${quizResults?.frontend ? `${quizResults.frontend.score}/5` : "Not Taken"}
+- Backend Development Quiz Score: ${quizResults?.backend ? `${quizResults.backend.score}/5` : "Not Taken"}
+- AI & Data Science Quiz Score: ${quizResults?.ai ? `${quizResults.ai.score}/5` : "Not Taken"}
 
-Quiz Answers/Performance:
-${quizAnswers}`;
+User Career Interests:
+- Target Role: ${targetRole}
+- Preferred Work Arrangement: ${interests?.workArrangement || "Remote"}
+- Experience Level: ${interests?.experienceLevel || "Mid-level"}
+- Primary Career Goals: ${interests?.goals || "None specified"}`;
 
     const chatResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",

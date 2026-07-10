@@ -16,7 +16,7 @@ test.describe('EdgeTalent UI Landing and Auth Verification', () => {
     await expect(title).toBeVisible();
 
     // 4. Verify CTA exists and click it
-    const getStartedBtn = page.locator('button.btn-primary', { hasText: 'Get Started' });
+    const getStartedBtn = page.locator('button#nav-btn-register');
     await expect(getStartedBtn).toBeVisible();
 
     // Click to navigate

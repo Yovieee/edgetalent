@@ -1,8 +1,176 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('EdgeTalent Complete E2E User Journeys', () => {
-  // Clear localStorage before each test to ensure state is clean
+  let hasApplied = false;
+
+  // Clear localStorage and intercept edge function and database calls to run hermetic tests
   test.beforeEach(async ({ page }) => {
+    hasApplied = false; // reset for each test run
+
+    // Mock analyze-skill-gap Edge Function
+    await page.route('**/functions/v1/analyze-skill-gap', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          skills: ["React", "TypeScript", "HTML5 & CSS3"],
+          skill_gaps: ["pgvector", "AWS Cloud Deployments"],
+          bio: "Senior React engineer with a focus on high-performance SPAs."
+        })
+      });
+    });
+
+    // Mock generate-project-embeddings Edge Function
+    await page.route('**/functions/v1/generate-project-embeddings', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true })
+      });
+    });
+
+    // Mock courses database query
+    await page.route('**/rest/v1/courses**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: "00000000-0000-0000-0000-000000000002",
+            title: "PostgreSQL & pgvector Deep Dive",
+            description: "Learn how to use pgvector for semantic search.",
+            skills_taught: ["pgvector"],
+            provider: "EdgeTalent Academy",
+            link: "https://example.com"
+          }
+        ])
+      });
+    });
+
+    // Mock projects database query
+    await page.route('**/rest/v1/projects**', async (route) => {
+      const method = route.request().method();
+      if (method === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([
+            {
+              id: "00000000-0000-0000-0000-000000000003",
+              partner_id: "00000000-0000-0000-0000-000000000004",
+              title: "Next-Gen Quantum Compiler",
+              description: "Build a compiler pipeline using web assembly, typescript, and vector optimization models.",
+              required_skills: ["WebAssembly", "TypeScript", "Quantum Computing"],
+              budget: 5000,
+              scope: "medium-term",
+              embedding: Array(1536).fill(0.025) // mock embedding is populated
+            }
+          ])
+        });
+      } else {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            id: "00000000-0000-0000-0000-000000000003",
+            title: "Next-Gen Quantum Compiler"
+          })
+        });
+      }
+    });
+
+    // Mock match_talents_for_project RPC call
+    await page.route('**/rest/v1/rpc/match_talents_for_project**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            talent_id: "00000000-0000-0000-0000-000000000001",
+            full_name: "Mock AI Expert",
+            email: "expert@edgetalent.com",
+            skills: ["Python", "TensorFlow", "PyTorch"],
+            bio: "Experienced AI/ML researcher specializing in deep neural networks.",
+            similarity: 0.85
+          }
+        ])
+      });
+    });
+
+    // Mock match_projects_for_talent RPC call
+    await page.route('**/rest/v1/rpc/match_projects_for_talent**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            project_id: "00000000-0000-0000-0000-000000000003",
+            title: "EdgeTalent AI Matching Engine",
+            description: "Build an end-to-end vector matching pipeline inside PostgreSQL using pgvector, typescript, and deno edge functions.",
+            budget: 1500,
+            scope: "medium-term",
+            required_skills: ["TypeScript", "Supabase", "pgvector"],
+            similarity: 0.95
+          }
+        ])
+      });
+    });
+
+    // Mock applications database query (stateful)
+    await page.route('**/rest/v1/applications**', async (route) => {
+      const method = route.request().method();
+      if (method === 'HEAD') {
+        await route.fulfill({
+          status: 200,
+          headers: {
+            'content-range': hasApplied ? '0-0/1' : '0-0/0'
+          }
+        });
+      } else if (method === 'GET') {
+        if (hasApplied) {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify([
+              {
+                id: "00000000-0000-0000-0000-000000000005",
+                project_id: "00000000-0000-0000-0000-000000000003",
+                talent_id: "00000000-0000-0000-0000-000000000001",
+                status: "applied",
+                match_percentage: 95,
+                match_breakdown: { score_method: "pgvector cosine similarity" },
+                applied_at: new Date().toISOString(),
+                projects: {
+                  id: "00000000-0000-0000-0000-000000000003",
+                  title: "EdgeTalent AI Matching Engine",
+                  description: "Build an end-to-end vector matching pipeline.",
+                  required_skills: ["TypeScript", "Supabase", "pgvector"],
+                  budget: 1500,
+                  scope: "medium-term"
+                }
+              }
+            ])
+          });
+        } else {
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify([])
+          });
+        }
+      } else if (method === 'POST') {
+        hasApplied = true;
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true })
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
     await page.goto('/');
     await page.evaluate(() => localStorage.removeItem('edgetalent_mock_db'));
   });
@@ -11,7 +179,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     // 1. Visit Landing Page and Navigate to Auth
     await page.goto('/');
     await expect(page).toHaveTitle(/EdgeTalent/);
-    const getStartedBtn = page.locator('button.btn-primary', { hasText: 'Get Started' });
+    const getStartedBtn = page.locator('button#nav-btn-register');
     await getStartedBtn.click();
 
     // 2. Register a new user
@@ -52,21 +220,56 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const successBadge = page.locator('.badge', { hasText: 'Profile updated successfully!' });
     await expect(successBadge).toBeVisible();
 
-    // 6. Navigate to AI Skill-Gap Analyzer
-    const analyzerTabBtn = page.locator('button', { hasText: 'AI Skill-Gap' });
+    // 6. Navigate to Skills & Interests Quiz Center
+    const analyzerTabBtn = page.locator('button', { hasText: 'Skills & Interests' }).first();
     await analyzerTabBtn.click();
 
-    const cvInput = page.locator('label:has-text("CV / Resume Text") + textarea');
-    await cvInput.fill('Experience building apps with React, TypeScript, and standard HTML/CSS. Looking for opportunities.');
-    const startAnalysisBtn = page.locator('button', { hasText: 'Start Analysis' });
-    await startAnalysisBtn.click();
+    // Start Frontend Quiz
+    const startQuizBtn = page.locator('#btn-quiz-frontend-start');
+    await expect(startQuizBtn).toBeVisible();
+    await startQuizBtn.click();
 
-    // Verify AI analysis results render
-    const resultsHeader = page.locator('h3', { hasText: 'Analyzer Results' });
+    // Question 1
+    await page.locator('.quiz-option-btn-0-0').click();
+    await page.locator('#btn-quiz-next').click();
+
+    // Question 2
+    await page.locator('.quiz-option-btn-1-0').click();
+    await page.locator('#btn-quiz-next').click();
+
+    // Question 3
+    await page.locator('.quiz-option-btn-2-0').click();
+    await page.locator('#btn-quiz-next').click();
+
+    // Question 4
+    await page.locator('.quiz-option-btn-3-0').click();
+    await page.locator('#btn-quiz-next').click();
+
+    // Question 5
+    await page.locator('.quiz-option-btn-4-0').click();
+    await page.locator('#btn-quiz-finish').click();
+
+    // Configure Preferences
+    const interestsBtn = page.locator('#btn-quiz-interests-start');
+    await expect(interestsBtn).toBeVisible();
+    await interestsBtn.click();
+    await page.locator('#select-interest-role').selectOption('Fullstack Developer');
+    await page.locator('#select-interest-arrangement').selectOption('Remote');
+    await page.locator('#select-interest-experience').selectOption('Senior');
+    await page.locator('#input-interest-goals').fill('Learn advanced backend and deployment strategies.');
+    await page.locator('#btn-save-interests').click();
+
+    // Submit Quiz & Interests
+    const submitQuizBtn = page.locator('#btn-submit-quiz-interests');
+    await expect(submitQuizBtn).toBeVisible();
+    await submitQuizBtn.click();
+
+    // Verify assessment results render
+    const resultsHeader = page.locator('h3', { hasText: 'Assessment Results' });
     await expect(resultsHeader).toBeVisible();
-    const verifiedSkillBadge = page.locator('.badge-emerald', { hasText: 'React' });
+    const verifiedSkillBadge = page.locator('.badge-emerald', { hasText: 'React' }).first();
     await expect(verifiedSkillBadge).toBeVisible();
-    const gapBadge = page.locator('.badge-rose', { hasText: 'pgvector' });
+    const gapBadge = page.locator('.badge-rose', { hasText: 'pgvector' }).first();
     await expect(gapBadge).toBeVisible();
 
     // 7. Check Upskilling Hub (should list recommended courses based on gaps)
@@ -115,7 +318,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
   test('Partner Journey: register, onboard, post project and check AI candidate matches', async ({ page }) => {
     // 1. Visit Landing Page and Navigate to Auth
     await page.goto('/');
-    const getStartedBtn = page.locator('button.btn-primary', { hasText: 'Get Started' });
+    const getStartedBtn = page.locator('button#nav-btn-register');
     await getStartedBtn.click();
 
     // 2. Register a new partner user

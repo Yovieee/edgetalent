@@ -44,7 +44,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
   // Presets mapping for Talent
   const talentPresetData = {
     frontend: {
-      input: "React developer, strong CSS and JS, needs to learn TypeScript and cloud tools",
+      input: "Frontend Quiz Score: 4/5 | Target Role: Frontend Developer | Work Arrangement: Remote",
       skills: ["HTML5 & CSS3", "JavaScript (ES6+)", "React Framework", "Responsive Design"],
       skillGaps: ["TypeScript Integration", "AWS Cloud Deployments", "Real-time WebSockets"],
       courses: [
@@ -54,7 +54,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
       ]
     },
     backend: {
-      input: "Python coder, built small Flask APIs, needs to learn PostgreSQL, pgvector, Docker",
+      input: "Backend Quiz Score: 3/5 | Target Role: Backend Developer | Work Arrangement: Hybrid",
       skills: ["Python Programming", "Flask APIs", "SQL Basics", "Git Version Control"],
       skillGaps: ["PostgreSQL & pgvector", "Docker Containerization", "Distributed Systems Architecture"],
       courses: [
@@ -64,7 +64,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
       ]
     },
     ai: {
-      input: "Mathematical background, knows basic numpy/pandas, wants to learn PyTorch, prompt engineering",
+      input: "AI Quiz Score: 3/5 | Target Role: AI Engineer | Work Arrangement: Remote",
       skills: ["Python Basics", "NumPy & Pandas Dataframes", "Linear Algebra & Calculus", "Stats Modeling"],
       skillGaps: ["PyTorch Deep Learning", "LLM Prompt Architecture", "Vector Embeddings & Search"],
       courses: [
@@ -82,13 +82,13 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
 
     const logMessages = [
       { text: "Connecting to EdgeTalent Deno Edge Function...", delay: 0 },
-      { text: "Reading profile context... Preset selected: " + talentPreset.toUpperCase(), delay: 600 },
+      { text: "Submitting Quiz Performance data... Preset: " + talentPreset.toUpperCase(), delay: 600 },
       { text: "Invoking OpenRouter AI Engine (model: google/gemini-2.5-flash)...", delay: 1200 },
-      { text: "Comparing profile against 140+ industry-standard curriculum mappings...", delay: 1800 },
-      { text: "Calculating vector distance skill-gaps...", delay: 2400 },
+      { text: "Analyzing quiz scores and interests against career standards...", delay: 1800 },
+      { text: "Determining verified skills and identifying upskilling gaps...", delay: 2400 },
       { text: "Generating 1536-dimensional skills embedding (openai/text-embedding-3-small)...", delay: 3000 },
       { text: "Writing updated skills data to public.profiles schema...", delay: 3600 },
-      { text: "Success! Profile fully analyzed and indexed in pgvector.", delay: 4100 }
+      { text: "Success! Quiz assessment processed and profile indexed in pgvector.", delay: 4100 }
     ];
 
     logMessages.forEach((msg) => {
@@ -208,11 +208,11 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
   const faqs = [
     {
       q: "What is EdgeTalent?",
-      a: "EdgeTalent is a comprehensive digital ecosystem dividing career growth into two pipelines: Upstream (EdgeTalent Foundation) which focuses on AI skill-gap assessment and courses, and Downstream (EdgeTalent Group) which matches talented candidates to corporate client projects."
+      a: "EdgeTalent is a comprehensive digital ecosystem dividing career growth into two pipelines: Upstream (EdgeTalent Foundation) which focuses on skills & interests quizzes and courses, and Downstream (EdgeTalent Group) which matches talented candidates to corporate client projects."
     },
     {
-      q: "How does the AI Skill-Gap Analyzer work?",
-      a: "We feed your CV or profile details to the google/gemini-2.5-flash model via the OpenRouter API. The model analyzes your skills against current market needs and identifies gaps. We then recommend specific upskilling courses from our database."
+      q: "How does the Skills & Interests Quiz work?",
+      a: "We evaluate your quiz performance and interests. An OpenRouter AI model then analyzes these results to generate your verified skills list, career gaps, and a professional summary bio."
     },
     {
       q: "What is pgvector and how is semantic search used?",
@@ -268,7 +268,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
         <header className="landing-grid" style={{ marginBottom: "6rem", minHeight: "60vh" }}>
           <div className="hero-text-block">
             <div style={{ display: "inline-flex", gap: "0.5rem", alignItems: "center", marginBottom: "1.5rem" }}>
-              <span className="badge badge-cyan" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem" }}>AI-Driven Platform</span>
+              <span className="badge badge-cyan" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem" }}>EdgeTalent Ecosystem</span>
               <span className="badge badge-purple" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem" }}>v2.0 Launched</span>
             </div>
             <h1 style={{ fontSize: "3.75rem", lineHeight: "1.15", marginBottom: "1.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>
@@ -359,7 +359,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               id="tab-btn-talent"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-              Talent Skill-Gap Analyzer
+              Skills & Interests Assessment
             </button>
             <button
               className={`showcase-tab-btn ${activeTab === "partner" ? "active-partner" : ""}`}
@@ -379,10 +379,10 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               <div className="showcase-panel">
                 <div>
                   <h3 style={{ fontSize: "1.75rem", marginBottom: "1rem", color: "var(--text-primary)" }}>
-                    AI Skill-Gap Diagnostics
+                    Skills & Interests Diagnostics
                   </h3>
                   <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem", lineHeight: "1.6" }}>
-                    Select a target profile direction below. The simulator will pass the details to a mock Deno Edge Function client to index the skills and identify gaps.
+                    Select a target profile direction below. The simulator will pass simulated quiz scores and career interests to a mock Deno Edge Function client to index the skills and identify gaps.
                   </p>
 
                   <div className="form-group" style={{ marginBottom: "1.5rem" }}>
@@ -433,11 +433,11 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                           borderRadius: "50%",
                           animation: "spin 0.8s linear infinite"
                         }}></span>
-                        Running Diagnostics...
+                        Processing Quiz Results...
                       </>
                     ) : (
                       <>
-                        Run AI Skill Analysis
+                        Submit Quiz Diagnostics
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                       </>
                     )}
@@ -451,7 +451,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                     <div className="sim-terminal" ref={terminalRef} id="talent-terminal-logs">
                       {talentLogs.length === 0 && (
                         <div style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
-                          Waiting for execution... Press "Run AI Skill Analysis" to begin.
+                          Waiting for execution... Press "Submit Quiz Diagnostics" to begin.
                         </div>
                       )}
                       {talentLogs.map((log, idx) => {
@@ -742,7 +742,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                 ))}
               </div>
               <p className="testimonial-quote">
-                "The AI Skill-Gap Analyzer completely changed my roadmap. I was struggling to land frontend jobs until the platform highlighted that I lacked TypeScript and WebSockets expertise, recommending the precise modules to resolve the gaps."
+                "The Skills & Interests Quizzes completely changed my roadmap. I was struggling to land frontend jobs until the platform highlighted that I lacked TypeScript and WebSockets expertise, recommending the precise modules to resolve the gaps."
               </p>
               <div className="testimonial-user">
                 <div className="testimonial-avatar">SL</div>

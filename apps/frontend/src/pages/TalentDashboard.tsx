@@ -2,6 +2,112 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../context/SupabaseContext";
 import { PortfolioLinksSchema } from "@edgetalent/shared";
 
+interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  answer: string;
+}
+
+const FRONTEND_QUESTIONS: Question[] = [
+  {
+    id: 1,
+    question: "Which hook in React is used to run side effects?",
+    options: ["useEffect", "useState", "useContext", "useReducer"],
+    answer: "useEffect"
+  },
+  {
+    id: 2,
+    question: "What does TypeScript do?",
+    options: ["Provides static type checking", "Compiles to machine code", "Replaces JavaScript entirely", "Manages CSS styles"],
+    answer: "Provides static type checking"
+  },
+  {
+    id: 3,
+    question: "What is the correct CSS property to align flex items along the cross-axis?",
+    options: ["align-items", "justify-content", "align-content", "flex-direction"],
+    answer: "align-items"
+  },
+  {
+    id: 4,
+    question: "Which HTML5 tag is most appropriate for navigation links?",
+    options: ["<nav>", "<header>", "<section>", "<aside>"],
+    answer: "<nav>"
+  },
+  {
+    id: 5,
+    question: "In React, what is the key prop used for?",
+    options: ["Helping React identify which items have changed/added/removed", "Styling list elements", "Storing state", "Accessing global context"],
+    answer: "Helping React identify which items have changed/added/removed"
+  }
+];
+
+const BACKEND_QUESTIONS: Question[] = [
+  {
+    id: 1,
+    question: "Which Node.js module is used to handle file paths?",
+    options: ["path", "fs", "http", "os"],
+    answer: "path"
+  },
+  {
+    id: 2,
+    question: "What is the purpose of an index in a relational database?",
+    options: ["To speed up data retrieval operations", "To enforce unique constraints", "To encrypt sensitive columns", "To define table relationships"],
+    answer: "To speed up data retrieval operations"
+  },
+  {
+    id: 3,
+    question: "Which HTTP status code represents 'Internal Server Error'?",
+    options: ["500", "400", "401", "404"],
+    answer: "500"
+  },
+  {
+    id: 4,
+    question: "What is the main characteristic of a REST API?",
+    options: ["Statelessness", "Uses XML only", "Requires WebSockets", "Single entry point query language"],
+    answer: "Statelessness"
+  },
+  {
+    id: 5,
+    question: "Which package manager is native to Node.js?",
+    options: ["npm", "pnpm", "yarn", "bower"],
+    answer: "npm"
+  }
+];
+
+const AI_QUESTIONS: Question[] = [
+  {
+    id: 1,
+    question: "What is the primary language used for Machine Learning and AI frameworks like PyTorch?",
+    options: ["Python", "JavaScript", "C++", "Java"],
+    answer: "Python"
+  },
+  {
+    id: 2,
+    question: "In vector databases, what is cosine similarity used for?",
+    options: ["Measuring the angle/semantic similarity between two vector embeddings", "Sorting text alphabetically", "Compressing image files", "Hashing passwords"],
+    answer: "Measuring the angle/semantic similarity between two vector embeddings"
+  },
+  {
+    id: 3,
+    question: "What does 'LLM' stand for in AI?",
+    options: ["Large Language Model", "Local Logic Machine", "Linear Log Matrix", "Low Latency Memory"],
+    answer: "Large Language Model"
+  },
+  {
+    id: 4,
+    question: "What is the purpose of 'embeddings' in NLP?",
+    options: ["To represent text tokens as high-dimensional numerical vectors", "To format text in HTML", "To encrypt text content", "To translate text to different languages"],
+    answer: "To represent text tokens as high-dimensional numerical vectors"
+  },
+  {
+    id: 5,
+    question: "What is 'prompt engineering'?",
+    options: ["The process of structuring instructions to guide LLM responses", "Designing processor hardware", "Running database backups", "Optimizing network routers"],
+    answer: "The process of structuring instructions to guide LLM responses"
+  }
+];
+
 export default function TalentDashboard(): React.ReactElement {
   const { supabase, profile, signOut, fetchProfile } = useSupabase();
   const [activeTab, setActiveTab] = useState<string>("overview");
@@ -20,10 +126,22 @@ export default function TalentDashboard(): React.ReactElement {
   const [applications, setApplications] = useState<any[]>([]);
   const [loadingOverview, setLoadingOverview] = useState<boolean>(true);
 
-  // AI Analyzer states
-  const [cvText, setCvText] = useState<string>("");
+  // Quiz states
+  const [frontendScore, setFrontendScore] = useState<number | null>(null);
+  const [backendScore, setBackendScore] = useState<number | null>(null);
+  const [aiScore, setAiScore] = useState<number | null>(null);
+
+  // Active quiz-taking states
+  const [activeQuiz, setActiveQuiz] = useState<"frontend" | "backend" | "ai" | "interests" | null>(null);
+  const [currentQuestionIdx, setCurrentQuestionIdx] = useState<number>(0);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
+
+  // Career Interest states
   const [targetRole, setTargetRole] = useState<string>("Fullstack Developer");
-  const [quizAnswers, setQuizAnswers] = useState<string>("");
+  const [workArrangement, setWorkArrangement] = useState<string>("Remote");
+  const [experienceLevel, setExperienceLevel] = useState<string>("Mid-level");
+  const [goals, setGoals] = useState<string>("");
+
   const [analyzing, setAnalyzing] = useState<boolean>(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [analyzerError, setAnalyzerError] = useState<string>("");
@@ -171,32 +289,43 @@ export default function TalentDashboard(): React.ReactElement {
     if (activeTab === "marketplace") loadProjects();
   }, [activeTab, loadOverview, loadCourses, loadProjects]);
 
-  // AI Gap Analyzer Request
-  const runAIAnalysis = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // AI Quiz & Preferences submission Request
+  const runAIAnalysis = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!profileId) return;
     setAnalyzing(true);
     setAnalyzerError("");
     setAnalysisResult(null);
 
+    const quizResultsPayload = {
+      frontend: frontendScore !== null ? { score: frontendScore } : undefined,
+      backend: backendScore !== null ? { score: backendScore } : undefined,
+      ai: aiScore !== null ? { score: aiScore } : undefined
+    };
+
+    const interestsPayload = {
+      role: targetRole,
+      workArrangement,
+      experienceLevel,
+      goals
+    };
+
     try {
-      // Call Supabase Edge Function using standard supabase functions invoke
       const { data: result, error: invokeErr } = await supabase.functions.invoke(
         "analyze-skill-gap",
         {
-          body: { cvText, targetRole, quizAnswers }
+          body: { quizResults: quizResultsPayload, interests: interestsPayload }
         }
       );
 
       if (invokeErr) {
-        throw new Error(invokeErr.message || "Failed to analyze skills.");
+        throw new Error(invokeErr.message || "Failed to submit assessment.");
       }
 
       setAnalysisResult(result);
-      // Refresh local profile context
       await fetchProfile(profileId);
     } catch (err: any) {
-      setAnalyzerError(err.message || "An error occurred during analysis.");
+      setAnalyzerError(err.message || "An error occurred during assessment profile generation.");
     } finally {
       setAnalyzing(false);
     }
@@ -305,7 +434,7 @@ export default function TalentDashboard(): React.ReactElement {
                 <rect x="3" y="16" width="7" height="5" />
               </svg>
             )},
-            { id: "analyzer", label: "AI Skill-Gap", icon: (
+            { id: "analyzer", label: "Skills & Interests", icon: (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
               </svg>
@@ -378,14 +507,14 @@ export default function TalentDashboard(): React.ReactElement {
             </button>
             <h2 className="dashboard-header-title">
               {activeTab === "overview" && "Overview"}
-              {activeTab === "analyzer" && "AI Skill-Gap"}
+              {activeTab === "analyzer" && "Skills & Interests"}
               {activeTab === "upskilling" && "Upskilling Hub"}
               {activeTab === "marketplace" && "Project Marketplace"}
               {activeTab === "profile" && "My Profile"}
             </h2>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }} className="user-profile-menu">
             <div style={{ textAlign: "right" }} className="header-user-info">
               <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>{profile?.full_name || "Talent Member"}</div>
               <span className="badge badge-emerald" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Talent</span>
@@ -455,19 +584,186 @@ export default function TalentDashboard(): React.ReactElement {
             </div>
           )}
 
-          {/* AI Skill-Gap Analyzer */}
+          {/* Skills & Interests Quiz */}
           {activeTab === "analyzer" && (
-            <div className="animate-fade-in" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
-              <div className="glass-panel" style={{ padding: "2rem" }}>
-                <h3>AI Skill Gap Profiler</h3>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-                  Upload your CV and specify your target technical role. Our OpenRouter-powered agent will compare your skills against industrial demands.
-                </p>
+            <div className="animate-fade-in">
+              {activeQuiz === null ? (
+                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "2rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                    <div className="glass-panel" style={{ padding: "2rem" }}>
+                      <h3>Skills & Interests Assessment</h3>
+                      <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+                        Complete the technical quizzes and define your career interests. Your scores and selections will determine your verified skills, identify upskilling gaps, and unlock project matching in the marketplace.
+                      </p>
 
-                <form onSubmit={runAIAnalysis}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                        {/* Frontend Quiz Card */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
+                          <div>
+                            <h4 style={{ margin: 0, fontSize: "1.1rem" }}>Frontend Development Quiz</h4>
+                            <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                              Test React, TypeScript, HTML/CSS, and state hooks. (5 Questions)
+                            </p>
+                          </div>
+                          <div>
+                            {frontendScore !== null ? (
+                              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                <span className={`badge ${frontendScore >= 3 ? "badge-emerald" : "badge-rose"}`} style={{ fontSize: "0.8rem" }}>
+                                  Score: {frontendScore}/5 ({frontendScore >= 3 ? "Passed" : "Fail"})
+                                </span>
+                                <button className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setActiveQuiz("frontend"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-frontend-retake">
+                                  Retake
+                                </button>
+                              </div>
+                            ) : (
+                              <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => { setActiveQuiz("frontend"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-frontend-start">
+                                Start Quiz
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Backend Quiz Card */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
+                          <div>
+                            <h4 style={{ margin: 0, fontSize: "1.1rem" }}>Backend Development Quiz</h4>
+                            <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                              Test Node.js, relational databases, REST APIs, and npm. (5 Questions)
+                            </p>
+                          </div>
+                          <div>
+                            {backendScore !== null ? (
+                              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                <span className={`badge ${backendScore >= 3 ? "badge-emerald" : "badge-rose"}`} style={{ fontSize: "0.8rem" }}>
+                                  Score: {backendScore}/5 ({backendScore >= 3 ? "Passed" : "Fail"})
+                                </span>
+                                <button className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setActiveQuiz("backend"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-backend-retake">
+                                  Retake
+                                </button>
+                              </div>
+                            ) : (
+                              <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => { setActiveQuiz("backend"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-backend-start">
+                                Start Quiz
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* AI Quiz Card */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
+                          <div>
+                            <h4 style={{ margin: 0, fontSize: "1.1rem" }}>AI & Data Science Quiz</h4>
+                            <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                              Test Python, PyTorch, vector databases, LLMs, and prompts. (5 Questions)
+                            </p>
+                          </div>
+                          <div>
+                            {aiScore !== null ? (
+                              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                                <span className={`badge ${aiScore >= 3 ? "badge-emerald" : "badge-rose"}`} style={{ fontSize: "0.8rem" }}>
+                                  Score: {aiScore}/5 ({aiScore >= 3 ? "Passed" : "Fail"})
+                                </span>
+                                <button className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setActiveQuiz("ai"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-ai-retake">
+                                  Retake
+                                </button>
+                              </div>
+                            ) : (
+                              <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => { setActiveQuiz("ai"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-ai-start">
+                                Start Quiz
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Career Interests Card */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.5rem" }}>
+                          <div>
+                            <h4 style={{ margin: 0, fontSize: "1.1rem" }}>Career Preferences</h4>
+                            <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                              Define your role target, arrangement preferences, and career goals.
+                            </p>
+                          </div>
+                          <div>
+                            <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => setActiveQuiz("interests")} id="btn-quiz-interests-start">
+                              Configure Preferences
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="glass-panel" style={{ padding: "2rem" }}>
+                      <h3>Generate Profile</h3>
+                      <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "1.5rem" }}>
+                        Submit your combined quiz results and preferences to run vector analysis, which computes your profile biography and matches you against marketplace projects.
+                      </p>
+
+                      <button
+                        className="btn btn-success"
+                        style={{ width: "100%" }}
+                        onClick={() => runAIAnalysis()}
+                        disabled={analyzing || (frontendScore === null && backendScore === null && aiScore === null)}
+                        id="btn-submit-quiz-interests"
+                      >
+                        {analyzing ? "Generating Profile..." : "Submit Quiz & Interests"}
+                      </button>
+                      {(frontendScore === null && backendScore === null && aiScore === null) && (
+                        <p style={{ color: "var(--color-rose)", fontSize: "0.75rem", marginTop: "0.5rem", textAlign: "center" }}>
+                          ⚠️ Please take at least one quiz before submitting.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Analyzer Results (Right side) */}
+                  <div className="glass-panel" style={{ padding: "2rem" }}>
+                    <h3>Assessment Results</h3>
+                    {analyzing ? (
+                      <div style={{ padding: "3rem 0", textAlign: "center" }}>
+                        <p style={{ color: "var(--text-secondary)", marginBottom: "1rem" }}>Generating your verified profiles and computing project match scoring...</p>
+                        <div className="badge badge-cyan">Connecting...</div>
+                      </div>
+                    ) : analyzerError ? (
+                      <div className="badge badge-rose" style={{ display: "block", padding: "1rem" }}>
+                        {analyzerError}
+                      </div>
+                    ) : analysisResult || profile?.skills_embedding ? (
+                      <div>
+                        <h4 style={{ color: "var(--color-cyan)", marginBottom: "0.5rem" }}>Generated Profile Bio</h4>
+                        <p style={{ fontSize: "0.95rem", lineHeight: "1.5", color: "var(--text-secondary)", marginBottom: "1.5rem" }} id="profile-bio-text">
+                          {analysisResult?.bio || profile?.bio || "No bio summary generated."}
+                        </p>
+
+                        <h4 style={{ color: "var(--color-emerald)", marginBottom: "0.5rem" }}>Verified Skills</h4>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1.5rem" }} id="verified-skills-list">
+                          {(analysisResult?.skills || profile?.skills || []).map((skill: string, i: number) => (
+                            <span key={i} className="badge badge-emerald">{skill}</span>
+                          ))}
+                        </div>
+
+                        <h4 style={{ color: "var(--color-rose)", marginBottom: "0.5rem" }}>Skill Gaps Identified</h4>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }} id="skill-gaps-list">
+                          {(analysisResult?.skill_gaps || profile?.skill_gaps || []).map((gap: string, i: number) => (
+                            <span key={i} className="badge badge-rose">{gap}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p style={{ color: "var(--text-secondary)" }}>Complete a quiz and submit the form to generate your skill and interest profile.</p>
+                    )}
+                  </div>
+                </div>
+              ) : activeQuiz === "interests" ? (
+                /* Career Interests Config Panel */
+                <div className="glass-panel animate-fade-in" style={{ padding: "2.5rem", maxWidth: "600px", margin: "0 auto" }}>
+                  <h3>Configure Career Preferences</h3>
+                  <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "2rem" }}>
+                    Select your preferred alignment to feed into your matching profile.
+                  </p>
+
                   <div className="form-group">
-                    <label>Target Role</label>
-                    <select className="form-select" value={targetRole} onChange={(e) => setTargetRole(e.target.value)}>
+                    <label>Target Role Alignment</label>
+                    <select className="form-select" value={targetRole} onChange={(e) => setTargetRole(e.target.value)} id="select-interest-role">
                       <option value="Fullstack Developer">Fullstack Developer</option>
                       <option value="AI Engineer">AI Engineer</option>
                       <option value="Cloud Architect">Cloud Architect</option>
@@ -476,80 +772,155 @@ export default function TalentDashboard(): React.ReactElement {
                   </div>
 
                   <div className="form-group">
-                    <label>CV / Resume Text</label>
+                    <label>Preferred Work Arrangement</label>
+                    <select className="form-select" value={workArrangement} onChange={(e) => setWorkArrangement(e.target.value)} id="select-interest-arrangement">
+                      <option value="Remote">Remote</option>
+                      <option value="Hybrid">Hybrid</option>
+                      <option value="Onsite">Onsite</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Experience Level</label>
+                    <select className="form-select" value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} id="select-interest-experience">
+                      <option value="Junior">Junior</option>
+                      <option value="Mid-level">Mid-level</option>
+                      <option value="Senior">Senior</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Primary Career Goals</label>
                     <textarea
                       className="form-input"
-                      style={{ height: "150px", resize: "none" }}
-                      placeholder="Paste your CV text here..."
-                      value={cvText}
-                      onChange={(e) => setCvText(e.target.value)}
-                      required
+                      style={{ height: "100px", resize: "none" }}
+                      placeholder="Describe what projects or tech stack you want to focus on..."
+                      value={goals}
+                      onChange={(e) => setGoals(e.target.value)}
+                      id="input-interest-goals"
                     />
                   </div>
 
-                  <div className="collapsible-details">
-                    <details>
-                      <summary className="collapsible-summary">
-                        <span>Add Assessment Answers (Optional)</span>
-                        <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>▼</span>
-                      </summary>
-                      <div className="collapsible-content">
-                        <div className="form-group" style={{ marginBottom: 0 }}>
-                          <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Technical Quiz/Assessment Answers</label>
-                          <textarea
-                            className="form-input"
-                            style={{ height: "80px", resize: "none" }}
-                            placeholder="Describe your answers to any quiz, coding tasks, or assessments..."
-                            value={quizAnswers}
-                            onChange={(e) => setQuizAnswers(e.target.value)}
-                          />
-                        </div>
+                  <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
+                    <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setActiveQuiz(null)}>
+                      Cancel
+                    </button>
+                    <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => setActiveQuiz(null)} id="btn-save-interests">
+                      Save Preferences
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Technical Quiz Taking Panel */
+                (() => {
+                  const questions = activeQuiz === "frontend" ? FRONTEND_QUESTIONS : activeQuiz === "backend" ? BACKEND_QUESTIONS : AI_QUESTIONS;
+                  const currentQuestion = questions[currentQuestionIdx];
+                  const progressPct = Math.round((currentQuestionIdx / questions.length) * 100);
+
+                  return (
+                    <div className="glass-panel animate-fade-in" style={{ padding: "2.5rem", maxWidth: "700px", margin: "0 auto" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                        <span className="badge badge-cyan" style={{ textTransform: "uppercase" }}>
+                          {activeQuiz} Quiz
+                        </span>
+                        <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+                          Question {currentQuestionIdx + 1} of {questions.length}
+                        </span>
                       </div>
-                    </details>
-                  </div>
 
-                  <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={analyzing}>
-                    {analyzing ? "Analyzing Profiles..." : "Start Analysis"}
-                  </button>
-                </form>
-              </div>
+                      {/* Progress Bar */}
+                      <div style={{ width: "100%", height: "6px", background: "var(--bg-tertiary)", borderRadius: "3px", marginBottom: "2rem", overflow: "hidden" }}>
+                        <div style={{ width: `${progressPct}%`, height: "100%", background: "var(--color-cyan)", transition: "width 0.3s ease" }} />
+                      </div>
 
-              <div className="glass-panel" style={{ padding: "2rem" }}>
-                <h3>Analyzer Results</h3>
-                {analyzing ? (
-                  <div style={{ padding: "3rem 0", textAlign: "center" }}>
-                    <p style={{ color: "var(--text-secondary)", marginBottom: "1rem" }}>OpenRouter is parsing details and generating vector embeddings...</p>
-                    <div className="badge badge-cyan">Connecting...</div>
-                  </div>
-                ) : analyzerError ? (
-                  <div className="badge badge-rose" style={{ display: "block", padding: "1rem" }}>
-                    {analyzerError}
-                  </div>
-                ) : analysisResult || profile?.skills_embedding ? (
-                  <div>
-                    <h4 style={{ color: "var(--color-cyan)", marginBottom: "0.5rem" }}>Analyzed Profile Bio</h4>
-                    <p style={{ fontSize: "0.95rem", lineHeight: "1.5", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
-                      {analysisResult?.bio || profile?.bio || "No bio summary generated."}
-                    </p>
+                      <h3 style={{ fontSize: "1.35rem", marginBottom: "1.5rem", color: "var(--text-primary)" }}>
+                        {currentQuestion.question}
+                      </h3>
 
-                    <h4 style={{ color: "var(--color-emerald)", marginBottom: "0.5rem" }}>Verified Skills</h4>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: "1.5rem" }}>
-                      {(analysisResult?.skills || profile?.skills || []).map((skill: string, i: number) => (
-                        <span key={i} className="badge badge-emerald">{skill}</span>
-                      ))}
+                      {/* Options */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "2rem" }}>
+                        {currentQuestion.options.map((option, idx) => {
+                          const isSelected = selectedAnswers[currentQuestionIdx] === option;
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => setSelectedAnswers(prev => ({ ...prev, [currentQuestionIdx]: option }))}
+                              className={`form-input quiz-option-btn-${currentQuestionIdx}-${idx}`}
+                              style={{
+                                textAlign: "left",
+                                padding: "1rem 1.25rem",
+                                borderRadius: "var(--radius-sm)",
+                                border: isSelected ? "2px solid var(--color-cyan)" : "1px solid var(--glass-border)",
+                                background: isSelected ? "rgba(8, 145, 178, 0.05)" : "var(--bg-secondary)",
+                                cursor: "pointer",
+                                fontSize: "0.95rem",
+                                fontWeight: isSelected ? 600 : 400,
+                                transition: "all 0.2s ease"
+                              }}
+                            >
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                                <div style={{
+                                  width: "18px",
+                                  height: "18px",
+                                  borderRadius: "50%",
+                                  border: isSelected ? "5px solid var(--color-cyan)" : "2px solid var(--text-muted)",
+                                  background: "var(--bg-secondary)",
+                                  transition: "all 0.15s ease"
+                                }} />
+                                <span>{option}</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "2rem" }}>
+                        <button
+                          className="btn btn-secondary"
+                          onClick={() => setCurrentQuestionIdx(prev => Math.max(0, prev - 1))}
+                          disabled={currentQuestionIdx === 0}
+                          id="btn-quiz-prev"
+                        >
+                          Previous
+                        </button>
+                        {currentQuestionIdx < questions.length - 1 ? (
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => setCurrentQuestionIdx(prev => prev + 1)}
+                            disabled={!selectedAnswers[currentQuestionIdx]}
+                            id="btn-quiz-next"
+                          >
+                            Next
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-success"
+                            onClick={() => {
+                              // Calculate score
+                              let score = 0;
+                              questions.forEach((q, idx) => {
+                                if (selectedAnswers[idx] === q.answer) {
+                                  score++;
+                                }
+                              });
+                              if (activeQuiz === "frontend") setFrontendScore(score);
+                              if (activeQuiz === "backend") setBackendScore(score);
+                              if (activeQuiz === "ai") setAiScore(score);
+
+                              // Clear active quiz
+                              setActiveQuiz(null);
+                            }}
+                            disabled={!selectedAnswers[currentQuestionIdx]}
+                            id="btn-quiz-finish"
+                          >
+                            Finish Quiz
+                          </button>
+                        )}
+                      </div>
                     </div>
-
-                    <h4 style={{ color: "var(--color-rose)", marginBottom: "0.5rem" }}>Skill Gaps Identified</h4>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                      {(analysisResult?.skill_gaps || profile?.skill_gaps || []).map((gap: string, i: number) => (
-                        <span key={i} className="badge badge-rose">{gap}</span>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p style={{ color: "var(--text-secondary)" }}>Submit the form to generate your AI skill gap profile.</p>
-                )}
-              </div>
+                  );
+                })()
+              )}
             </div>
           )}
 
