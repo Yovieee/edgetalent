@@ -129,21 +129,7 @@ export default function PartnerDashboard(): React.ReactElement {
 
       if (insertErr) throw insertErr;
 
-      setPortalMsg("Project saved! Initiating vector embedding generation...");
-
-      // Call Edge Function to generate embeddings using standard supabase functions invoke
-      const { error: invokeErr } = await supabase.functions.invoke(
-        "generate-project-embeddings",
-        {
-          body: { projectId: project.id }
-        }
-      );
-
-      if (invokeErr) {
-        throw new Error(invokeErr.message || "Failed to generate embedding vector.");
-      }
-
-      setPortalMsg("Project posted successfully with vector embeddings!");
+      setPortalMsg("Project posted successfully! Asynchronously generating vector embeddings...");
       setTitle("");
       setDescription("");
       setRequiredSkills("");

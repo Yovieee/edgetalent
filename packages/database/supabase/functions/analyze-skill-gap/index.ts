@@ -111,7 +111,13 @@ ${quizAnswers}`;
     }
 
     const chatData = await chatResponse.json();
-    const resultText = chatData.choices[0].message.content.trim();
+    let resultText = chatData.choices[0].message.content.trim();
+    
+    // Strip markdown code block wrappers if the model returned them
+    if (resultText.startsWith("```")) {
+      resultText = resultText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+    }
+    
     const analysis = JSON.parse(resultText);
 
     // Validate structure
