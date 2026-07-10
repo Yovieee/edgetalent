@@ -49,6 +49,28 @@ async function runE2ETests() {
     // -------------------------------------------------------------
     console.log("\n🧪 [2/6] Verifying database profiles and trigger mocks...");
     
+    // Ensure auth users exist first by cleaning up any leftovers and creating them
+    await supabase.auth.admin.deleteUser(testTalentId).catch(() => {});
+    await supabase.auth.admin.deleteUser(testPartnerId).catch(() => {});
+
+    const { error: createTalentErr } = await supabase.auth.admin.createUser({
+      id: testTalentId,
+      email: "test-talent@edgetalent.com",
+      password: "password123",
+      email_confirm: true,
+      user_metadata: { full_name: "Test Talent Agent" }
+    });
+    if (createTalentErr) throw new Error(`Auth talent creation failed: ${createTalentErr.message}`);
+
+    const { error: createPartnerErr } = await supabase.auth.admin.createUser({
+      id: testPartnerId,
+      email: "test-partner@edgetalent.com",
+      password: "password123",
+      email_confirm: true,
+      user_metadata: { full_name: "Test Partner Org" }
+    });
+    if (createPartnerErr) throw new Error(`Auth partner creation failed: ${createPartnerErr.message}`);
+
     // Upsert a test talent profile using Service Role key
     const { data: talentProfile, error: talentErr } = await supabase
       .from("profiles")
@@ -221,17 +243,11 @@ async function runE2ETests() {
       if (cleanProjErr) console.error("Error cleaning test project:", cleanProjErr.message);
     }
     
-    const { error: cleanTalentErr } = await supabase
-      .from("profiles")
-      .delete()
-      .eq("id", testTalentId);
-    if (cleanTalentErr) console.error("Error cleaning test talent profile:", cleanTalentErr.message);
+    const { error: cleanTalentErr } = await supabase.auth.admin.deleteUser(testTalentId);
+    if (cleanTalentErr) console.error("Error cleaning test talent auth:", cleanTalentErr.message);
 
-    const { error: cleanPartnerErr } = await supabase
-      .from("profiles")
-      .delete()
-      .eq("id", testPartnerId);
-    if (cleanPartnerErr) console.error("Error cleaning test partner profile:", cleanPartnerErr.message);
+    const { error: cleanPartnerErr } = await supabase.auth.admin.deleteUser(testPartnerId);
+    if (cleanPartnerErr) console.error("Error cleaning test partner auth:", cleanPartnerErr.message);
 
     console.log("🧹 Test database records cleaned up. Teardown complete.\n");
   }

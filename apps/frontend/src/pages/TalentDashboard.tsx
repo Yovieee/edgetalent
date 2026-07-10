@@ -35,9 +35,9 @@ export default function TalentDashboard(): React.ReactElement {
   // Profile Builder states
   const [fullName, setFullName] = useState<string>(profile?.full_name || "");
   const [bio, setBio] = useState<string>(profile?.bio || "");
-  const [portfolioLinks, setPortfolioLinks] = useState<string>(
-    JSON.stringify(profile?.portfolio_links || { github: "", linkedin: "", website: "" }, null, 2)
-  );
+  const [githubUrl, setGithubUrl] = useState<string>("");
+  const [linkedinUrl, setLinkedinUrl] = useState<string>("");
+  const [websiteUrl, setWebsiteUrl] = useState<string>("");
   const [savingProfile, setSavingProfile] = useState<boolean>(false);
   const [profileMsg, setProfileMsg] = useState<string>("");
 
@@ -46,9 +46,10 @@ export default function TalentDashboard(): React.ReactElement {
     if (profile) {
       setFullName(profile.full_name || "");
       setBio(profile.bio || "");
-      setPortfolioLinks(
-        JSON.stringify(profile.portfolio_links || { github: "", linkedin: "", website: "" }, null, 2)
-      );
+      const links = profile.portfolio_links || {};
+      setGithubUrl(links.github || "");
+      setLinkedinUrl(links.linkedin || "");
+      setWebsiteUrl(links.website || "");
     }
   }, [profile]);
 
@@ -230,17 +231,16 @@ export default function TalentDashboard(): React.ReactElement {
     setProfileMsg("");
 
     try {
-      let parsedLinks = {};
-      try {
-        parsedLinks = JSON.parse(portfolioLinks);
-      } catch {
-        throw new Error("Portfolio links must be valid JSON.");
-      }
+      const payloadLinks = {
+        github: githubUrl.trim(),
+        linkedin: linkedinUrl.trim(),
+        website: websiteUrl.trim()
+      };
 
       // Validate portfolio links structure with Zod
-      const validation = PortfolioLinksSchema.safeParse(parsedLinks);
+      const validation = PortfolioLinksSchema.safeParse(payloadLinks);
       if (!validation.success) {
-        throw new Error("Invalid portfolio URLs. Ensure links begin with http:// or https://");
+        throw new Error("Invalid URL format. Links must start with http:// or https://");
       }
 
       const { error } = await supabase
@@ -264,42 +264,46 @@ export default function TalentDashboard(): React.ReactElement {
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem" }}>
-      {/* Dashboard Header */}
-      <header className="glass-panel animate-fade-in" style={{ padding: "1.5rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-        <div>
-          <h2 style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>
-            Hello, {profile?.full_name || "Talent Member"}
-          </h2>
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <span className="badge badge-emerald">Talent Partner</span>
-            <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{profile?.email}</span>
-          </div>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "1rem 2rem 2rem 2rem" }}>
+      {/* Navigation Bar */}
+      <nav className="navbar animate-fade-in">
+        <div className="navbar-brand">
+          <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ fontSize: "1.75rem" }}>⚡</span> EdgeTalent
+          </span>
         </div>
-        <button className="btn btn-secondary" onClick={signOut}>
-          Sign Out
-        </button>
-      </header>
+        
+        <div className="navbar-tabs">
+          {[
+            { id: "overview", label: "Overview" },
+            { id: "analyzer", label: "AI Skill-Gap" },
+            { id: "upskilling", label: "Upskilling" },
+            { id: "marketplace", label: "Marketplace" },
+            { id: "profile", label: "My Profile" }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              className={`nav-tab ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-      {/* Tabs Menu */}
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem", overflowX: "auto" }}>
-        {[
-          { id: "overview", label: "Overview" },
-          { id: "analyzer", label: "AI Skill-Gap Analyzer" },
-          { id: "upskilling", label: "Upskilling Hub" },
-          { id: "marketplace", label: "Marketplace" },
-          { id: "profile", label: "Profile Builder" }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            className={`btn ${activeTab === tab.id ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => setActiveTab(tab.id)}
-            style={{ whiteSpace: "nowrap" }}
-          >
-            {tab.label}
+        <div className="user-profile-menu">
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: "0.9rem", fontWeight: "600" }}>{profile?.full_name || "Talent Member"}</div>
+            <span className="badge badge-emerald" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem", marginTop: "0.2rem" }}>Talent</span>
+          </div>
+          <div className="avatar-badge">
+            {(profile?.full_name || "T")[0].toUpperCase()}
+          </div>
+          <button className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={signOut}>
+            Sign Out
           </button>
-        ))}
-      </div>
+        </div>
+      </nav>
 
       {/* Overview Content */}
       {activeTab === "overview" && (
@@ -391,15 +395,25 @@ export default function TalentDashboard(): React.ReactElement {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Technical Quiz/Assessment Answers (Optional)</label>
-                <textarea
-                  className="form-input"
-                  style={{ height: "80px", resize: "none" }}
-                  placeholder="Describe your answers to any quiz, coding tasks, or assessments..."
-                  value={quizAnswers}
-                  onChange={(e) => setQuizAnswers(e.target.value)}
-                />
+              <div className="collapsible-details">
+                <details>
+                  <summary className="collapsible-summary">
+                    <span>Add Assessment Answers (Optional)</span>
+                    <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>▼</span>
+                  </summary>
+                  <div className="collapsible-content">
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Technical Quiz/Assessment Answers</label>
+                      <textarea
+                        className="form-input"
+                        style={{ height: "80px", resize: "none" }}
+                        placeholder="Describe your answers to any quiz, coding tasks, or assessments..."
+                        value={quizAnswers}
+                        onChange={(e) => setQuizAnswers(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </details>
               </div>
 
               <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={analyzing}>
@@ -547,11 +561,11 @@ export default function TalentDashboard(): React.ReactElement {
         <div className="animate-fade-in glass-panel" style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
           <h3>Profile Builder</h3>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-            Manually update your name, biography, or portfolio link details.
+            Manually update your name, biography, and web portfolio links.
           </p>
 
           {profileMsg && (
-            <div className={`badge ${profileMsg.startsWith("Error") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
+            <div className={`badge ${profileMsg.startsWith("Error") || profileMsg.startsWith("Invalid") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
               {profileMsg}
             </div>
           )}
@@ -559,20 +573,30 @@ export default function TalentDashboard(): React.ReactElement {
           <form onSubmit={handleSaveProfile}>
             <div className="form-group">
               <label>Full Name</label>
-              <input type="text" className="form-input" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+              <input type="text" className="form-input" placeholder="Your Name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
             </div>
 
             <div className="form-group">
               <label>Biography Summary</label>
-              <textarea className="form-input" style={{ height: "100px" }} value={bio} onChange={(e) => setBio(e.target.value)} />
+              <textarea className="form-input" style={{ height: "100px" }} placeholder="Tell us about yourself..." value={bio} onChange={(e) => setBio(e.target.value)} />
             </div>
 
             <div className="form-group">
-              <label>Portfolio Links (JSON Format)</label>
-              <textarea className="form-input" style={{ height: "120px", fontFamily: "monospace" }} value={portfolioLinks} onChange={(e) => setPortfolioLinks(e.target.value)} />
+              <label>GitHub Profile URL</label>
+              <input type="url" className="form-input" placeholder="https://github.com/your-username" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} />
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={savingProfile}>
+            <div className="form-group">
+              <label>LinkedIn Profile URL</label>
+              <input type="url" className="form-input" placeholder="https://linkedin.com/in/your-profile" value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} />
+            </div>
+
+            <div className="form-group">
+              <label>Personal Website URL</label>
+              <input type="url" className="form-input" placeholder="https://yourportfolio.com" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} />
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "1rem" }} disabled={savingProfile}>
               {savingProfile ? "Saving Details..." : "Update Profile"}
             </button>
           </form>

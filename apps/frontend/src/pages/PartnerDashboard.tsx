@@ -22,7 +22,7 @@ export default function PartnerDashboard(): React.ReactElement {
   const [retryingProjectId, setRetryingProjectId] = useState<string>("");
 
   // AI Matcher states
-  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [expandedProjectId, setExpandedProjectId] = useState<string>("");
   const [matchedTalents, setMatchedTalents] = useState<any[]>([]);
   const [loadingTalents, setLoadingTalents] = useState<boolean>(false);
 
@@ -39,9 +39,6 @@ export default function PartnerDashboard(): React.ReactElement {
       if (!projErr && projs) {
         setProjects(projs);
         if (projs.length > 0) {
-          // Select the first project by default for the AI matcher
-          if (!selectedProjectId) setSelectedProjectId(projs[0].id);
-
           // Get application counts for partner's projects
           const projIds = projs.map((p) => p.id);
           const { count, error: appErr } = await supabase
@@ -57,7 +54,7 @@ export default function PartnerDashboard(): React.ReactElement {
     } finally {
       setLoadingOverview(false);
     }
-  }, [profile, selectedProjectId, supabase]);
+  }, [profile, supabase]);
 
   // Run AI Talent Matching via RPC
   const loadMatches = useCallback(async (projId: string) => {
@@ -86,10 +83,12 @@ export default function PartnerDashboard(): React.ReactElement {
   }, [loadOverview]);
 
   useEffect(() => {
-    if (activeTab === "matcher" && selectedProjectId) {
-      loadMatches(selectedProjectId);
+    if (expandedProjectId) {
+      loadMatches(expandedProjectId);
+    } else {
+      setMatchedTalents([]);
     }
-  }, [activeTab, selectedProjectId, loadMatches]);
+  }, [expandedProjectId, loadMatches]);
 
   // Post project
   const handlePostProject = async (e: React.FormEvent) => {
@@ -184,39 +183,46 @@ export default function PartnerDashboard(): React.ReactElement {
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "2rem" }}>
-      {/* Dashboard Header */}
-      <header className="glass-panel animate-fade-in" style={{ padding: "1.5rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-        <div>
-          <h2 style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>
-            {profile?.full_name || "Enterprise Partner"}
-          </h2>
-          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <span className="badge badge-cyan">Company Partner</span>
-            <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{profile?.email}</span>
-          </div>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "1rem 2rem 2rem 2rem" }}>
+      {/* Navigation Bar */}
+      <nav className="navbar animate-fade-in">
+        <div className="navbar-brand">
+          <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ fontSize: "1.75rem" }}>⚡</span> EdgeTalent
+          </span>
         </div>
-        <button className="btn btn-secondary" onClick={signOut}>
-          Sign Out
-        </button>
-      </header>
+        
+        <div className="navbar-tabs">
+          {[
+            { id: "overview", label: "Projects Dashboard" },
+            { id: "portal", label: "Post New Project" }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              className={`nav-tab ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setExpandedProjectId("");
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-      {/* Tabs Menu */}
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-        {[
-          { id: "overview", label: "Partner Overview" },
-          { id: "portal", label: "Project Manager Portal" },
-          { id: "matcher", label: "AI Talent Matcher" }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            className={`btn ${activeTab === tab.id ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
+        <div className="user-profile-menu">
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: "0.9rem", fontWeight: "600" }}>{profile?.full_name || "Enterprise Partner"}</div>
+            <span className="badge badge-cyan" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem", marginTop: "0.2rem" }}>Partner</span>
+          </div>
+          <div className="avatar-badge">
+            {(profile?.full_name || "P")[0].toUpperCase()}
+          </div>
+          <button className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={signOut}>
+            Sign Out
           </button>
-        ))}
-      </div>
+        </div>
+      </nav>
 
       {/* Overview Tab */}
       {activeTab === "overview" && (
@@ -244,40 +250,93 @@ export default function PartnerDashboard(): React.ReactElement {
               <p style={{ color: "var(--text-secondary)" }}>No projects posted. Head to the Project Portal to publish a deliverables scope.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {projects.map((proj) => (
-                  <div key={proj.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <h4 style={{ fontSize: "1.1rem" }}>{proj.title}</h4>
-                        {!proj.embedding && (
-                          <span className="badge badge-rose" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem" }}>AI Inactive</span>
-                        )}
+                {projects.map((proj) => {
+                  const isExpanded = expandedProjectId === proj.id;
+                  return (
+                    <div key={proj.id} className="glass-panel" style={{ padding: "1.5rem", marginBottom: "1rem" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                            <h4 style={{ fontSize: "1.2rem", margin: 0 }}>{proj.title}</h4>
+                            {!proj.embedding && (
+                              <span className="badge badge-rose" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem" }}>AI Inactive</span>
+                            )}
+                          </div>
+                          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0.25rem 0" }}>
+                            Scope: <b>{proj.scope}</b> | Budget: <b>${proj.budget}</b>
+                          </p>
+                          <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
+                            {proj.description}
+                          </p>
+                        </div>
+                        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                          {!proj.embedding ? (
+                            <button 
+                              className="btn btn-warning" 
+                              disabled={retryingProjectId === proj.id}
+                              onClick={() => handleGenerateEmbedding(proj.id)}
+                              style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
+                            >
+                              {retryingProjectId === proj.id ? "Activating AI..." : "Activate AI Matching"}
+                            </button>
+                          ) : (
+                            <button 
+                              className={`btn ${isExpanded ? "btn-secondary" : "btn-primary"}`}
+                              onClick={() => setExpandedProjectId(isExpanded ? "" : proj.id)}
+                            >
+                              {isExpanded ? "Hide Talent Matches" : "Find Talent Matches"}
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                        Scope: <b>{proj.scope}</b> | Budget: <b>${proj.budget}</b>
-                      </p>
-                    </div>
-                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                      {!proj.embedding ? (
-                        <button 
-                          className="btn btn-warning" 
-                          disabled={retryingProjectId === proj.id}
-                          onClick={() => handleGenerateEmbedding(proj.id)}
-                          style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
-                        >
-                          {retryingProjectId === proj.id ? "Activating AI..." : "Activate AI Matching"}
-                        </button>
-                      ) : (
-                        <button className="btn btn-secondary" onClick={() => {
-                          setSelectedProjectId(proj.id);
-                          setActiveTab("matcher");
-                        }}>
-                          Find Talent Matches
-                        </button>
+
+                      {/* Inline Talent Matches */}
+                      {isExpanded && (
+                        <div className="expandable-section">
+                          <h5 style={{ fontSize: "1rem", color: "var(--color-cyan)", marginBottom: "1rem" }}>
+                            AI Talent Recommendations
+                          </h5>
+                          
+                          {loadingTalents ? (
+                            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                              Running semantic vector matches against talent profiles...
+                            </p>
+                          ) : matchedTalents.length === 0 ? (
+                            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                              No profiles matched with high similarity. Ensure talent members have analyzed their profiles!
+                            </p>
+                          ) : (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "0.5rem" }}>
+                              {matchedTalents.map((talent) => (
+                                <div key={talent.talent_id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255, 255, 255, 0.02)", border: "1px solid var(--glass-border)", borderRadius: "var(--radius-sm)", padding: "1rem" }}>
+                                  <div style={{ flex: 1, marginRight: "1.5rem" }}>
+                                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
+                                      <h6 style={{ fontSize: "1rem", margin: 0 }}>{talent.full_name}</h6>
+                                      {talent.similarity !== null && (
+                                        <span className="badge badge-cyan" style={{ fontSize: "0.65rem" }}>{Math.round(talent.similarity * 100)}% Match</span>
+                                      )}
+                                    </div>
+                                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>{talent.bio}</p>
+                                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                                      {talent.skills.map((skill: string, idx: number) => (
+                                        <span key={idx} className="badge badge-emerald" style={{ fontSize: "0.65rem" }}>{skill}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <a href={`mailto:${talent.email}`} className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}>
+                                      Contact
+                                    </a>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -337,65 +396,7 @@ export default function PartnerDashboard(): React.ReactElement {
         </div>
       )}
 
-      {/* AI Talent Matcher */}
-      {activeTab === "matcher" && (
-        <div className="animate-fade-in">
-          <div className="glass-panel" style={{ padding: "2.5rem", marginBottom: "2rem" }}>
-            <h3>Semantic AI Candidate Matcher</h3>
-            <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
-              Select a project description to execute a vector similarity search across all registered Talent profiles.
-            </p>
 
-            <div className="form-group" style={{ maxWidth: "400px" }}>
-              <label>Select Project Scope</label>
-              <select 
-                className="form-select" 
-                value={selectedProjectId} 
-                onChange={(e) => setSelectedProjectId(e.target.value)}
-              >
-                <option value="">-- Choose Project --</option>
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>{p.title}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {!selectedProjectId ? (
-            <p style={{ color: "var(--text-secondary)" }}>Choose a project to see matches.</p>
-          ) : loadingTalents ? (
-            <p style={{ color: "var(--text-secondary)" }}>Running pgvector similarity matches against talent profiles...</p>
-          ) : matchedTalents.length === 0 ? (
-            <p style={{ color: "var(--text-secondary)" }}>No profiles matched with high similarity. Ensure talent members have analyzed their profiles!</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              {matchedTalents.map((talent) => (
-                <div key={talent.talent_id} className="glass-panel" style={{ padding: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ flex: 1, marginRight: "2rem" }}>
-                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.5rem" }}>
-                      <h4 style={{ fontSize: "1.25rem" }}>{talent.full_name}</h4>
-                      {talent.similarity !== null && (
-                        <span className="badge badge-cyan">{Math.round(talent.similarity * 100)}% Match</span>
-                      )}
-                    </div>
-                    <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginBottom: "1rem" }}>{talent.bio}</p>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
-                      {talent.skills.map((skill: string, idx: number) => (
-                        <span key={idx} className="badge badge-emerald" style={{ fontSize: "0.7rem" }}>{skill}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <a href={`mailto:${talent.email}`} className="btn btn-primary">
-                      Contact Candidate
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
     </div>
   );

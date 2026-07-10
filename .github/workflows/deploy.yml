@@ -45,11 +45,9 @@ jobs:
 
       - name: Build application
         run: pnpm build
-        # Note: If you want to connect to a live Supabase database on deploy,
-        # you can add environment variables here like:
-        # env:
-        #   VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-        #   VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3

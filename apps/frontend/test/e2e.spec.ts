@@ -37,11 +37,11 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await selectTalentBtn.click();
 
     // 4. Verify Dashboard Welcome message
-    const welcomeHeader = page.locator('h2', { hasText: 'Hello, Alex Developer' });
+    const welcomeHeader = page.locator('.user-profile-menu', { hasText: 'Alex Developer' });
     await expect(welcomeHeader).toBeVisible();
 
     // 5. Navigate to Profile Builder and update info
-    const profileTabBtn = page.locator('button', { hasText: 'Profile Builder' });
+    const profileTabBtn = page.locator('button', { hasText: 'My Profile' });
     await profileTabBtn.click();
 
     const bioInput = page.locator('label:has-text("Biography Summary") + textarea');
@@ -53,7 +53,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await expect(successBadge).toBeVisible();
 
     // 6. Navigate to AI Skill-Gap Analyzer
-    const analyzerTabBtn = page.locator('button', { hasText: 'AI Skill-Gap Analyzer' });
+    const analyzerTabBtn = page.locator('button', { hasText: 'AI Skill-Gap' });
     await analyzerTabBtn.click();
 
     const cvInput = page.locator('label:has-text("CV / Resume Text") + textarea');
@@ -70,7 +70,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await expect(gapBadge).toBeVisible();
 
     // 7. Check Upskilling Hub (should list recommended courses based on gaps)
-    const upskillingTabBtn = page.locator('button', { hasText: 'Upskilling Hub' });
+    const upskillingTabBtn = page.locator('button', { hasText: 'Upskilling' });
     await upskillingTabBtn.click();
     const coursesTitle = page.locator('h3', { hasText: 'Recommended Upskilling Paths' });
     await expect(coursesTitle).toBeVisible();
@@ -138,11 +138,11 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await selectPartnerBtn.click();
 
     // 4. Verify Dashboard Header
-    const welcomeHeader = page.locator('h2', { hasText: 'Google DeepMind Partner' });
+    const welcomeHeader = page.locator('.user-profile-menu', { hasText: 'Google DeepMind Partner' });
     await expect(welcomeHeader).toBeVisible();
 
     // 5. Navigate to Project Manager Portal and post a new project
-    const portalTabBtn = page.locator('button', { hasText: 'Project Manager Portal' });
+    const portalTabBtn = page.locator('button', { hasText: 'Post New Project' });
     await portalTabBtn.click();
 
     const projTitleInput = page.locator('label:has-text("Project Title") + input');
@@ -162,23 +162,21 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await expect(successMsg).toBeVisible();
 
     // 6. Go to Partner Overview and verify the project shows up
-    const overviewTabBtn = page.locator('button', { hasText: 'Partner Overview' });
+    const overviewTabBtn = page.locator('button', { hasText: 'Projects Dashboard' });
     await overviewTabBtn.click();
 
     const postedProjectTitle = page.locator('h4', { hasText: 'Next-Gen Quantum Compiler' });
     await expect(postedProjectTitle).toBeVisible();
 
-    // 7. Go to AI Talent Matcher and view matched talent list
-    const matcherTabBtn = page.locator('button', { hasText: 'AI Talent Matcher' });
-    await matcherTabBtn.click();
-
-    const selectProjectDropdown = page.locator('label:has-text("Select Project Scope") + select');
-    await selectProjectDropdown.selectOption({ label: 'Next-Gen Quantum Compiler' });
+    // 7. Expand matches inline on the dashboard
+    const findMatchesBtn = page.locator('button', { hasText: 'Find Talent Matches' }).first();
+    await expect(findMatchesBtn).toBeVisible();
+    await findMatchesBtn.click();
 
     // Verify candidate matches list is displayed
-    const candidateName = page.locator('h4', { hasText: 'Mock AI Expert' });
+    const candidateName = page.locator('h6', { hasText: 'Mock AI Expert' });
     await expect(candidateName).toBeVisible();
-    const contactBtn = page.locator('a', { hasText: 'Contact Candidate' });
+    const contactBtn = page.locator('a', { hasText: 'Contact' });
     await expect(contactBtn).toBeVisible();
     await expect(contactBtn).toHaveAttribute('href', 'mailto:expert@edgetalent.com');
 
