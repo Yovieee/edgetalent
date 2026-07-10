@@ -5,6 +5,16 @@ import { ProjectSchema } from "@edgetalent/shared";
 export default function PartnerDashboard(): React.ReactElement {
   const { supabase, profile, signOut } = useSupabase();
   const [activeTab, setActiveTab] = useState<string>("overview");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
+
+  const toggleSidebar = () => {
+    if (window.innerWidth <= 768) {
+      setIsMobileOpen(!isMobileOpen);
+    } else {
+      setIsSidebarCollapsed(!isSidebarCollapsed);
+    }
+  };
 
   // Overview states
   const [projects, setProjects] = useState<any[]>([]);
@@ -121,7 +131,7 @@ export default function PartnerDashboard(): React.ReactElement {
       }
 
       // Insert project
-      const { data: project, error: insertErr } = await supabase
+      const { error: insertErr } = await supabase
         .from("projects")
         .insert(validation.data)
         .select()
@@ -169,221 +179,284 @@ export default function PartnerDashboard(): React.ReactElement {
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "1rem 2rem 2rem 2rem" }}>
-      {/* Navigation Bar */}
-      <nav className="navbar animate-fade-in">
-        <div className="navbar-brand">
+    <div className="dashboard-layout">
+      {/* Backdrop for mobile drawer */}
+      <div className={`sidebar-overlay ${isMobileOpen ? "active" : ""}`} onClick={() => setIsMobileOpen(false)} />
+
+      {/* Sidebar Navigation */}
+      <aside className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""} ${isMobileOpen ? "open" : ""}`}>
+        <div className="sidebar-brand">
           <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <span style={{ fontSize: "1.75rem" }}>⚡</span> EdgeTalent
+            <span style={{ fontSize: "1.5rem" }}>⚡</span>
+            <span className="sidebar-brand-text">EdgeTalent</span>
           </span>
+          {isMobileOpen && (
+            <button className="hamburger-btn" onClick={() => setIsMobileOpen(false)} style={{ padding: "0.25rem" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          )}
         </div>
-        
-        <div className="navbar-tabs">
+
+        <div className="sidebar-menu">
           {[
-            { id: "overview", label: "Projects Dashboard" },
-            { id: "portal", label: "Post New Project" }
+            { id: "overview", label: "Projects Dashboard", icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="9" />
+                <rect x="14" y="3" width="7" height="5" />
+                <rect x="14" y="12" width="7" height="9" />
+                <rect x="3" y="16" width="7" height="5" />
+              </svg>
+            )},
+            { id: "portal", label: "Post New Project", icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="16" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+              </svg>
+            )}
           ].map((tab) => (
             <button
               key={tab.id}
-              className={`nav-tab ${activeTab === tab.id ? "active" : ""}`}
+              className={`sidebar-menu-btn ${activeTab === tab.id ? "active" : ""}`}
               onClick={() => {
                 setActiveTab(tab.id);
                 setExpandedProjectId("");
+                setIsMobileOpen(false);
               }}
+              title={tab.label}
             >
-              {tab.label}
+              {tab.icon}
+              <span className="sidebar-menu-label">{tab.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="user-profile-menu">
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: "0.9rem", fontWeight: "600" }}>{profile?.full_name || "Enterprise Partner"}</div>
-            <span className="badge badge-cyan" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem", marginTop: "0.2rem" }}>Partner</span>
+        <div className="sidebar-footer">
+          <div className="sidebar-user-card">
+            <div className="sidebar-user-avatar">
+              {(profile?.full_name || "P")[0].toUpperCase()}
+            </div>
+            <div className="sidebar-user-info">
+              <span className="sidebar-user-name">{profile?.full_name || "Enterprise Partner"}</span>
+              <span className="sidebar-user-role">Partner</span>
+            </div>
           </div>
-          <div className="avatar-badge">
-            {(profile?.full_name || "P")[0].toUpperCase()}
-          </div>
-          <button className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={signOut}>
-            Sign Out
+          <button className="btn btn-secondary sidebar-signout-btn" onClick={signOut} title="Sign Out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span>Sign Out</span>
           </button>
         </div>
-      </nav>
+      </aside>
 
-      {/* Overview Tab */}
-      {activeTab === "overview" && (
-        <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
-            <div className="glass-panel" style={{ padding: "1.5rem" }}>
-              <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.5rem", fontSize: "0.85rem", textTransform: "uppercase" }}>Active Projects</h4>
-              <p style={{ fontSize: "2rem", fontWeight: "bold", color: "var(--color-cyan)" }}>
-                {projects.length} Posted
-              </p>
-            </div>
-            <div className="glass-panel" style={{ padding: "1.5rem" }}>
-              <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.5rem", fontSize: "0.85rem", textTransform: "uppercase" }}>Total Applicants</h4>
-              <p style={{ fontSize: "2rem", fontWeight: "bold", color: "var(--color-purple)" }}>
-                {totalApplications} Submissions
-              </p>
-            </div>
+      {/* Main Content Area */}
+      <div className="dashboard-main">
+        <header className="dashboard-header">
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <button className="hamburger-btn" onClick={toggleSidebar}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <h2 className="dashboard-header-title">
+              {activeTab === "overview" && "Projects Dashboard"}
+              {activeTab === "portal" && "Post New Project"}
+            </h2>
           </div>
 
-          <div className="glass-panel" style={{ padding: "2rem" }}>
-            <h3 style={{ marginBottom: "1.5rem" }}>My Project Postings</h3>
-            {loadingOverview ? (
-              <p style={{ color: "var(--text-secondary)" }}>Loading overview...</p>
-            ) : projects.length === 0 ? (
-              <p style={{ color: "var(--text-secondary)" }}>No projects posted. Head to the Project Portal to publish a deliverables scope.</p>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {projects.map((proj) => {
-                  const isExpanded = expandedProjectId === proj.id;
-                  return (
-                    <div key={proj.id} className="glass-panel" style={{ padding: "1.5rem", marginBottom: "1rem" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div>
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-                            <h4 style={{ fontSize: "1.2rem", margin: 0 }}>{proj.title}</h4>
-                            {!proj.embedding && (
-                              <span className="badge badge-rose" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem" }}>AI Inactive</span>
-                            )}
-                          </div>
-                          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0.25rem 0" }}>
-                            Scope: <b>{proj.scope}</b> | Budget: <b>${proj.budget}</b>
-                          </p>
-                          <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
-                            {proj.description}
-                          </p>
-                        </div>
-                        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                          {!proj.embedding ? (
-                            <button 
-                              className="btn btn-warning" 
-                              disabled={retryingProjectId === proj.id}
-                              onClick={() => handleGenerateEmbedding(proj.id)}
-                              style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
-                            >
-                              {retryingProjectId === proj.id ? "Activating AI..." : "Activate AI Matching"}
-                            </button>
-                          ) : (
-                            <button 
-                              className={`btn ${isExpanded ? "btn-secondary" : "btn-primary"}`}
-                              onClick={() => setExpandedProjectId(isExpanded ? "" : proj.id)}
-                            >
-                              {isExpanded ? "Hide Talent Matches" : "Find Talent Matches"}
-                            </button>
-                          )}
-                        </div>
-                      </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+            <div style={{ textAlign: "right" }} className="header-user-info">
+              <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>{profile?.full_name || "Enterprise Partner"}</div>
+              <span className="badge badge-cyan" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Partner</span>
+            </div>
+            <div className="avatar-badge" style={{ width: "32px", height: "32px", fontSize: "0.85rem", margin: 0 }}>
+              {(profile?.full_name || "P")[0].toUpperCase()}
+            </div>
+          </div>
+        </header>
 
-                      {/* Inline Talent Matches */}
-                      {isExpanded && (
-                        <div className="expandable-section">
-                          <h5 style={{ fontSize: "1rem", color: "var(--color-cyan)", marginBottom: "1rem" }}>
-                            AI Talent Recommendations
-                          </h5>
-                          
-                          {loadingTalents ? (
-                            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-                              Running semantic vector matches against talent profiles...
-                            </p>
-                          ) : matchedTalents.length === 0 ? (
-                            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
-                              No profiles matched with high similarity. Ensure talent members have analyzed their profiles!
-                            </p>
-                          ) : (
-                            <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "0.5rem" }}>
-                              {matchedTalents.map((talent) => (
-                                <div key={talent.talent_id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255, 255, 255, 0.02)", border: "1px solid var(--glass-border)", borderRadius: "var(--radius-sm)", padding: "1rem" }}>
-                                  <div style={{ flex: 1, marginRight: "1.5rem" }}>
-                                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
-                                      <h6 style={{ fontSize: "1rem", margin: 0 }}>{talent.full_name}</h6>
-                                      {talent.similarity !== null && (
-                                        <span className="badge badge-cyan" style={{ fontSize: "0.65rem" }}>{Math.round(talent.similarity * 100)}% Match</span>
-                                      )}
+        <main className="dashboard-content">
+          {/* Overview Tab */}
+          {activeTab === "overview" && (
+            <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
+                <div className="glass-panel" style={{ padding: "1.5rem" }}>
+                  <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.5rem", fontSize: "0.85rem", textTransform: "uppercase" }}>Active Projects</h4>
+                  <p style={{ fontSize: "2rem", fontWeight: "bold", color: "var(--color-cyan)" }}>
+                    {projects.length} Posted
+                  </p>
+                </div>
+                <div className="glass-panel" style={{ padding: "1.5rem" }}>
+                  <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.5rem", fontSize: "0.85rem", textTransform: "uppercase" }}>Total Applicants</h4>
+                  <p style={{ fontSize: "2rem", fontWeight: "bold", color: "var(--color-purple)" }}>
+                    {totalApplications} Submissions
+                  </p>
+                </div>
+              </div>
+
+              <div className="glass-panel" style={{ padding: "2rem" }}>
+                <h3 style={{ marginBottom: "1.5rem" }}>My Project Postings</h3>
+                {loadingOverview ? (
+                  <p style={{ color: "var(--text-secondary)" }}>Loading overview...</p>
+                ) : projects.length === 0 ? (
+                  <p style={{ color: "var(--text-secondary)" }}>No projects posted. Head to the Project Portal to publish a deliverables scope.</p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {projects.map((proj) => {
+                      const isExpanded = expandedProjectId === proj.id;
+                      return (
+                        <div key={proj.id} className="glass-panel" style={{ padding: "1.5rem", marginBottom: "1rem" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                                <h4 style={{ fontSize: "1.2rem", margin: 0 }}>{proj.title}</h4>
+                                {!proj.embedding && (
+                                  <span className="badge badge-rose" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem" }}>AI Inactive</span>
+                                )}
+                              </div>
+                              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0.25rem 0" }}>
+                                Scope: <b>{proj.scope}</b> | Budget: <b>${proj.budget}</b>
+                              </p>
+                              <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
+                                {proj.description}
+                              </p>
+                            </div>
+                            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                              {!proj.embedding ? (
+                                <button 
+                                  className="btn btn-warning" 
+                                  disabled={retryingProjectId === proj.id}
+                                  onClick={() => handleGenerateEmbedding(proj.id)}
+                                  style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
+                                >
+                                  {retryingProjectId === proj.id ? "Activating AI..." : "Activate AI Matching"}
+                                </button>
+                              ) : (
+                                <button 
+                                  className={`btn ${isExpanded ? "btn-secondary" : "btn-primary"}`}
+                                  onClick={() => setExpandedProjectId(isExpanded ? "" : proj.id)}
+                                >
+                                  {isExpanded ? "Hide Talent Matches" : "Find Talent Matches"}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Inline Talent Matches */}
+                          {isExpanded && (
+                            <div className="expandable-section">
+                              <h5 style={{ fontSize: "1rem", color: "var(--color-cyan)", marginBottom: "1rem" }}>
+                                AI Talent Recommendations
+                              </h5>
+                              
+                              {loadingTalents ? (
+                                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                                  Running semantic vector matches against talent profiles...
+                                </p>
+                              ) : matchedTalents.length === 0 ? (
+                                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                                  No profiles matched with high similarity. Ensure talent members have analyzed their profiles!
+                                </p>
+                              ) : (
+                                <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "0.5rem" }}>
+                                  {matchedTalents.map((talent) => (
+                                    <div key={talent.talent_id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(255, 255, 255, 0.02)", border: "1px solid var(--glass-border)", borderRadius: "var(--radius-sm)", padding: "1rem" }}>
+                                      <div style={{ flex: 1, marginRight: "1.5rem" }}>
+                                        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
+                                          <h6 style={{ fontSize: "1rem", margin: 0 }}>{talent.full_name}</h6>
+                                          {talent.similarity !== null && (
+                                            <span className="badge badge-cyan" style={{ fontSize: "0.65rem" }}>{Math.round(talent.similarity * 100)}% Match</span>
+                                          )}
+                                        </div>
+                                        <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>{talent.bio}</p>
+                                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                                          {talent.skills.map((skill: string, idx: number) => (
+                                            <span key={idx} className="badge badge-emerald" style={{ fontSize: "0.65rem" }}>{skill}</span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <a href={`mailto:${talent.email}`} className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}>
+                                          Contact
+                                        </a>
+                                      </div>
                                     </div>
-                                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>{talent.bio}</p>
-                                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
-                                      {talent.skills.map((skill: string, idx: number) => (
-                                        <span key={idx} className="badge badge-emerald" style={{ fontSize: "0.65rem" }}>{skill}</span>
-                                      ))}
-                                    </div>
-                                  </div>
-                                  <div>
-                                    <a href={`mailto:${talent.email}`} className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }}>
-                                      Contact
-                                    </a>
-                                  </div>
+                                  ))}
                                 </div>
-                              ))}
+                              )}
                             </div>
                           )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Project Manager Portal */}
-      {activeTab === "portal" && (
-        <div className="animate-fade-in glass-panel" style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
-          <h3>Publish Industrial Project</h3>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-            Add technical deliverables, required skills, and scope. This triggers our embeddings Deno agent.
-          </p>
-
-          {portalMsg && (
-            <div className={`badge ${portalMsg.startsWith("Error") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
-              {portalMsg}
             </div>
           )}
 
-          <form onSubmit={handlePostProject}>
-            <div className="form-group">
-              <label>Project Title</label>
-              <input type="text" className="form-input" placeholder="e.g. EdgeTalent Upgrades" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          {/* Project Manager Portal */}
+          {activeTab === "portal" && (
+            <div className="animate-fade-in glass-panel" style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
+              <h3>Publish Industrial Project</h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+                Add technical deliverables, required skills, and scope. This triggers our embeddings Deno agent.
+              </p>
+
+              {portalMsg && (
+                <div className={`badge ${portalMsg.startsWith("Error") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
+                  {portalMsg}
+                </div>
+              )}
+
+              <form onSubmit={handlePostProject}>
+                <div className="form-group">
+                  <label>Project Title</label>
+                  <input type="text" className="form-input" placeholder="e.g. EdgeTalent Upgrades" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Description & Scope</label>
+                  <textarea className="form-input" style={{ height: "100px" }} placeholder="Describe deliverables and parameters..." value={description} onChange={(e) => setDescription(e.target.value)} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Required Skills (comma-separated)</label>
+                  <input type="text" className="form-input" placeholder="React, TypeScript, Supabase, Deno" value={requiredSkills} onChange={(e) => setRequiredSkills(e.target.value)} required />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                  <div className="form-group">
+                    <label>Budget ($)</label>
+                    <input type="number" className="form-input" placeholder="5000" value={budget} onChange={(e) => setBudget(e.target.value)} />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Scope</label>
+                    <select className="form-select" value={scope} onChange={(e) => setScope(e.target.value as any)}>
+                      <option value="short-term">Short-term</option>
+                      <option value="medium-term">Medium-term</option>
+                      <option value="long-term">Long-term</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "1rem" }} disabled={posting}>
+                  {posting ? "Publishing Project..." : "Post Project Scope"}
+                </button>
+              </form>
             </div>
-
-            <div className="form-group">
-              <label>Description & Scope</label>
-              <textarea className="form-input" style={{ height: "100px" }} placeholder="Describe deliverables and parameters..." value={description} onChange={(e) => setDescription(e.target.value)} required />
-            </div>
-
-            <div className="form-group">
-              <label>Required Skills (comma-separated)</label>
-              <input type="text" className="form-input" placeholder="React, TypeScript, Supabase, Deno" value={requiredSkills} onChange={(e) => setRequiredSkills(e.target.value)} required />
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div className="form-group">
-                <label>Budget ($)</label>
-                <input type="number" className="form-input" placeholder="5000" value={budget} onChange={(e) => setBudget(e.target.value)} />
-              </div>
-
-              <div className="form-group">
-                <label>Scope</label>
-                <select className="form-select" value={scope} onChange={(e) => setScope(e.target.value as any)}>
-                  <option value="short-term">Short-term</option>
-                  <option value="medium-term">Medium-term</option>
-                  <option value="long-term">Long-term</option>
-                </select>
-              </div>
-            </div>
-
-            <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "1rem" }} disabled={posting}>
-              {posting ? "Publishing Project..." : "Post Project Scope"}
-            </button>
-          </form>
-        </div>
-      )}
-
-
-
+          )}
+        </main>
+      </div>
     </div>
   );
 }
