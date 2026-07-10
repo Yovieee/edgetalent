@@ -5,34 +5,34 @@
   --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Colors */
-  --bg-primary: #06050b;
-  --bg-secondary: #12101e;
-  --bg-tertiary: #19162b;
-  --glass-bg: rgba(25, 22, 43, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.06);
-  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-hover: rgba(0, 0, 0, 0.15);
   
-  --color-cyan: #06b6d4;
-  --color-purple: #8b5cf6;
-  --color-emerald: #10b981;
-  --color-amber: #f59e0b;
-  --color-rose: #f43f5e;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --color-cyan: #0891b2;
+  --color-purple: #7c3aed;
+  --color-emerald: #059669;
+  --color-amber: #d97706;
+  --color-rose: #e11d48;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
   --text-muted: #64748b;
   
   /* Gradients */
   --grad-cyan-purple: linear-gradient(135deg, var(--color-cyan) 0%, var(--color-purple) 100%);
   --grad-emerald-cyan: linear-gradient(135deg, var(--color-emerald) 0%, var(--color-cyan) 100%);
   --grad-amber-rose: linear-gradient(135deg, var(--color-amber) 0%, var(--color-rose) 100%);
-  --grad-dark: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  --grad-dark: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
 
   /* Shadows & Glows */
-  --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.2);
-  --glow-purple: 0 0 20px rgba(139, 92, 246, 0.2);
-  --glow-emerald: 0 0 20px rgba(16, 185, 129, 0.2);
-  --glow-amber: 0 0 20px rgba(245, 158, 11, 0.2);
-  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glow-cyan: 0 4px 12px rgba(8, 145, 178, 0.15);
+  --glow-purple: 0 4px 12px rgba(124, 58, 237, 0.15);
+  --glow-emerald: 0 4px 12px rgba(5, 150, 105, 0.15);
+  --glow-amber: 0 4px 12px rgba(217, 119, 6, 0.15);
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.06);
 
   --radius-sm: 8px;
   --radius-md: 16px;
@@ -48,9 +48,9 @@
 body {
   background-color: var(--bg-primary);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-    linear-gradient(to bottom, var(--bg-primary), #0e0d16);
+    radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.06) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(8, 145, 178, 0.06) 0px, transparent 50%),
+    linear-gradient(to bottom, var(--bg-primary), #f1f5f9);
   background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -203,7 +203,7 @@ a {
 }
 
 .form-input, .form-textarea, .form-select {
-  background: rgba(8, 7, 14, 0.6);
+  background: rgba(255, 255, 255, 0.8);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -217,8 +217,8 @@ a {
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
   border-color: var(--color-cyan);
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
-  background: rgba(8, 7, 14, 0.8);
+  box-shadow: 0 0 10px rgba(8, 145, 178, 0.1);
+  background: var(--bg-secondary);
 }
 
 /* Badge System */
@@ -234,33 +234,33 @@ a {
 }
 
 .badge-cyan {
-  background: rgba(6, 182, 212, 0.12);
+  background: rgba(8, 145, 178, 0.08);
   color: var(--color-cyan);
-  border: 1px solid rgba(6, 182, 212, 0.2);
+  border: 1px solid rgba(8, 145, 178, 0.2);
 }
 
 .badge-purple {
-  background: rgba(139, 92, 246, 0.12);
+  background: rgba(124, 58, 237, 0.08);
   color: var(--color-purple);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
 .badge-emerald {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(5, 150, 105, 0.08);
   color: var(--color-emerald);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(5, 150, 105, 0.2);
 }
 
 .badge-amber {
-  background: rgba(245, 158, 11, 0.12);
+  background: rgba(217, 119, 6, 0.08);
   color: var(--color-amber);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(217, 119, 6, 0.2);
 }
 
 .badge-rose {
-  background: rgba(244, 63, 94, 0.12);
+  background: rgba(225, 29, 72, 0.08);
   color: var(--color-rose);
-  border: 1px solid rgba(244, 63, 94, 0.2);
+  border: 1px solid rgba(225, 29, 72, 0.2);
 }
 
 /* Navigation Bar */
@@ -370,7 +370,7 @@ a {
 .collapsible-details {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
-  background: rgba(8, 7, 14, 0.4);
+  background: var(--bg-secondary);
   overflow: hidden;
   margin-bottom: 1.25rem;
 }
@@ -389,13 +389,13 @@ a {
 }
 
 .collapsible-summary:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.02);
   color: var(--text-primary);
 }
 
 .collapsible-content {
   padding: 1.25rem;
   border-top: 1px solid var(--glass-border);
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.02);
 }
 
