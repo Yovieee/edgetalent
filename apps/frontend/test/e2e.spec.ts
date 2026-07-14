@@ -43,6 +43,14 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
             skills_taught: ["pgvector"],
             provider: "EdgeTalent Academy",
             link: "https://example.com"
+          },
+          {
+            id: "00000000-0000-0000-0000-000000000025",
+            title: "Startup School: How to Start a Startup",
+            description: "A free, 10-week online course for founders and aspiring entrepreneurs by Y Combinator.",
+            skills_taught: ["Entrepreneurship", "Pitching"],
+            provider: "Y Combinator",
+            link: "https://www.startupschool.org/"
           }
         ])
       });
@@ -383,7 +391,18 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await expect(contactBtn).toBeVisible();
     await expect(contactBtn).toHaveAttribute('href', 'mailto:expert@edgetalent.com');
 
-    // 8. Sign out and return home
+    // 8. Navigate to Entrepreneurship Academy
+    const coursesTabBtn = page.locator('button', { hasText: 'Entrepreneurship Academy' });
+    await expect(coursesTabBtn).toBeVisible();
+    await coursesTabBtn.click();
+
+    // Verify training courses are displayed
+    const academyHeader = page.locator('h3', { hasText: 'Entrepreneurship & Business Training' });
+    await expect(academyHeader).toBeVisible();
+    const courseItem = page.locator('h4', { hasText: 'Startup School: How to Start a Startup' });
+    await expect(courseItem).toBeVisible();
+
+    // 9. Sign out and return home
     const signOutBtn = page.locator('button', { hasText: 'Sign Out' });
     await signOutBtn.click();
 

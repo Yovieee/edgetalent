@@ -36,6 +36,10 @@ export default function PartnerDashboard(): React.ReactElement {
   const [matchedTalents, setMatchedTalents] = useState<any[]>([]);
   const [loadingTalents, setLoadingTalents] = useState<boolean>(false);
 
+  // Course states
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loadingCourses, setLoadingCourses] = useState<boolean>(false);
+
   // Load overview details
   const loadOverview = useCallback(async () => {
     if (!profile) return;
@@ -88,6 +92,40 @@ export default function PartnerDashboard(): React.ReactElement {
     }
   }, [supabase]);
 
+  // Fetch entrepreneurship training courses
+  const loadCourses = useCallback(async () => {
+    setLoadingCourses(true);
+    try {
+      const entrepreneurshipSkills = [
+        "Entrepreneurship",
+        "Business Strategy",
+        "Venture Capital",
+        "Product-Market Fit",
+        "Startup Scaling",
+        "Pitching",
+        "Financial Modeling",
+        "Marketing Strategy",
+        "Leadership"
+      ];
+      const { data, error } = await supabase
+        .from("courses")
+        .select("*")
+        .overlaps("skills_taught", entrepreneurshipSkills);
+
+      if (!error && data && data.length > 0) {
+        setCourses(data);
+      } else {
+        // Fallback: load all courses if none matched or if error occurred
+        const { data: all } = await supabase.from("courses").select("*").limit(6);
+        setCourses(all || []);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingCourses(false);
+    }
+  }, [supabase]);
+
   useEffect(() => {
     loadOverview();
   }, [loadOverview]);
@@ -99,6 +137,12 @@ export default function PartnerDashboard(): React.ReactElement {
       setMatchedTalents([]);
     }
   }, [expandedProjectId, loadMatches]);
+
+  useEffect(() => {
+    if (activeTab === "courses") {
+      loadCourses();
+    }
+  }, [activeTab, loadCourses]);
 
   // Post project
   const handlePostProject = async (e: React.FormEvent) => {
@@ -216,6 +260,12 @@ export default function PartnerDashboard(): React.ReactElement {
                 <line x1="12" y1="8" x2="12" y2="16" />
                 <line x1="8" y1="12" x2="16" y2="12" />
               </svg>
+            )},
+            { id: "courses", label: "Entrepreneurship Academy", icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              </svg>
             )}
           ].map((tab) => (
             <button
@@ -269,6 +319,7 @@ export default function PartnerDashboard(): React.ReactElement {
             <h2 className="dashboard-header-title">
               {activeTab === "overview" && "Projects Dashboard"}
               {activeTab === "portal" && "Post New Project"}
+              {activeTab === "courses" && "Entrepreneurship Academy"}
             </h2>
           </div>
 
@@ -453,6 +504,46 @@ export default function PartnerDashboard(): React.ReactElement {
                   {posting ? "Publishing Project..." : "Post Project Scope"}
                 </button>
               </form>
+            </div>
+          )}
+
+          {/* Entrepreneurship Academy Tab */}
+          {activeTab === "courses" && (
+            <div className="animate-fade-in">
+              <div className="glass-panel" style={{ padding: "2rem", marginBottom: "2rem" }}>
+                <h3>Entrepreneurship & Business Training</h3>
+                <p style={{ color: "var(--text-secondary)" }}>
+                  Upskill your entrepreneurial journey with premium business strategy, financial modeling, and venture leadership training courses.
+                </p>
+              </div>
+
+              {loadingCourses ? (
+                <p style={{ color: "var(--text-secondary)" }}>Loading business courses...</p>
+              ) : courses.length === 0 ? (
+                <p style={{ color: "var(--text-secondary)" }}>No courses available. Check back later!</p>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
+                  {courses.map((course) => (
+                    <div key={course.id} className="glass-panel" style={{ padding: "2rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1rem" }}>
+                      <div>
+                        <span className="badge badge-amber" style={{ marginBottom: "1rem" }}>{course.provider}</span>
+                        <h4 style={{ fontSize: "1.2rem", marginBottom: "0.5rem" }}>{course.title}</h4>
+                        <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>{course.description}</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem", marginBottom: "1.5rem" }}>
+                          {course.skills_taught.map((skill: string, idx: number) => (
+                            <span key={idx} className="badge badge-cyan" style={{ fontSize: "0.7rem" }}>{skill}</span>
+                          ))}
+                        </div>
+                      </div>
+                      {course.link && (
+                        <a href={course.link} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ width: "100%", textAlign: "center" }}>
+                          Enroll / Visit Course
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </main>
