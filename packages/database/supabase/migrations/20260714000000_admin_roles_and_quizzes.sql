@@ -1,3 +1,14 @@
+-- Helper function to check if the current user is an admin without causing infinite recursion
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Create Quiz Questions Table
 CREATE TABLE IF NOT EXISTS public.quiz_questions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -22,10 +33,10 @@ CREATE POLICY "Only admins can modify quiz questions"
 ON public.quiz_questions FOR ALL
 TO authenticated
 USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 )
 WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 );
 
 -- Seed quiz questions
@@ -53,10 +64,10 @@ CREATE POLICY "Admins can manage all profiles"
 ON public.profiles FOR ALL
 TO authenticated
 USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 )
 WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 );
 
 -- 4. Update Projects Policies for Admins
@@ -64,10 +75,10 @@ CREATE POLICY "Admins can manage all projects"
 ON public.projects FOR ALL
 TO authenticated
 USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 )
 WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 );
 
 -- 5. Update Applications Policies for Admins
@@ -75,8 +86,8 @@ CREATE POLICY "Admins can manage all applications"
 ON public.applications FOR ALL
 TO authenticated
 USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 )
 WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
+    public.is_admin()
 );
