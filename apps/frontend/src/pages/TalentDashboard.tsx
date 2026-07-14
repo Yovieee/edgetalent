@@ -136,6 +136,52 @@ export default function TalentDashboard(): React.ReactElement {
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState<number>(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
 
+  const [dbQuestions, setDbQuestions] = useState<{
+    frontend: Question[];
+    backend: Question[];
+    ai: Question[];
+  }>({
+    frontend: FRONTEND_QUESTIONS,
+    backend: BACKEND_QUESTIONS,
+    ai: AI_QUESTIONS,
+  });
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("quiz_questions")
+          .select("*");
+        if (!error && data && data.length > 0) {
+          const frontend: Question[] = [];
+          const backend: Question[] = [];
+          const ai: Question[] = [];
+          
+          data.forEach((q: any) => {
+            const formatted: Question = {
+              id: q.id,
+              question: q.question,
+              options: q.options,
+              answer: q.answer
+            };
+            if (q.category === "frontend") frontend.push(formatted);
+            else if (q.category === "backend") backend.push(formatted);
+            else if (q.category === "ai") ai.push(formatted);
+          });
+          
+          setDbQuestions({
+            frontend: frontend.length > 0 ? frontend : FRONTEND_QUESTIONS,
+            backend: backend.length > 0 ? backend : BACKEND_QUESTIONS,
+            ai: ai.length > 0 ? ai : AI_QUESTIONS,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load questions from database, falling back to static questions.", err);
+      }
+    };
+    fetchQuestions();
+  }, [supabase]);
+
   // Career Interest states
   const [targetRole, setTargetRole] = useState<string>("Fullstack Developer");
   const [workArrangement, setWorkArrangement] = useState<string>("Remote");
@@ -813,7 +859,7 @@ export default function TalentDashboard(): React.ReactElement {
               ) : (
                 /* Technical Quiz Taking Panel */
                 (() => {
-                  const questions = activeQuiz === "frontend" ? FRONTEND_QUESTIONS : activeQuiz === "backend" ? BACKEND_QUESTIONS : AI_QUESTIONS;
+                  const questions = activeQuiz === "frontend" ? dbQuestions.frontend : activeQuiz === "backend" ? dbQuestions.backend : dbQuestions.ai;
                   const currentQuestion = questions[currentQuestionIdx];
                   const progressPct = Math.round((currentQuestionIdx / questions.length) * 100);
 

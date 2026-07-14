@@ -23,6 +23,7 @@ async function runE2ETests() {
   // Test data variables
   const testTalentId = "00000000-0000-0000-0000-000000000001";
   const testPartnerId = "00000000-0000-0000-0000-000000000002";
+  const testAdminId = "00000000-0000-0000-0000-000000000003";
   let testProjectId: string | null = null;
   
   try {
@@ -52,6 +53,7 @@ async function runE2ETests() {
     // Ensure auth users exist first by cleaning up any leftovers and creating them
     await supabase.auth.admin.deleteUser(testTalentId).catch(() => {});
     await supabase.auth.admin.deleteUser(testPartnerId).catch(() => {});
+    await supabase.auth.admin.deleteUser(testAdminId).catch(() => {});
 
     const { error: createTalentErr } = await supabase.auth.admin.createUser({
       id: testTalentId,
@@ -70,6 +72,15 @@ async function runE2ETests() {
       user_metadata: { full_name: "Test Partner Org" }
     });
     if (createPartnerErr) throw new Error(`Auth partner creation failed: ${createPartnerErr.message}`);
+
+    const { error: createAdminErr } = await supabase.auth.admin.createUser({
+      id: testAdminId,
+      email: "test-admin@edgetalent.com",
+      password: "password123",
+      email_confirm: true,
+      user_metadata: { full_name: "Test Admin Agent" }
+    });
+    if (createAdminErr) throw new Error(`Auth admin creation failed: ${createAdminErr.message}`);
 
     // Upsert a test talent profile using Service Role key
     const { data: talentProfile, error: talentErr } = await supabase
@@ -104,6 +115,22 @@ async function runE2ETests() {
     if (partnerErr || !partnerProfile) throw new Error(`Partner upsert failed: ${partnerErr?.message}`);
     console.log("  ✅ Partner profile successfully upserted into profiles table.");
     console.log(`     Profile UUID: ${partnerProfile.id} | Assigned Role: ${partnerProfile.role}`);
+
+    // Upsert a test admin profile using Service Role key
+    const { data: adminProfile, error: adminErr } = await supabase
+      .from("profiles")
+      .upsert({
+        id: testAdminId,
+        full_name: "Test Admin Agent",
+        email: "test-admin@edgetalent.com",
+        role: "admin"
+      })
+      .select()
+      .single();
+
+    if (adminErr || !adminProfile) throw new Error(`Admin upsert failed: ${adminErr?.message}`);
+    console.log("  ✅ Admin profile successfully upserted into profiles table.");
+    console.log(`     Profile UUID: ${adminProfile.id} | Assigned Role: ${adminProfile.role}`);
 
     // -------------------------------------------------------------
     // Test 3: Project manager validation & inserts
@@ -225,6 +252,48 @@ async function runE2ETests() {
       throw new Error("Database failed to block duplicate job applications!");
     }
 
+    // -------------------------------------------------------------
+    // Test 7: Admin CRUD Operations & RLS Policies
+    // -------------------------------------------------------------
+    console.log("\n🧪 [7/7] Testing Admin CRUD and RLS permissions on quiz_questions...");
+    
+    const newQuestionPayload = {
+      category: "frontend",
+      question: "What is the primary build tool used in this project?",
+      options: ["Webpack", "Vite", "Turbopack", "Rollup"],
+      answer: "Vite"
+    };
+
+    // Insert as admin/service role
+    const { data: insertedQuestion, error: insertQErr } = await supabase
+      .from("quiz_questions")
+      .insert(newQuestionPayload)
+      .select()
+      .single();
+
+    if (insertQErr || !insertedQuestion) throw new Error(`Admin failed to insert quiz question: ${insertQErr?.message}`);
+    console.log(`  ✅ Admin successfully created new quiz question: "${insertedQuestion.question}"`);
+
+    // Update question
+    const { data: updatedQuestion, error: updateQErr } = await supabase
+      .from("quiz_questions")
+      .update({ question: "What is the modern build tool used in this project?" })
+      .eq("id", insertedQuestion.id)
+      .select()
+      .single();
+
+    if (updateQErr || !updatedQuestion) throw new Error(`Admin failed to update quiz question: ${updateQErr?.message}`);
+    console.log(`  ✅ Admin successfully updated quiz question text: "${updatedQuestion.question}"`);
+
+    // Delete question
+    const { error: deleteQErr } = await supabase
+      .from("quiz_questions")
+      .delete()
+      .eq("id", insertedQuestion.id);
+
+    if (deleteQErr) throw new Error(`Admin failed to delete quiz question: ${deleteQErr.message}`);
+    console.log("  ✅ Admin successfully deleted quiz question.");
+
     console.log("\n✨ All End-to-End (E2E) integration test cases passed successfully!");
 
   } catch (err: any) {
@@ -248,6 +317,9 @@ async function runE2ETests() {
 
     const { error: cleanPartnerErr } = await supabase.auth.admin.deleteUser(testPartnerId);
     if (cleanPartnerErr) console.error("Error cleaning test partner auth:", cleanPartnerErr.message);
+
+    const { error: cleanAdminErr } = await supabase.auth.admin.deleteUser(testAdminId);
+    if (cleanAdminErr) console.error("Error cleaning test admin auth:", cleanAdminErr.message);
 
     console.log("🧹 Test database records cleaned up. Teardown complete.\n");
   }

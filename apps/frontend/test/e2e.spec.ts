@@ -396,4 +396,247 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const landingBadge = page.locator('.badge', { hasText: 'EdgeTalent Ecosystem' });
     await expect(landingBadge).toBeVisible();
   });
+
+  test('Admin Journey: login/onboard as admin and manage quizzes, courses, jobs, and users', async ({ page }) => {
+    // Intercept profile fetch to mock the admin role
+    await page.route('**/rest/v1/profiles**', async (route) => {
+      const url = route.request().url();
+      const method = route.request().method();
+      if (method === 'GET') {
+        if (url.includes('select=role')) {
+          // Stats query
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify([
+              { role: "admin" },
+              { role: "talent" },
+              { role: "partner" }
+            ])
+          });
+        } else if (url.includes('order=created_at')) {
+          // Users list query
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify([
+              {
+                id: "00000000-0000-0000-0000-000000000003",
+                full_name: "Mock Administrator",
+                email: "admin@edgetalent.com",
+                role: "admin",
+                skills: [],
+                skill_gaps: [],
+                created_at: new Date().toISOString()
+              },
+              {
+                id: "00000000-0000-0000-0000-000000000001",
+                full_name: "Alex Developer",
+                email: "talent.test@edgetalent.com",
+                role: "talent",
+                skills: ["React"],
+                skill_gaps: ["pgvector"],
+                created_at: new Date().toISOString()
+              }
+            ])
+          });
+        } else {
+          // Single profile query (for context/auth check)
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              id: "00000000-0000-0000-0000-000000000003",
+              full_name: "Mock Administrator",
+              email: "admin@edgetalent.com",
+              role: "admin",
+              created_at: new Date().toISOString()
+            })
+          });
+        }
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Intercept quiz questions endpoint (since the dashboard fetches questions, and does CRUD)
+    let mockQuestions = [
+      {
+        id: "00000000-0000-0000-0000-000000000010",
+        category: "frontend",
+        question: "Which hook is used for state in React?",
+        options: ["useState", "useEffect", "useRef", "useMemo"],
+        answer: "useState",
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    await page.route('**/rest/v1/quiz_questions**', async (route) => {
+      const method = route.request().method();
+      if (method === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(mockQuestions)
+        });
+      } else if (method === 'POST') {
+        const body = JSON.parse(route.request().postData() || '{}');
+        const newQ = {
+          id: `00000000-0000-0000-0000-${Date.now().toString().slice(-12)}`,
+          category: body.category,
+          question: body.question,
+          options: body.options,
+          answer: body.answer,
+          created_at: new Date().toISOString()
+        };
+        mockQuestions.push(newQ);
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(newQ)
+        });
+      } else {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true })
+        });
+      }
+    });
+
+    // Intercept courses endpoint
+    let mockCourses = [
+      {
+        id: "00000000-0000-0000-0000-000000000020",
+        title: "Introduction to AI",
+        description: "Basic artificial intelligence concepts.",
+        skills_taught: ["AI", "Python"],
+        provider: "EdgeTalent Academy",
+        link: "https://example.com",
+        created_at: new Date().toISOString()
+      }
+    ];
+    await page.route('**/rest/v1/courses**', async (route) => {
+      const method = route.request().method();
+      if (method === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(mockCourses)
+        });
+      } else if (method === 'POST') {
+        const body = JSON.parse(route.request().postData() || '{}');
+        const newC = {
+          id: `00000000-0000-0000-0000-${Date.now().toString().slice(-12)}`,
+          title: body.title,
+          description: body.description,
+          skills_taught: body.skills_taught,
+          provider: body.provider,
+          link: body.link,
+          created_at: new Date().toISOString()
+        };
+        mockCourses.push(newC);
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(newC)
+        });
+      } else {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true })
+        });
+      }
+    });
+
+    // Users list queries are now handled by the unified profiles router above
+
+    // 1. Visit Landing Page and Navigate to Auth
+    await page.goto('/');
+    const getStartedBtn = page.locator('button#nav-btn-register');
+    await getStartedBtn.click();
+
+    // 2. Register a new user (who will have mock admin role via routing intercept)
+    const toggleToSignUpBtn = page.locator('button', { hasText: 'Register' });
+    await toggleToSignUpBtn.click();
+
+    const fullNameInput = page.locator('input#fullName');
+    const emailInput = page.locator('input#email');
+    const passwordInput = page.locator('input#password');
+    const submitBtn = page.locator('button[type="submit"]', { hasText: 'Sign Up' });
+
+    const testEmail = `admin.${Date.now()}@edgetalent.com`;
+    await fullNameInput.fill('Mock Administrator');
+    await emailInput.fill(testEmail);
+    await passwordInput.fill('supersecret123');
+    await submitBtn.click();
+
+    // 3. Verify redirected to Admin Dashboard and check welcome/stats
+    const welcomeHeader = page.locator('h2', { hasText: 'Overview Management' });
+    await expect(welcomeHeader).toBeVisible();
+
+    const welcomeBody = page.locator('p', { hasText: 'As an administrator, you have complete read and write access' });
+    await expect(welcomeBody).toBeVisible();
+
+    // 4. Navigate to Users tab
+    const usersTabBtn = page.locator('button', { hasText: 'Users List' });
+    await usersTabBtn.click();
+    const usersTitle = page.locator('h3', { hasText: 'Users Accounts Profiles' });
+    await expect(usersTitle).toBeVisible();
+    const developerRow = page.locator('td', { hasText: 'Alex Developer' });
+    await expect(developerRow).toBeVisible();
+
+    // 5. Navigate to Quizzes tab and add a quiz question
+    const quizzesTabBtn = page.locator('button', { hasText: 'Quizzes' });
+    await quizzesTabBtn.click();
+    const quizzesTitle = page.locator('h3', { hasText: 'Assessment Quiz Questions' });
+    await expect(quizzesTitle).toBeVisible();
+
+    // Add quiz question
+    const addQuestionBtn = page.locator('button', { hasText: 'Add Question' });
+    await addQuestionBtn.click();
+
+    await page.locator('textarea[placeholder*="handles state"]').fill('Which React hook is used to run side effects?');
+    await page.locator('input[placeholder="Option A"]').fill('useEffect');
+    await page.locator('input[placeholder="Option B"]').fill('useState');
+    await page.locator('input[placeholder="Option C"]').fill('useContext');
+    await page.locator('input[placeholder="Option D"]').fill('useReducer');
+    await page.locator('select:has-text("-- Select Answer --")').selectOption('useEffect');
+
+    await page.locator('button', { hasText: 'Create Question' }).click();
+
+    // Verify question is added in frontend
+    const newQuestion = page.locator('p', { hasText: 'Which React hook is used to run side effects?' });
+    await expect(newQuestion).toBeVisible();
+
+    // 6. Navigate to Courses tab and add a course
+    const coursesTabBtn = page.locator('button', { hasText: 'Upskilling Hub' });
+    await coursesTabBtn.click();
+    const coursesTitle = page.locator('h3', { hasText: 'Upskilling Courses Catalog' });
+    await expect(coursesTitle).toBeVisible();
+
+    const addCourseBtn = page.locator('button', { hasText: 'Add Course' });
+    await addCourseBtn.click();
+
+    await page.locator('input[placeholder*="React & Node"]').fill('Tailwind CSS Mastery');
+    await page.locator('textarea[placeholder*="Summarize course"]').fill('Learn utility-first styling patterns.');
+    await page.locator('input[placeholder="React, TypeScript, Node.js"]').fill('TailwindCSS, CSS');
+    await page.locator('input[placeholder*="Coursera"]').fill('Frontend Masters');
+    await page.locator('input[placeholder*="example.com"]').fill('https://example.com/tailwind');
+
+    await page.locator('button', { hasText: 'Create Course' }).click();
+
+    // Verify course added
+    const newCourse = page.locator('h4', { hasText: 'Tailwind CSS Mastery' });
+    await expect(newCourse).toBeVisible();
+
+    // 7. Logout
+    const logoutBtn = page.locator('button', { hasText: 'Logout' });
+    await logoutBtn.click();
+
+    const welcomeBackHeader = page.locator('h2', { hasText: 'Welcome Back' });
+    await expect(welcomeBackHeader).toBeVisible();
+  });
 });
+

@@ -5,6 +5,7 @@ import AuthPage from "./pages/AuthPage";
 import RoleOnboarding from "./pages/RoleOnboarding";
 import TalentDashboard from "./pages/TalentDashboard";
 import PartnerDashboard from "./pages/PartnerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App(): React.ReactElement {
   const { session, profile, loading } = useSupabase();
@@ -65,6 +66,10 @@ export default function App(): React.ReactElement {
 
   if (profile.role === "partner") {
     return <PartnerDashboard />;
+  }
+
+  if (profile.role === "admin") {
+    return <AdminDashboard />;
   }
 
   // Fallback / Admin

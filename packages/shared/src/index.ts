@@ -65,3 +65,29 @@ export const ApplicationSchema = z.object({
 });
 
 export type Application = z.infer<typeof ApplicationSchema>;
+
+// 5. Course Schema
+export const CourseSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(3, "Title must be at least 3 characters long"),
+  description: z.string().optional().nullable(),
+  skills_taught: z.array(z.string()).default([]),
+  provider: z.string().optional().nullable(),
+  link: z.string().url("Must be a valid URL").or(z.literal("")).optional().nullable(),
+  created_at: z.string().optional()
+});
+
+export type Course = z.infer<typeof CourseSchema>;
+
+// 6. Quiz Question Schema
+export const QuizQuestionSchema = z.object({
+  id: z.string().uuid().optional(),
+  category: z.enum(["frontend", "backend", "ai"]),
+  question: z.string().min(5, "Question must be at least 5 characters long"),
+  options: z.array(z.string()).min(2, "Provide at least two options"),
+  answer: z.string().min(1, "Answer cannot be empty"),
+  created_at: z.string().optional()
+});
+
+export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
+
