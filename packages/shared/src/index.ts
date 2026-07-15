@@ -91,3 +91,30 @@ export const QuizQuestionSchema = z.object({
 
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 
+// 7. Course Lesson Schema
+export const CourseLessonSchema = z.object({
+  id: z.string().uuid().optional(),
+  course_id: z.string().uuid(),
+  title: z.string().min(3, "Title must be at least 3 characters long"),
+  content: z.string().min(10, "Content must be at least 10 characters long"),
+  sequence_order: z.number().int().nonnegative(),
+  duration_minutes: z.number().int().positive().default(10),
+  created_at: z.string().optional()
+});
+
+export type CourseLesson = z.infer<typeof CourseLessonSchema>;
+
+// 8. Course Enrollment Schema
+export const CourseEnrollmentSchema = z.object({
+  id: z.string().uuid().optional(),
+  user_id: z.string().uuid(),
+  course_id: z.string().uuid(),
+  completed_lessons: z.array(z.string().uuid()).default([]),
+  completed_at: z.string().nullable().optional(),
+  last_accessed_at: z.string().optional(),
+  created_at: z.string().optional()
+});
+
+export type CourseEnrollment = z.infer<typeof CourseEnrollmentSchema>;
+
+

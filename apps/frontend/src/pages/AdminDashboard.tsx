@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../context/SupabaseContext";
-import { CourseSchema, QuizQuestionSchema, ProjectSchema } from "@edgetalent/shared";
+import { CourseSchema, QuizQuestionSchema, ProjectSchema, CourseLessonSchema } from "@edgetalent/shared";
 
 interface UserProfile {
   id: string;
@@ -74,10 +74,24 @@ export default function AdminDashboard(): React.ReactElement {
   const [loadingQuizzes, setLoadingQuizzes] = useState(false);
 
   // Modal / Form States
-  const [activeModal, setActiveModal] = useState<"course" | "quiz" | "project" | null>(null);
+  const [activeModal, setActiveModal] = useState<"course" | "quiz" | "project" | "lessons" | null>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ text: string; type: "success" | "error" | "" }>({ text: "", type: "" });
+
+  // Lesson Management States
+  const [selectedCourseForLessons, setSelectedCourseForLessons] = useState<CourseItem | null>(null);
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [loadingLessons, setLoadingLessons] = useState(false);
+  const [showLessonForm, setShowLessonForm] = useState(false);
+  const [lessonEditMode, setLessonEditMode] = useState(false);
+  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
+
+  // Lesson Form Fields
+  const [lessonTitle, setLessonTitle] = useState("");
+  const [lessonContent, setLessonContent] = useState("");
+  const [lessonSequence, setLessonSequence] = useState<number>(1);
+  const [lessonDuration, setLessonDuration] = useState<number>(10);
 
   // Course Form Fields
   const [courseTitle, setCourseTitle] = useState("");
@@ -366,6 +380,112 @@ export default function AdminDashboard(): React.ReactElement {
       }
     } catch (e: any) {
       showStatus("Delete error: " + e.message, "error");
+    }
+  };
+
+  // Lesson Management Functions
+  const fetchLessons = async (courseId: string) => {
+    setLoadingLessons(true);
+    try {
+      const { data, error } = await supabase
+        .from("course_lessons")
+        .select("*")
+        .eq("course_id", courseId)
+        .order("sequence_order", { ascending: true });
+      if (error) {
+        showStatus("Failed to load lessons: " + error.message, "error");
+      } else {
+        setLessons(data || []);
+      }
+    } catch (e: any) {
+      showStatus("Lessons error: " + e.message, "error");
+    } finally {
+      setLoadingLessons(false);
+    }
+  };
+
+  const handleOpenLessonsManager = (course: CourseItem) => {
+    setSelectedCourseForLessons(course);
+    setLessons([]);
+    setShowLessonForm(false);
+    fetchLessons(course.id);
+    setActiveModal("lessons");
+  };
+
+  const handleOpenLessonForm = (lesson?: any) => {
+    if (lesson) {
+      setLessonEditMode(true);
+      setSelectedLessonId(lesson.id);
+      setLessonTitle(lesson.title);
+      setLessonContent(lesson.content);
+      setLessonSequence(lesson.sequence_order);
+      setLessonDuration(lesson.duration_minutes);
+    } else {
+      setLessonEditMode(false);
+      setSelectedLessonId(null);
+      setLessonTitle("");
+      setLessonContent("");
+      setLessonSequence(lessons.length + 1);
+      setLessonDuration(10);
+    }
+    setShowLessonForm(true);
+  };
+
+  const handleSaveLesson = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCourseForLessons) return;
+
+    const payload = {
+      course_id: selectedCourseForLessons.id,
+      title: lessonTitle,
+      content: lessonContent,
+      sequence_order: Number(lessonSequence),
+      duration_minutes: Number(lessonDuration),
+    };
+
+    const validate = CourseLessonSchema.safeParse(payload);
+    if (!validate.success) {
+      showStatus("Validation Error: " + validate.error.errors[0].message, "error");
+      return;
+    }
+
+    try {
+      let error;
+      if (lessonEditMode && selectedLessonId) {
+        const { error: err } = await supabase
+          .from("course_lessons")
+          .update(payload)
+          .eq("id", selectedLessonId);
+        error = err;
+      } else {
+        const { error: err } = await supabase.from("course_lessons").insert(payload);
+        error = err;
+      }
+
+      if (error) {
+        showStatus("Saving lesson failed: " + error.message, "error");
+      } else {
+        showStatus(lessonEditMode ? "Lesson updated successfully!" : "Lesson created successfully!", "success");
+        setShowLessonForm(false);
+        fetchLessons(selectedCourseForLessons.id);
+      }
+    } catch (e: any) {
+      showStatus("Save lesson error: " + e.message, "error");
+    }
+  };
+
+  const handleDeleteLesson = async (lessonId: string) => {
+    if (!window.confirm("Are you sure you want to delete this lesson?")) return;
+    try {
+      const { error } = await supabase.from("course_lessons").delete().eq("id", lessonId);
+      if (error) {
+        showStatus("Delete lesson failed: " + error.message, "error");
+      } else {
+        showStatus("Lesson deleted successfully!", "success");
+        if (selectedCourseForLessons) fetchLessons(selectedCourseForLessons.id);
+      }
+    } catch (e: any) {
+      showStatus("Delete lesson error: " + e.message, "error");
     }
   };
 
@@ -981,6 +1101,9 @@ export default function AdminDashboard(): React.ReactElement {
                           Course Link ↗
                         </a>
                       )}
+                      <button className="btn btn-secondary" onClick={() => handleOpenLessonsManager(c)} style={{ padding: "0.5rem", fontSize: "0.85rem", borderColor: "var(--color-cyan)" }}>
+                        Lessons
+                      </button>
                       <button className="btn btn-secondary" onClick={() => openCourseModal(c)} style={{ padding: "0.5rem", fontSize: "0.85rem" }}>
                         Edit
                       </button>
@@ -1378,6 +1501,141 @@ export default function AdminDashboard(): React.ReactElement {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Lessons Modal Form */}
+      {activeModal === "lessons" && selectedCourseForLessons && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+        >
+          <div className="glass-panel animate-fade-in" style={{ width: "95%", maxWidth: "700px", padding: "2rem", maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <h3 style={{ margin: 0 }}>Lessons for {selectedCourseForLessons.title}</h3>
+              <button className="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+            </div>
+
+            {showLessonForm ? (
+              <form onSubmit={handleSaveLesson} className="glass-panel" style={{ padding: "1.5rem", marginBottom: "1.5rem" }}>
+                <h4>{lessonEditMode ? "Edit Lesson" : "Add New Lesson"}</h4>
+                <div className="form-group">
+                  <label>Lesson Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={lessonTitle}
+                    onChange={(e) => setLessonTitle(e.target.value)}
+                    className="form-input"
+                    placeholder="e.g. Lesson 1: Getting Started"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Lesson Content (Supports Markdown)</label>
+                  <textarea
+                    required
+                    value={lessonContent}
+                    onChange={(e) => setLessonContent(e.target.value)}
+                    className="form-input"
+                    placeholder="Enter lesson contents, text, or markdown code here..."
+                    style={{ minHeight: "150px" }}
+                  />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                  <div className="form-group">
+                    <label>Sequence Order</label>
+                    <input
+                      type="number"
+                      required
+                      value={lessonSequence}
+                      onChange={(e) => setLessonSequence(Number(e.target.value))}
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Duration (Minutes)</label>
+                    <input
+                      type="number"
+                      required
+                      value={lessonDuration}
+                      onChange={(e) => setLessonDuration(Number(e.target.value))}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowLessonForm(false)} style={{ flex: 1 }}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+                    {lessonEditMode ? "Save Changes" : "Add Lesson"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div style={{ marginBottom: "1.5rem" }}>
+                <button className="btn btn-primary" onClick={() => handleOpenLessonForm()} style={{ marginBottom: "1rem" }}>
+                  Add Lesson
+                </button>
+              </div>
+            )}
+
+            {loadingLessons ? (
+              <p>Loading lessons...</p>
+            ) : lessons.length === 0 ? (
+              <p style={{ color: "var(--text-secondary)" }}>No lessons added yet. Use the button above to add the first lesson.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {lessons.map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "1rem",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: "6px",
+                      border: "1px solid var(--glass-border)",
+                    }}
+                  >
+                    <div>
+                      <span className="badge badge-cyan" style={{ marginRight: "0.5rem", fontSize: "0.75rem" }}>
+                        Seq {lesson.sequence_order}
+                      </span>
+                      <strong style={{ fontSize: "0.95rem" }}>{lesson.title}</strong>
+                      <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
+                        ⏱ {lesson.duration_minutes} mins | Content length: {lesson.content.length} chars
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <button className="btn btn-secondary" style={{ padding: "0.25rem 0.5rem", fontSize: "0.8rem" }} onClick={() => handleOpenLessonForm(lesson)}>
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-secondary"
+                        style={{ padding: "0.25rem 0.5rem", fontSize: "0.8rem", color: "var(--color-rose)" }}
+                        onClick={() => handleDeleteLesson(lesson.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
