@@ -1606,7 +1606,7 @@ export default function AdminDashboard(): React.ReactElement {
                       justifyContent: "space-between",
                       alignItems: "center",
                       padding: "1rem",
-                      background: "rgba(255, 255, 255, 0.05)",
+                      background: "rgba(0, 0, 0, 0.02)",
                       borderRadius: "6px",
                       border: "1px solid var(--glass-border)",
                     }}

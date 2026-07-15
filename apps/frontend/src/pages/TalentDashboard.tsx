@@ -1155,7 +1155,7 @@ export default function TalentDashboard(): React.ReactElement {
                                 <span style={{ color: "var(--text-secondary)" }}>Progress</span>
                                 <span>{completedLessons}/{totalLessons} Lessons ({progressPercent}%)</span>
                               </div>
-                              <div style={{ width: "100%", height: "6px", background: "rgba(255, 255, 255, 0.1)", borderRadius: "3px", overflow: "hidden" }}>
+                              <div style={{ width: "100%", height: "6px", background: "rgba(0, 0, 0, 0.05)", borderRadius: "3px", overflow: "hidden" }}>
                                 <div style={{ width: `${progressPercent}%`, height: "100%", background: progressPercent === 100 ? "var(--color-emerald)" : "var(--color-cyan)", transition: "width 0.3s" }} />
                               </div>
                             </div>
@@ -1315,7 +1315,7 @@ export default function TalentDashboard(): React.ReactElement {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(10, 10, 15, 0.98)",
+            background: "var(--bg-primary)",
             zIndex: 1000,
             display: "flex",
             flexDirection: "column"
@@ -1325,7 +1325,7 @@ export default function TalentDashboard(): React.ReactElement {
           <div
             style={{
               padding: "1.25rem 2rem",
-              background: "rgba(255, 255, 255, 0.02)",
+              background: "var(--bg-secondary)",
               borderBottom: "1px solid var(--glass-border)",
               display: "flex",
               justifyContent: "space-between",
@@ -1350,7 +1350,7 @@ export default function TalentDashboard(): React.ReactElement {
               style={{
                 width: "280px",
                 borderRight: "1px solid var(--glass-border)",
-                background: "rgba(255, 255, 255, 0.01)",
+                background: "var(--bg-tertiary)",
                 display: "flex",
                 flexDirection: "column",
                 overflowY: "auto"
@@ -1425,7 +1425,7 @@ export default function TalentDashboard(): React.ReactElement {
             </div>
 
             {/* Content Area */}
-            <div style={{ flex: 1, padding: "3rem", overflowY: "auto", background: "rgba(0,0,0,0.2)" }}>
+            <div style={{ flex: 1, padding: "3rem", overflowY: "auto", background: "var(--bg-secondary)" }}>
               {loadingCourseLessons ? (
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
                   <p>Loading course materials...</p>
