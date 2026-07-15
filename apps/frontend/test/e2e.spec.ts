@@ -352,9 +352,9 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const welcomeHeader = page.locator('.user-profile-menu', { hasText: 'Google DeepMind Partner' });
     await expect(welcomeHeader).toBeVisible();
 
-    // 5. Navigate to Project Manager Portal and post a new project
-    const portalTabBtn = page.locator('button', { hasText: 'Post New Project' });
-    await portalTabBtn.click();
+    // 5. Open Post New Project modal from Manage Projects dashboard
+    const openPostModalBtn = page.locator('button', { hasText: '+ Post New Project' });
+    await openPostModalBtn.click();
 
     const projTitleInput = page.locator('label:has-text("Project Title") + input');
     const projDescInput = page.locator('label:has-text("Description & Scope") + textarea');
@@ -368,14 +368,11 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await projBudgetInput.fill('5000');
     await postProjBtn.click();
 
-    // Verify project posted successfully
+    // Verify project posted successfully in modal
     const successMsg = page.locator('.badge', { hasText: 'Project posted successfully with vector embeddings!' });
     await expect(successMsg).toBeVisible();
 
-    // 6. Go to Partner Overview and verify the project shows up
-    const overviewTabBtn = page.locator('button', { hasText: 'Projects Dashboard' });
-    await overviewTabBtn.click();
-
+    // Verify the project shows up on the dashboard list (modal auto-closes)
     const postedProjectTitle = page.locator('h4', { hasText: 'Next-Gen Quantum Compiler' });
     await expect(postedProjectTitle).toBeVisible();
 

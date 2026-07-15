@@ -22,6 +22,7 @@ export default function PartnerDashboard(): React.ReactElement {
   const [totalApplications, setTotalApplications] = useState<number>(0);
 
   // Portal states
+  const [showPostModal, setShowPostModal] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [requiredSkills, setRequiredSkills] = useState<string>("");
@@ -324,6 +325,11 @@ export default function PartnerDashboard(): React.ReactElement {
       
       // Reload overview
       await loadOverview();
+
+      setTimeout(() => {
+        setShowPostModal(false);
+        setPortalMsg("");
+      }, 1500);
     } catch (err: any) {
       setPortalMsg("Error: " + err.message);
     } finally {
@@ -379,19 +385,12 @@ export default function PartnerDashboard(): React.ReactElement {
 
         <div className="sidebar-menu">
           {[
-            { id: "overview", label: "Projects Dashboard", icon: (
+            { id: "overview", label: "Manage Projects", icon: (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="7" height="9" />
                 <rect x="14" y="3" width="7" height="5" />
                 <rect x="14" y="12" width="7" height="9" />
                 <rect x="3" y="16" width="7" height="5" />
-              </svg>
-            )},
-            { id: "portal", label: "Post New Project", icon: (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
               </svg>
             )},
             { id: "courses", label: "Entrepreneurship Academy", icon: (
@@ -450,8 +449,7 @@ export default function PartnerDashboard(): React.ReactElement {
               </svg>
             </button>
             <h2 className="dashboard-header-title">
-              {activeTab === "overview" && "Projects Dashboard"}
-              {activeTab === "portal" && "Post New Project"}
+              {activeTab === "overview" && "Manage Projects"}
               {activeTab === "courses" && "Entrepreneurship Academy"}
             </h2>
           </div>
@@ -487,11 +485,22 @@ export default function PartnerDashboard(): React.ReactElement {
               </div>
 
               <div className="glass-panel" style={{ padding: "2rem" }}>
-                <h3 style={{ marginBottom: "1.5rem" }}>My Project Postings</h3>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
+                  <h3 style={{ margin: 0 }}>My Project Postings</h3>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setPortalMsg("");
+                      setShowPostModal(true);
+                    }}
+                  >
+                    + Post New Project
+                  </button>
+                </div>
                 {loadingOverview ? (
                   <p style={{ color: "var(--text-secondary)" }}>Loading overview...</p>
                 ) : projects.length === 0 ? (
-                  <p style={{ color: "var(--text-secondary)" }}>No projects posted. Head to the Project Portal to publish a deliverables scope.</p>
+                  <p style={{ color: "var(--text-secondary)" }}>No projects posted. Click "+ Post New Project" above to publish a deliverables scope.</p>
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     {projects.map((proj) => {
@@ -588,57 +597,7 @@ export default function PartnerDashboard(): React.ReactElement {
           )}
 
           {/* Project Manager Portal */}
-          {activeTab === "portal" && (
-            <div className="animate-fade-in glass-panel" style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
-              <h3>Publish Industrial Project</h3>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-                Add technical deliverables, required skills, and scope. This triggers our embeddings Deno agent.
-              </p>
 
-              {portalMsg && (
-                <div className={`badge ${portalMsg.startsWith("Error") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
-                  {portalMsg}
-                </div>
-              )}
-
-              <form onSubmit={handlePostProject}>
-                <div className="form-group">
-                  <label>Project Title</label>
-                  <input type="text" className="form-input" placeholder="e.g. EdgeTalent Upgrades" value={title} onChange={(e) => setTitle(e.target.value)} required />
-                </div>
-
-                <div className="form-group">
-                  <label>Description & Scope</label>
-                  <textarea className="form-input" style={{ height: "100px" }} placeholder="Describe deliverables and parameters..." value={description} onChange={(e) => setDescription(e.target.value)} required />
-                </div>
-
-                <div className="form-group">
-                  <label>Required Skills (comma-separated)</label>
-                  <input type="text" className="form-input" placeholder="React, TypeScript, Supabase, Deno" value={requiredSkills} onChange={(e) => setRequiredSkills(e.target.value)} required />
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                  <div className="form-group">
-                    <label>Budget ($)</label>
-                    <input type="number" className="form-input" placeholder="5000" value={budget} onChange={(e) => setBudget(e.target.value)} />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Scope</label>
-                    <select className="form-select" value={scope} onChange={(e) => setScope(e.target.value as any)}>
-                      <option value="short-term">Short-term</option>
-                      <option value="medium-term">Medium-term</option>
-                      <option value="long-term">Long-term</option>
-                    </select>
-                  </div>
-                </div>
-
-                <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "1rem" }} disabled={posting}>
-                  {posting ? "Publishing Project..." : "Post Project Scope"}
-                </button>
-              </form>
-            </div>
-          )}
 
           {/* Entrepreneurship Academy Tab */}
           {activeTab === "courses" && (
@@ -739,6 +698,104 @@ export default function PartnerDashboard(): React.ReactElement {
           )}
         </main>
       </div>
+      {/* Post Project Modal */}
+      {showPostModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.6)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+        >
+          <div className="glass-panel animate-fade-in" style={{ width: "90%", maxWidth: "600px", padding: "2.5rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <h3 style={{ margin: 0 }}>Publish Industrial Project</h3>
+              <button
+                className="hamburger-btn"
+                onClick={() => {
+                  setShowPostModal(false);
+                  setPortalMsg("");
+                }}
+                style={{ padding: "0.25rem", cursor: "pointer", border: "none", background: "transparent", color: "var(--text-primary)" }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+              Add technical deliverables, required skills, and scope. This triggers our embeddings Deno agent.
+            </p>
+
+            {portalMsg && (
+              <div className={`badge ${portalMsg.startsWith("Error") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
+                {portalMsg}
+              </div>
+            )}
+
+            <form onSubmit={handlePostProject}>
+              <div className="form-group" style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Project Title</label>
+                <input type="text" className="form-input" placeholder="e.g. EdgeTalent Upgrades" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Description & Scope</label>
+                <textarea className="form-input" style={{ height: "100px" }} placeholder="Describe deliverables and parameters..." value={description} onChange={(e) => setDescription(e.target.value)} required />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: "1rem" }}>
+                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Required Skills (comma-separated)</label>
+                <input type="text" className="form-input" placeholder="React, TypeScript, Supabase, Deno" value={requiredSkills} onChange={(e) => setRequiredSkills(e.target.value)} required />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
+                <div className="form-group">
+                  <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Budget ($)</label>
+                  <input type="number" className="form-input" placeholder="5000" value={budget} onChange={(e) => setBudget(e.target.value)} />
+                </div>
+
+                <div className="form-group">
+                  <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Scope</label>
+                  <select className="form-select" value={scope} onChange={(e) => setScope(e.target.value as any)}>
+                    <option value="short-term">Short-term</option>
+                    <option value="medium-term">Medium-term</option>
+                    <option value="long-term">Long-term</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ flex: 1 }}
+                  onClick={() => {
+                    setShowPostModal(false);
+                    setPortalMsg("");
+                  }}
+                  disabled={posting}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={posting}>
+                  {posting ? "Publishing Project..." : "Post Project Scope"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Course Player Overlay */}
       {activePlayingCourse && (
         <div
