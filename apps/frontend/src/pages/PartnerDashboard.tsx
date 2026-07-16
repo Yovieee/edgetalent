@@ -1352,6 +1352,280 @@ export default function PartnerDashboard(): React.ReactElement {
               )}
             </div>
           )}
+
+          {/* Funding Opportunities Workspace */}
+          {activeTab === "funding" && (
+            <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              {/* Hero Header */}
+              <div className="glass-panel" style={{ padding: "2.5rem 2rem", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--grad-cyan-purple)" }} />
+                <h3 style={{ fontSize: "1.75rem", margin: 0, fontWeight: "700" }}>Funding & Grants Hub</h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: "1rem", margin: 0, maxWidth: "700px" }}>
+                  Explore capital financing, accelerators, government research grants, and equity financing opportunities curated for tech entrepreneurs and startups.
+                </p>
+              </div>
+
+              {/* Filters & Search Panel */}
+              <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  {["All", "Grants", "Accelerators", "Equity/VC", "Loans/Debt"].map((cat) => (
+                    <button
+                      key={cat}
+                      className={`badge ${selectedFundingCategory === cat ? "badge-cyan" : "badge-neutral"}`}
+                      style={{ cursor: "pointer", border: "none", padding: "0.5rem 1rem", fontSize: "0.85rem", borderRadius: "100px", transition: "all 0.2s" }}
+                      onClick={() => setSelectedFundingCategory(cat)}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "0.5rem", width: "100%", maxWidth: "320px", position: "relative" }}>
+                  <input
+                    type="text"
+                    placeholder="Search opportunities..."
+                    className="input-field"
+                    style={{ paddingRight: "2.5rem", margin: 0 }}
+                    value={searchFundingQuery}
+                    onChange={(e) => setSearchFundingQuery(e.target.value)}
+                  />
+                  <span style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-secondary)" }}>🔍</span>
+                </div>
+              </div>
+
+              {/* Funding Grid */}
+              {loadingFunding ? (
+                <div style={{ textAlign: "center", padding: "3rem" }}>
+                  <p style={{ color: "var(--text-secondary)" }}>Loading funding opportunities...</p>
+                </div>
+              ) : (() => {
+                const filtered = fundingOpportunities.filter((opp) => {
+                  const matchCat = selectedFundingCategory === "All" || opp.category === selectedFundingCategory;
+                  const matchQuery = opp.title.toLowerCase().includes(searchFundingQuery.toLowerCase()) ||
+                    opp.description.toLowerCase().includes(searchFundingQuery.toLowerCase());
+                  return matchCat && matchQuery;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="glass-panel" style={{ padding: "3rem", textAlign: "center" }}>
+                      <p style={{ color: "var(--text-secondary)", margin: 0 }}>No funding opportunities matched your criteria.</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
+                    {filtered.map((opp) => {
+                      // Profile fit calculation
+                      let fitPercent = 0;
+                      if (profile && profile.skills) {
+                        const userSkills = profile.skills.map((s: string) => s.toLowerCase());
+                        const text = (opp.title + " " + opp.description + " " + opp.content).toLowerCase();
+                        let matches = 0;
+                        userSkills.forEach((s: string) => {
+                          if (text.includes(s)) matches++;
+                        });
+                        fitPercent = userSkills.length > 0 ? Math.min(100, Math.round(40 + (matches / userSkills.length) * 60)) : 55;
+                      } else {
+                        fitPercent = 55;
+                      }
+
+                      return (
+                        <div key={opp.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem" }}>
+                          <div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                              <span className={`badge ${
+                                opp.category === "Grants" ? "badge-emerald" :
+                                opp.category === "Accelerators" ? "badge-purple" :
+                                opp.category === "Equity/VC" ? "badge-cyan" : "badge-amber"
+                              }`} style={{ fontSize: "0.75rem" }}>
+                                {opp.category}
+                              </span>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Profile Fit:</span>
+                                <span className={`badge ${fitPercent >= 75 ? "badge-emerald" : fitPercent >= 50 ? "badge-cyan" : "badge-rose"}`} style={{ fontSize: "0.7rem", padding: "0.1rem 0.3rem" }}>
+                                  {fitPercent}%
+                                </span>
+                              </div>
+                            </div>
+                            <h4 style={{ fontSize: "1.2rem", margin: "0 0 0.5rem 0", fontWeight: "600" }}>{opp.title}</h4>
+                            <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", margin: "0 0 1.25rem 0", lineHeight: "1.5" }}>{opp.description}</p>
+                            
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1rem" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "var(--text-secondary)" }}>Amount:</span>
+                                <span style={{ fontWeight: "600" }}>{opp.amount || "N/A"}</span>
+                              </div>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "var(--text-secondary)" }}>Deadline:</span>
+                                <span style={{ fontWeight: "600", color: "var(--color-rose)" }}>{opp.deadline || "N/A"}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            className="btn btn-primary"
+                            style={{ width: "100%", padding: "0.6rem" }}
+                            onClick={() => {
+                              setSelectedOpportunity(opp);
+                              setShowOpportunityModal(true);
+                            }}
+                          >
+                            Read Details & Apply
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* Events Hub Workspace */}
+          {activeTab === "events" && (
+            <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              {/* Hero Header */}
+              <div className="glass-panel" style={{ padding: "2.5rem 2rem", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--grad-cyan-purple)" }} />
+                <h3 style={{ fontSize: "1.75rem", margin: 0, fontWeight: "700" }}>Events & Workshops</h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: "1rem", margin: 0, maxWidth: "700px" }}>
+                  Explore and attend community tech events, hackathons, and networking opportunities. Connect with upcoming tech talent and enterprise partners.
+                </p>
+              </div>
+
+              {/* Filters & Search Panel */}
+              <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  {["All", "Hackathon", "Webinar", "Workshop", "Networking", "Pitch Night"].map((cat) => (
+                    <button
+                      key={cat}
+                      className={`badge ${selectedEventCategory === cat ? "badge-cyan" : "badge-neutral"}`}
+                      style={{ cursor: "pointer", border: "none", padding: "0.5rem 1rem", fontSize: "0.85rem", borderRadius: "100px", transition: "all 0.2s" }}
+                      onClick={() => setSelectedEventCategory(cat)}
+                    >
+                      {cat === "All" ? "All Events" : cat}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: "0.5rem", width: "100%", maxWidth: "320px", position: "relative" }}>
+                  <input
+                    type="text"
+                    placeholder="Search events..."
+                    className="input-field"
+                    style={{ paddingRight: "2.5rem", margin: 0 }}
+                    value={searchEventQuery}
+                    onChange={(e) => setSearchEventQuery(e.target.value)}
+                  />
+                  <span style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-secondary)" }}>🔍</span>
+                </div>
+              </div>
+
+              {/* Events Grid */}
+              {loadingEvents ? (
+                <div style={{ textAlign: "center", padding: "3rem" }}>
+                  <p style={{ color: "var(--text-secondary)" }}>Loading upcoming events...</p>
+                </div>
+              ) : (() => {
+                const filtered = events.filter((evt) => {
+                  const matchCat = selectedEventCategory === "All" || evt.category === selectedEventCategory;
+                  const matchQuery = evt.title.toLowerCase().includes(searchEventQuery.toLowerCase()) ||
+                    evt.description.toLowerCase().includes(searchEventQuery.toLowerCase());
+                  return matchCat && matchQuery;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="glass-panel" style={{ padding: "3rem", textAlign: "center" }}>
+                      <p style={{ color: "var(--text-secondary)", margin: 0 }}>No upcoming events matched your criteria.</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
+                    {filtered.map((evt) => {
+                      const isRegistered = eventRegistrations.some((reg) => reg.event_id === evt.id);
+                      const registeredCount = allRegistrations.filter((r) => r.event_id === evt.id).length;
+                      const isFull = evt.capacity ? registeredCount >= evt.capacity : false;
+                      const capacityText = evt.capacity
+                        ? `${registeredCount} / ${evt.capacity} registered ${isFull ? "(Full)" : ""}`
+                        : `${registeredCount} registered (Unlimited)`;
+
+                      return (
+                        <div key={evt.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem" }}>
+                          <div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                              <span className={`badge ${
+                                evt.category === "Hackathon" ? "badge-rose" :
+                                evt.category === "Webinar" ? "badge-purple" :
+                                evt.category === "Workshop" ? "badge-cyan" :
+                                evt.category === "Networking" ? "badge-emerald" : "badge-amber"
+                              }`} style={{ fontSize: "0.75rem" }}>
+                                {evt.category}
+                              </span>
+                              {isRegistered && (
+                                <span className="badge badge-emerald" style={{ fontSize: "0.7rem", padding: "0.15rem 0.4rem" }}>
+                                  ✓ Registered
+                                </span>
+                              )}
+                              {!isRegistered && isFull && (
+                                <span className="badge badge-rose" style={{ fontSize: "0.7rem", padding: "0.15rem 0.4rem" }}>
+                                  Full
+                                </span>
+                              )}
+                            </div>
+                            <h4 style={{ fontSize: "1.2rem", margin: "0 0 0.5rem 0", fontWeight: "600" }}>{evt.title}</h4>
+                            <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", margin: "0 0 1.25rem 0", lineHeight: "1.5" }}>{evt.description}</p>
+                            
+                            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1rem" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "var(--text-secondary)" }}>Date & Time:</span>
+                                <span style={{ fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(evt.event_date).toLocaleString()}</span>
+                              </div>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "var(--text-secondary)" }}>Location:</span>
+                                <span style={{ fontWeight: "600" }}>{evt.location}</span>
+                              </div>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "var(--text-secondary)" }}>Host:</span>
+                                <span style={{ fontWeight: "600" }}>{evt.organizer}</span>
+                              </div>
+                              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <span style={{ color: "var(--text-secondary)" }}>Capacity:</span>
+                                <span style={{ fontWeight: "600", color: isFull ? "var(--color-rose)" : "var(--text-muted)" }}>{capacityText}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <button
+                              className="btn btn-secondary"
+                              style={{ flex: 1, padding: "0.6rem" }}
+                              onClick={() => {
+                                setSelectedEvent(evt);
+                                setShowEventDetailModal(true);
+                              }}
+                            >
+                              Details
+                            </button>
+                            <button
+                              className={`btn ${isRegistered ? "btn-secondary" : isFull ? "btn-secondary" : "btn-primary"}`}
+                              style={{ flex: 1.5, padding: "0.6rem" }}
+                              disabled={registeringEventId === evt.id || (isFull && !isRegistered)}
+                              onClick={() => handleEventRSVP(evt.id)}
+                            >
+                              {registeringEventId === evt.id ? "Loading..." : isRegistered ? "Cancel RSVP" : isFull ? "Full" : "RSVP / Register"}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </main>
       </div>
       {/* Post Project Modal */}
@@ -1635,279 +1909,6 @@ export default function PartnerDashboard(): React.ReactElement {
         </div>
       )}
 
-      {/* Funding Opportunities Workspace */}
-      {activeTab === "funding" && (
-        <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          {/* Hero Header */}
-          <div className="glass-panel" style={{ padding: "2.5rem 2rem", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--grad-cyan-purple)" }} />
-            <h3 style={{ fontSize: "1.75rem", margin: 0, fontWeight: "700" }}>Funding & Grants Hub</h3>
-            <p style={{ color: "var(--text-secondary)", fontSize: "1rem", margin: 0, maxWidth: "700px" }}>
-              Explore capital financing, accelerators, government research grants, and equity financing opportunities curated for tech entrepreneurs and startups.
-            </p>
-          </div>
-
-          {/* Filters & Search Panel */}
-          <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              {["All", "Grants", "Accelerators", "Equity/VC", "Loans/Debt"].map((cat) => (
-                <button
-                  key={cat}
-                  className={`badge ${selectedFundingCategory === cat ? "badge-cyan" : "badge-neutral"}`}
-                  style={{ cursor: "pointer", border: "none", padding: "0.5rem 1rem", fontSize: "0.85rem", borderRadius: "100px", transition: "all 0.2s" }}
-                  onClick={() => setSelectedFundingCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem", width: "100%", maxWidth: "320px", position: "relative" }}>
-              <input
-                type="text"
-                placeholder="Search opportunities..."
-                className="input-field"
-                style={{ paddingRight: "2.5rem", margin: 0 }}
-                value={searchFundingQuery}
-                onChange={(e) => setSearchFundingQuery(e.target.value)}
-              />
-              <span style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-secondary)" }}>🔍</span>
-            </div>
-          </div>
-
-          {/* Funding Grid */}
-          {loadingFunding ? (
-            <div style={{ textAlign: "center", padding: "3rem" }}>
-              <p style={{ color: "var(--text-secondary)" }}>Loading funding opportunities...</p>
-            </div>
-          ) : (() => {
-            const filtered = fundingOpportunities.filter((opp) => {
-              const matchCat = selectedFundingCategory === "All" || opp.category === selectedFundingCategory;
-              const matchQuery = opp.title.toLowerCase().includes(searchFundingQuery.toLowerCase()) ||
-                opp.description.toLowerCase().includes(searchFundingQuery.toLowerCase());
-              return matchCat && matchQuery;
-            });
-
-            if (filtered.length === 0) {
-              return (
-                <div className="glass-panel" style={{ padding: "3rem", textAlign: "center" }}>
-                  <p style={{ color: "var(--text-secondary)", margin: 0 }}>No funding opportunities matched your criteria.</p>
-                </div>
-              );
-            }
-
-            return (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
-                {filtered.map((opp) => {
-                  // Profile fit calculation
-                  let fitPercent = 0;
-                  if (profile && profile.skills) {
-                    const userSkills = profile.skills.map((s: string) => s.toLowerCase());
-                    const text = (opp.title + " " + opp.description + " " + opp.content).toLowerCase();
-                    let matches = 0;
-                    userSkills.forEach((s: string) => {
-                      if (text.includes(s)) matches++;
-                    });
-                    fitPercent = userSkills.length > 0 ? Math.min(100, Math.round(40 + (matches / userSkills.length) * 60)) : 55;
-                  } else {
-                    fitPercent = 55;
-                  }
-
-                  return (
-                    <div key={opp.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem" }}>
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                          <span className={`badge ${
-                            opp.category === "Grants" ? "badge-emerald" :
-                            opp.category === "Accelerators" ? "badge-purple" :
-                            opp.category === "Equity/VC" ? "badge-cyan" : "badge-amber"
-                          }`} style={{ fontSize: "0.75rem" }}>
-                            {opp.category}
-                          </span>
-                          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                            <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Profile Fit:</span>
-                            <span className={`badge ${fitPercent >= 75 ? "badge-emerald" : fitPercent >= 50 ? "badge-cyan" : "badge-rose"}`} style={{ fontSize: "0.7rem", padding: "0.1rem 0.3rem" }}>
-                              {fitPercent}%
-                            </span>
-                          </div>
-                        </div>
-                        <h4 style={{ fontSize: "1.2rem", margin: "0 0 0.5rem 0", fontWeight: "600" }}>{opp.title}</h4>
-                        <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", margin: "0 0 1.25rem 0", lineHeight: "1.5" }}>{opp.description}</p>
-                        
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1rem" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--text-secondary)" }}>Amount:</span>
-                            <span style={{ fontWeight: "600" }}>{opp.amount || "N/A"}</span>
-                          </div>
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--text-secondary)" }}>Deadline:</span>
-                            <span style={{ fontWeight: "600", color: "var(--color-rose)" }}>{opp.deadline || "N/A"}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <button
-                        className="btn btn-primary"
-                        style={{ width: "100%", padding: "0.6rem" }}
-                        onClick={() => {
-                          setSelectedOpportunity(opp);
-                          setShowOpportunityModal(true);
-                        }}
-                      >
-                        Read Details & Apply
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
-        </div>
-      )}
-
-      {/* Events Hub Workspace */}
-      {activeTab === "events" && (
-        <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          {/* Hero Header */}
-          <div className="glass-panel" style={{ padding: "2.5rem 2rem", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--grad-cyan-purple)" }} />
-            <h3 style={{ fontSize: "1.75rem", margin: 0, fontWeight: "700" }}>Events & Workshops</h3>
-            <p style={{ color: "var(--text-secondary)", fontSize: "1rem", margin: 0, maxWidth: "700px" }}>
-              Explore and attend community tech events, hackathons, and networking opportunities. Connect with upcoming tech talent and enterprise partners.
-            </p>
-          </div>
-
-          {/* Filters & Search Panel */}
-          <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-              {["All", "Hackathon", "Webinar", "Workshop", "Networking", "Pitch Night"].map((cat) => (
-                <button
-                  key={cat}
-                  className={`badge ${selectedEventCategory === cat ? "badge-cyan" : "badge-neutral"}`}
-                  style={{ cursor: "pointer", border: "none", padding: "0.5rem 1rem", fontSize: "0.85rem", borderRadius: "100px", transition: "all 0.2s" }}
-                  onClick={() => setSelectedEventCategory(cat)}
-                >
-                  {cat === "All" ? "All Events" : cat}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem", width: "100%", maxWidth: "320px", position: "relative" }}>
-              <input
-                type="text"
-                placeholder="Search events..."
-                className="input-field"
-                style={{ paddingRight: "2.5rem", margin: 0 }}
-                value={searchEventQuery}
-                onChange={(e) => setSearchEventQuery(e.target.value)}
-              />
-              <span style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-secondary)" }}>🔍</span>
-            </div>
-          </div>
-
-          {/* Events Grid */}
-          {loadingEvents ? (
-            <div style={{ textAlign: "center", padding: "3rem" }}>
-              <p style={{ color: "var(--text-secondary)" }}>Loading upcoming events...</p>
-            </div>
-          ) : (() => {
-            const filtered = events.filter((evt) => {
-              const matchCat = selectedEventCategory === "All" || evt.category === selectedEventCategory;
-              const matchQuery = evt.title.toLowerCase().includes(searchEventQuery.toLowerCase()) ||
-                evt.description.toLowerCase().includes(searchEventQuery.toLowerCase());
-              return matchCat && matchQuery;
-            });
-
-            if (filtered.length === 0) {
-              return (
-                <div className="glass-panel" style={{ padding: "3rem", textAlign: "center" }}>
-                  <p style={{ color: "var(--text-secondary)", margin: 0 }}>No upcoming events matched your criteria.</p>
-                </div>
-              );
-            }
-
-            return (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
-                {filtered.map((evt) => {
-                  const isRegistered = eventRegistrations.some((reg) => reg.event_id === evt.id);
-                  const registeredCount = allRegistrations.filter((r) => r.event_id === evt.id).length;
-                  const isFull = evt.capacity ? registeredCount >= evt.capacity : false;
-                  const capacityText = evt.capacity
-                    ? `${registeredCount} / ${evt.capacity} registered ${isFull ? "(Full)" : ""}`
-                    : `${registeredCount} registered (Unlimited)`;
-
-                  return (
-                    <div key={evt.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem" }}>
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                          <span className={`badge ${
-                            evt.category === "Hackathon" ? "badge-rose" :
-                            evt.category === "Webinar" ? "badge-purple" :
-                            evt.category === "Workshop" ? "badge-cyan" :
-                            evt.category === "Networking" ? "badge-emerald" : "badge-amber"
-                          }`} style={{ fontSize: "0.75rem" }}>
-                            {evt.category}
-                          </span>
-                          {isRegistered && (
-                            <span className="badge badge-emerald" style={{ fontSize: "0.7rem", padding: "0.15rem 0.4rem" }}>
-                              ✓ Registered
-                            </span>
-                          )}
-                          {!isRegistered && isFull && (
-                            <span className="badge badge-rose" style={{ fontSize: "0.7rem", padding: "0.15rem 0.4rem" }}>
-                              Full
-                            </span>
-                          )}
-                        </div>
-                        <h4 style={{ fontSize: "1.2rem", margin: "0 0 0.5rem 0", fontWeight: "600" }}>{evt.title}</h4>
-                        <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", margin: "0 0 1.25rem 0", lineHeight: "1.5" }}>{evt.description}</p>
-                        
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1rem" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--text-secondary)" }}>Date & Time:</span>
-                            <span style={{ fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(evt.event_date).toLocaleString()}</span>
-                          </div>
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--text-secondary)" }}>Location:</span>
-                            <span style={{ fontWeight: "600" }}>{evt.location}</span>
-                          </div>
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--text-secondary)" }}>Host:</span>
-                            <span style={{ fontWeight: "600" }}>{evt.organizer}</span>
-                          </div>
-                          <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <span style={{ color: "var(--text-secondary)" }}>Capacity:</span>
-                            <span style={{ fontWeight: "600", color: isFull ? "var(--color-rose)" : "var(--text-muted)" }}>{capacityText}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <button
-                          className="btn btn-secondary"
-                          style={{ flex: 1, padding: "0.6rem" }}
-                          onClick={() => {
-                            setSelectedEvent(evt);
-                            setShowEventDetailModal(true);
-                          }}
-                        >
-                          Details
-                        </button>
-                        <button
-                          className={`btn ${isRegistered ? "btn-secondary" : isFull ? "btn-secondary" : "btn-primary"}`}
-                          style={{ flex: 1.5, padding: "0.6rem" }}
-                          disabled={registeringEventId === evt.id || (isFull && !isRegistered)}
-                          onClick={() => handleEventRSVP(evt.id)}
-                        >
-                          {registeringEventId === evt.id ? "Loading..." : isRegistered ? "Cancel RSVP" : isFull ? "Full" : "RSVP / Register"}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })()}
-        </div>
-      )}
 
       {/* Funding Opportunity Detail Modal */}
       {showOpportunityModal && selectedOpportunity && (
