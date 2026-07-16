@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('EdgeTalent Complete E2E User Journeys', () => {
+  test.describe.configure({ mode: 'serial' });
+  test.setTimeout(60000);
   let hasApplied = false;
 
   // Clear localStorage and intercept edge function and database calls to run hermetic tests
@@ -85,6 +87,69 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
             title: "Next-Gen Quantum Compiler"
           })
         });
+      }
+    });
+
+    // Mock funding opportunities database queries (GET, POST, PATCH, DELETE)
+    let mockFunding = [
+      {
+        id: "00000000-0000-0000-0000-000000000099",
+        title: "Y Combinator W27 Funding Program",
+        description: "YC invests $500,000 in startup founders twice a year.",
+        content: "Y Combinator is a startup accelerator that launches twice a year. We invest a standard $500,000 in every startup we accept.",
+        amount: "$500,000",
+        eligibility: "Open to founders globally across all tech and business verticals.",
+        deadline: "September 15, 2026",
+        link: "https://www.ycombinator.com/apply",
+        category: "Accelerators",
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    await page.route('**/rest/v1/funding_opportunities**', async (route) => {
+      const method = route.request().method();
+      if (method === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(mockFunding)
+        });
+      } else if (method === 'POST') {
+        const body = JSON.parse(route.request().postData() || '{}');
+        const newItem = {
+          id: Math.random().toString(),
+          created_at: new Date().toISOString(),
+          ...body
+        };
+        mockFunding.push(newItem);
+        await route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify(newItem)
+        });
+      } else if (method === 'PATCH') {
+        const body = JSON.parse(route.request().postData() || '{}');
+        mockFunding = mockFunding.map(item => {
+          if (route.request().url().includes(item.id)) {
+            return { ...item, ...body };
+          }
+          return item;
+        });
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(body)
+        });
+      } else if (method === 'DELETE') {
+        const url = route.request().url();
+        mockFunding = mockFunding.filter(item => !url.includes(item.id));
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true })
+        });
+      } else {
+        await route.continue();
       }
     });
 
@@ -309,6 +374,24 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const appItem = page.locator('h4', { hasText: 'EdgeTalent AI Matching Engine' });
     await expect(appItem).toBeVisible();
 
+    // 9.5 Navigate to Funding Opportunities
+    const fundingTabBtn = page.locator('button', { hasText: 'Funding Opportunities' }).first();
+    await expect(fundingTabBtn).toBeVisible();
+    await fundingTabBtn.click();
+
+    // Verify funding opportunities are displayed
+    const fundingHeader = page.locator('h3', { hasText: 'Funding & Grants Hub' });
+    await expect(fundingHeader).toBeVisible();
+    const fundingOpp = page.locator('h4', { hasText: 'Y Combinator W27 Funding Program' });
+    await expect(fundingOpp).toBeVisible();
+
+    // Open details
+    await page.locator('button', { hasText: 'Read Details & Apply' }).first().click();
+    const detailModalTitle = page.locator('h3', { hasText: 'Y Combinator W27 Funding Program' });
+    await expect(detailModalTitle).toBeVisible();
+    // Close modal
+    await page.locator('#btn-close-funding-modal').click();
+
     // 10. Sign out and return home
     const signOutBtn = page.locator('button', { hasText: 'Sign Out' });
     await signOutBtn.click();
@@ -408,6 +491,24 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await expect(academyHeader).toBeVisible();
     const courseItem = page.locator('h4', { hasText: 'Startup School: How to Start a Startup' });
     await expect(courseItem).toBeVisible();
+
+    // 8.5 Navigate to Funding Opportunities
+    const fundingTabBtn = page.locator('button', { hasText: 'Funding Opportunities' }).first();
+    await expect(fundingTabBtn).toBeVisible();
+    await fundingTabBtn.click();
+
+    // Verify funding opportunities are displayed
+    const fundingHeader = page.locator('h3', { hasText: 'Funding & Grants Hub' });
+    await expect(fundingHeader).toBeVisible();
+    const fundingOpp = page.locator('h4', { hasText: 'Y Combinator W27 Funding Program' });
+    await expect(fundingOpp).toBeVisible();
+
+    // Open details
+    await page.locator('button', { hasText: 'Read Details & Apply' }).first().click();
+    const detailModalTitle = page.locator('h3', { hasText: 'Y Combinator W27 Funding Program' });
+    await expect(detailModalTitle).toBeVisible();
+    // Close modal
+    await page.locator('#btn-close-funding-modal').click();
 
     // 9. Sign out and return home
     const signOutBtn = page.locator('button', { hasText: 'Sign Out' });
@@ -656,6 +757,30 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     // Verify course added
     const newCourse = page.locator('h4', { hasText: 'Tailwind CSS Mastery' });
     await expect(newCourse).toBeVisible();
+
+    // 6.5 Navigate to Manage Funding tab and add a funding opportunity
+    const fundingTabBtn = page.locator('button', { hasText: 'Manage Funding' });
+    await fundingTabBtn.click();
+    const fundingTitleHeader = page.locator('h3', { hasText: 'Funding Opportunities' });
+    await expect(fundingTitleHeader).toBeVisible();
+
+    const addFundingBtn = page.locator('button', { hasText: 'Add Funding Opportunity' });
+    await addFundingBtn.click();
+
+    await page.locator('input[placeholder*="Y Combinator W27"]').fill('Thiel Fellowship W27');
+    await page.locator('form select').selectOption('Grants');
+    await page.locator('input[placeholder*="Brief 1-sentence summary"]').fill('A fellowship program for young builders.');
+    await page.locator('textarea[placeholder*="Detailed explanation"]').fill('Thiel Fellowship is a two-year program giving $100k.');
+    await page.locator('input[placeholder*="$500,000"]').fill('$100,000');
+    await page.locator('input[placeholder*="Tech startups"]').fill('Under 22 years old');
+    await page.locator('input[placeholder*="September 15, 2026"]').fill('Rolling');
+    await page.locator('input[placeholder*="example.com/apply"]').fill('https://www.thielfellowship.org/');
+
+    await page.locator('button', { hasText: 'Create Opportunity' }).click();
+
+    // Verify funding opportunity added
+    const newFunding = page.locator('td', { hasText: 'Thiel Fellowship W27' });
+    await expect(newFunding).toBeVisible();
 
     // 7. Logout
     const logoutBtn = page.locator('button', { hasText: 'Logout' });

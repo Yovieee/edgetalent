@@ -117,4 +117,21 @@ export const CourseEnrollmentSchema = z.object({
 
 export type CourseEnrollment = z.infer<typeof CourseEnrollmentSchema>;
 
+// 9. Funding Opportunity Schema
+export const FundingOpportunitySchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(3, "Title must be at least 3 characters long"),
+  description: z.string().min(10, "Description must be at least 10 characters long"),
+  content: z.string().min(10, "Content must be at least 10 characters long"),
+  amount: z.string().optional().nullable(),
+  eligibility: z.string().optional().nullable(),
+  deadline: z.string().optional().nullable(),
+  link: z.string().url("Must be a valid URL").or(z.literal("")).optional().nullable(),
+  category: z.enum(["Grants", "Equity/VC", "Accelerators", "Loans/Debt"]),
+  created_at: z.string().optional()
+});
+
+export type FundingOpportunity = z.infer<typeof FundingOpportunitySchema>;
+
+
 
