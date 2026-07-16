@@ -1548,35 +1548,21 @@ export default function TalentDashboard(): React.ReactElement {
 
                         <div>
                           {enrollment ? (
-                            <div style={{ display: "flex", gap: "0.5rem" }}>
-                              <button
-                                className="btn btn-primary"
-                                style={{ flex: 1 }}
-                                onClick={() => handleStartCourse(course)}
-                              >
-                                {progressPercent === 100 ? "Review Lessons" : "Continue Lessons"}
-                              </button>
-                              {course.link && (
-                                <a href={course.link} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center" }} title="Visit External Course Website">
-                                  ↗
-                                </a>
-                              )}
-                            </div>
+                            <button
+                              className="btn btn-primary"
+                              style={{ width: "100%" }}
+                              onClick={() => handleStartCourse(course)}
+                            >
+                              {progressPercent === 100 ? "Review Lessons" : "Continue Lessons"}
+                            </button>
                           ) : (
-                            <div style={{ display: "flex", gap: "0.5rem" }}>
-                              <button
-                                className="btn btn-primary"
-                                style={{ flex: 1 }}
-                                onClick={() => handleEnrollCourse(course.id)}
-                              >
-                                Enroll in Course
-                              </button>
-                              {course.link && (
-                                <a href={course.link} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                  Link ↗
-                                </a>
-                              )}
-                            </div>
+                            <button
+                              className="btn btn-primary"
+                              style={{ width: "100%" }}
+                              onClick={() => handleEnrollCourse(course.id)}
+                            >
+                              Enroll in Course
+                            </button>
                           )}
                         </div>
                       </div>

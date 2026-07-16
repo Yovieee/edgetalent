@@ -1369,11 +1369,6 @@ export default function AdminDashboard(): React.ReactElement {
                       )}
                     </div>
                     <div style={{ display: "flex", gap: "0.5rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1rem" }}>
-                      {c.link && (
-                        <a href={c.link} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ flex: 1, padding: "0.5rem", fontSize: "0.85rem" }}>
-                          Course Link ↗
-                        </a>
-                      )}
                       <button className="btn btn-secondary" onClick={() => handleOpenLessonsManager(c)} style={{ padding: "0.5rem", fontSize: "0.85rem", borderColor: "var(--color-cyan)" }}>
                         Lessons
                       </button>
