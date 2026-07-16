@@ -40,14 +40,10 @@ USING (public.is_admin())
 WITH CHECK (public.is_admin());
 
 -- Event Registrations policies
-CREATE POLICY "Event registrations are viewable by registered user, event host, or admin"
+CREATE POLICY "Event registrations are viewable by all authenticated users"
 ON public.event_registrations FOR SELECT
 TO authenticated
-USING (
-    auth.uid() = user_id OR 
-    EXISTS (SELECT 1 FROM public.events WHERE events.id = event_registrations.event_id AND events.organizer_id = auth.uid()) OR
-    public.is_admin()
-);
+USING (true);
 
 CREATE POLICY "Users can register/RSVP for events"
 ON public.event_registrations FOR INSERT

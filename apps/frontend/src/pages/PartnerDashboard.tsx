@@ -68,6 +68,7 @@ export default function PartnerDashboard(): React.ReactElement {
   const [events, setEvents] = useState<any[]>([]);
   const [loadingEvents, setLoadingEvents] = useState<boolean>(false);
   const [eventRegistrations, setEventRegistrations] = useState<any[]>([]);
+  const [allRegistrations, setAllRegistrations] = useState<any[]>([]);
   const [searchEventQuery, setSearchEventQuery] = useState<string>("");
   const [selectedEventCategory, setSelectedEventCategory] = useState<string>("All");
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
@@ -320,14 +321,15 @@ export default function PartnerDashboard(): React.ReactElement {
 
   // Fetch registrations/RSVPs
   const loadEventRegistrations = useCallback(async () => {
-    if (!profile) return;
     try {
       const { data, error } = await supabase
         .from("event_registrations")
-        .select("*")
-        .eq("user_id", profile.id);
+        .select("*");
       if (!error && data) {
-        setEventRegistrations(data);
+        setAllRegistrations(data);
+        if (profile) {
+          setEventRegistrations(data.filter((r: any) => r.user_id === profile.id));
+        }
       }
     } catch (e) {
       console.error(e);
@@ -337,9 +339,20 @@ export default function PartnerDashboard(): React.ReactElement {
   // RSVP handler
   const handleEventRSVP = async (eventId: string) => {
     if (!profile) return;
-    setRegisteringEventId(eventId);
-    const existingRegistration = eventRegistrations.find(r => r.event_id === eventId);
 
+    // Capacity check
+    const eventObj = events.find(e => e.id === eventId);
+    const existingRegistration = eventRegistrations.find(r => r.event_id === eventId);
+    
+    if (eventObj && eventObj.capacity && !existingRegistration) {
+      const currentRSVPs = allRegistrations.filter(r => r.event_id === eventId).length;
+      if (currentRSVPs >= eventObj.capacity) {
+        alert("Sorry, this event has already reached its capacity limit!");
+        return;
+      }
+    }
+
+    setRegisteringEventId(eventId);
     try {
       if (existingRegistration) {
         // Cancel RSVP
@@ -351,6 +364,7 @@ export default function PartnerDashboard(): React.ReactElement {
         if (error) throw error;
         
         setEventRegistrations(prev => prev.filter(r => r.id !== existingRegistration.id));
+        setAllRegistrations(prev => prev.filter(r => r.id !== existingRegistration.id));
       } else {
         // RSVP/Register
         const { data, error } = await supabase
@@ -365,6 +379,7 @@ export default function PartnerDashboard(): React.ReactElement {
         if (error) throw error;
         if (data) {
           setEventRegistrations(prev => [...prev, data]);
+          setAllRegistrations(prev => [...prev, data]);
         }
       }
     } catch (e: any) {
@@ -1813,7 +1828,11 @@ export default function PartnerDashboard(): React.ReactElement {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
                 {filtered.map((evt) => {
                   const isRegistered = eventRegistrations.some((reg) => reg.event_id === evt.id);
-                  const capacityText = evt.capacity ? `${evt.capacity} spots maximum` : "Unlimited capacity";
+                  const registeredCount = allRegistrations.filter((r) => r.event_id === evt.id).length;
+                  const isFull = evt.capacity ? registeredCount >= evt.capacity : false;
+                  const capacityText = evt.capacity
+                    ? `${registeredCount} / ${evt.capacity} registered ${isFull ? "(Full)" : ""}`
+                    : `${registeredCount} registered (Unlimited)`;
 
                   return (
                     <div key={evt.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem" }}>
@@ -1830,6 +1849,11 @@ export default function PartnerDashboard(): React.ReactElement {
                           {isRegistered && (
                             <span className="badge badge-emerald" style={{ fontSize: "0.7rem", padding: "0.15rem 0.4rem" }}>
                               ✓ Registered
+                            </span>
+                          )}
+                          {!isRegistered && isFull && (
+                            <span className="badge badge-rose" style={{ fontSize: "0.7rem", padding: "0.15rem 0.4rem" }}>
+                              Full
                             </span>
                           )}
                         </div>
@@ -1851,7 +1875,7 @@ export default function PartnerDashboard(): React.ReactElement {
                           </div>
                           <div style={{ display: "flex", justifyContent: "space-between" }}>
                             <span style={{ color: "var(--text-secondary)" }}>Capacity:</span>
-                            <span style={{ fontWeight: "600", color: "var(--text-muted)" }}>{capacityText}</span>
+                            <span style={{ fontWeight: "600", color: isFull ? "var(--color-rose)" : "var(--text-muted)" }}>{capacityText}</span>
                           </div>
                         </div>
                       </div>
@@ -1868,12 +1892,12 @@ export default function PartnerDashboard(): React.ReactElement {
                           Details
                         </button>
                         <button
-                          className={`btn ${isRegistered ? "btn-secondary" : "btn-primary"}`}
+                          className={`btn ${isRegistered ? "btn-secondary" : isFull ? "btn-secondary" : "btn-primary"}`}
                           style={{ flex: 1.5, padding: "0.6rem" }}
-                          disabled={registeringEventId === evt.id}
+                          disabled={registeringEventId === evt.id || (isFull && !isRegistered)}
                           onClick={() => handleEventRSVP(evt.id)}
                         >
-                          {registeringEventId === evt.id ? "Loading..." : isRegistered ? "Cancel RSVP" : "RSVP / Register"}
+                          {registeringEventId === evt.id ? "Loading..." : isRegistered ? "Cancel RSVP" : isFull ? "Full" : "RSVP / Register"}
                         </button>
                       </div>
                     </div>
