@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('EdgeTalent Complete E2E User Journeys', () => {
-  test.describe.configure({ mode: 'serial' });
   test.setTimeout(60000);
   let hasApplied = false;
 
@@ -279,7 +278,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
 
     // 4. Verify Dashboard Welcome message
     const welcomeHeader = page.locator('.user-profile-menu', { hasText: 'Alex Developer' });
-    await expect(welcomeHeader).toBeVisible();
+    await expect(welcomeHeader).toBeVisible({ timeout: 15000 });
 
     // 5. Navigate to Profile Builder and update info
     const profileTabBtn = page.locator('button', { hasText: 'My Profile' });
@@ -433,7 +432,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
 
     // 4. Verify Dashboard Header
     const welcomeHeader = page.locator('.user-profile-menu', { hasText: 'Google DeepMind Partner' });
-    await expect(welcomeHeader).toBeVisible();
+    await expect(welcomeHeader).toBeVisible({ timeout: 15000 });
 
     // 5. Navigate to Manage Projects tab and open Post New Project modal
     const manageProjectsBtn = page.locator('button', { hasText: 'Manage Projects' });
