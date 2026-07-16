@@ -352,7 +352,10 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const welcomeHeader = page.locator('.user-profile-menu', { hasText: 'Google DeepMind Partner' });
     await expect(welcomeHeader).toBeVisible();
 
-    // 5. Open Post New Project modal from Manage Projects dashboard
+    // 5. Navigate to Manage Projects tab and open Post New Project modal
+    const manageProjectsBtn = page.locator('button', { hasText: 'Manage Projects' });
+    await manageProjectsBtn.click();
+
     const openPostModalBtn = page.locator('button', { hasText: '+ Post New Project' });
     await openPostModalBtn.click();
 
@@ -372,11 +375,18 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const successMsg = page.locator('.badge', { hasText: 'Project posted successfully with vector embeddings!' });
     await expect(successMsg).toBeVisible();
 
-    // Verify the project shows up on the dashboard list (modal auto-closes)
+    // Verify the project shows up on the Manage Projects list (modal auto-closes)
     const postedProjectTitle = page.locator('h4', { hasText: 'Next-Gen Quantum Compiler' });
     await expect(postedProjectTitle).toBeVisible();
 
-    // 7. Expand matches inline on the dashboard
+    // 6. Go back to Dashboard and verify the project shows up under Recent Project Postings
+    const dashboardTabBtn = page.locator('button', { hasText: 'Dashboard' });
+    await dashboardTabBtn.click();
+    const recentProjectTitle = page.locator('h4', { hasText: 'Next-Gen Quantum Compiler' }).first();
+    await expect(recentProjectTitle).toBeVisible();
+
+    // 7. Go back to Manage Projects to expand matches inline
+    await manageProjectsBtn.click();
     const findMatchesBtn = page.locator('button', { hasText: 'Find Talent Matches' }).first();
     await expect(findMatchesBtn).toBeVisible();
     await findMatchesBtn.click();
