@@ -200,7 +200,41 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
           }
         });
       } else if (method === 'GET') {
-        if (hasApplied) {
+        const url = route.request().url();
+        if (url.includes('project_id=') || url.includes('profiles:talent_id')) {
+          // Partner dashboard query
+          await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify([
+              {
+                id: "00000000-0000-0000-0000-000000000005",
+                project_id: "00000000-0000-0000-0000-000000000003",
+                talent_id: "00000000-0000-0000-0000-000000000001",
+                status: "applied",
+                match_percentage: 95,
+                match_breakdown: { score_method: "pgvector cosine similarity" },
+                applied_at: new Date().toISOString(),
+                projects: {
+                  id: "00000000-0000-0000-0000-000000000003",
+                  title: "Next-Gen Quantum Compiler",
+                  description: "Build a compiler pipeline using web assembly, typescript, and vector optimization models.",
+                  required_skills: ["WebAssembly", "TypeScript", "Quantum Computing"],
+                  budget: 5000,
+                  scope: "medium-term"
+                },
+                profiles: {
+                  id: "00000000-0000-0000-0000-000000000001",
+                  full_name: "Mock Talent Candidate",
+                  email: "candidate@edgetalent.com",
+                  avatar_url: "",
+                  bio: "React & TypeScript expert with compiler experience.",
+                  skills: ["TypeScript", "React", "WebAssembly"]
+                }
+              }
+            ])
+          });
+        } else if (hasApplied) {
           await route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -237,6 +271,13 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({ success: true })
+        });
+      } else if (method === 'PATCH') {
+        const postData = JSON.parse(route.request().postData() || '{}');
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true, ...postData })
         });
       } else {
         await route.continue();
@@ -508,6 +549,28 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await expect(detailModalTitle).toBeVisible();
     // Close modal
     await page.locator('#btn-close-funding-modal').click();
+
+    // 8.6 Navigate to Hiring Desk and check applications
+    const hiringTabBtn = page.locator('button', { hasText: 'Hiring Desk' });
+    await expect(hiringTabBtn).toBeVisible();
+    await hiringTabBtn.click();
+
+    // Verify Hiring Desk header
+    const hiringHeader = page.locator('h3', { hasText: 'Hiring Desk' });
+    await expect(hiringHeader).toBeVisible();
+
+    // Verify candidate details are displayed
+    const candidateNameText = page.locator('h4', { hasText: 'Mock Talent Candidate' });
+    await expect(candidateNameText).toBeVisible();
+
+    // Perform status update (click Shortlist)
+    const shortlistBtn = page.locator('button.btn-shortlist').first();
+    await expect(shortlistBtn).toBeVisible();
+    await shortlistBtn.click();
+
+    // Verify status badge update
+    const statusBadge = page.locator('span.badge', { hasText: 'shortlisted' }).first();
+    await expect(statusBadge).toBeVisible();
 
     // 9. Sign out and return home
     const signOutBtn = page.locator('button', { hasText: 'Sign Out' });

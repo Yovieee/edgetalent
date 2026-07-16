@@ -49,6 +49,13 @@ export default function PartnerDashboard(): React.ReactElement {
   const [activeLessonIdx, setActiveLessonIdx] = useState<number>(0);
   const [allLessonsSummary, setAllLessonsSummary] = useState<Record<string, number>>({});
 
+  // Hiring Desk states
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loadingApplications, setLoadingApplications] = useState<boolean>(false);
+  const [applicationsError, setApplicationsError] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("All");
+
   // Funding states
   const [fundingOpportunities, setFundingOpportunities] = useState<FundingOpportunity[]>([]);
   const [loadingFunding, setLoadingFunding] = useState<boolean>(false);
@@ -283,6 +290,69 @@ export default function PartnerDashboard(): React.ReactElement {
     }
   }, [supabase]);
 
+  // Fetch applications for the entrepreneur's projects
+  const loadApplications = useCallback(async () => {
+    if (!profile) return;
+    setLoadingApplications(true);
+    setApplicationsError("");
+    try {
+      const { data: projs, error: projErr } = await supabase
+        .from("projects")
+        .select("id")
+        .eq("partner_id", profile.id);
+
+      if (projErr) throw projErr;
+
+      if (!projs || projs.length === 0) {
+        setApplications([]);
+        return;
+      }
+
+      const projIds = projs.map((p) => p.id);
+
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*, projects(*), profiles:talent_id(*)")
+        .in("project_id", projIds);
+
+      if (error) throw error;
+
+      if (data) {
+        // Sort newest first
+        const sorted = [...data].sort((a, b) => new Date(b.applied_at).getTime() - new Date(a.applied_at).getTime());
+        setApplications(sorted);
+      }
+    } catch (e: any) {
+      console.error("Error loading applications:", e);
+      setApplicationsError(e.message || "Failed to load applications.");
+    } finally {
+      setLoadingApplications(false);
+    }
+  }, [profile, supabase]);
+
+  // Update application status
+  const handleUpdateStatus = async (applicationId: string, newStatus: "applied" | "reviewing" | "shortlisted" | "accepted" | "rejected") => {
+    try {
+      const { error } = await supabase
+        .from("applications")
+        .update({ status: newStatus })
+        .eq("id", applicationId);
+
+      if (error) throw error;
+
+      // Update state locally
+      setApplications(prev =>
+        prev.map(app => (app.id === applicationId ? { ...app, status: newStatus } : app))
+      );
+
+      // Refresh stats on dashboard overview
+      loadOverview();
+    } catch (err: any) {
+      console.error("Error updating application status:", err);
+      alert(err.message || "Failed to update application status.");
+    }
+  };
+
   useEffect(() => {
     loadOverview();
   }, [loadOverview]);
@@ -304,7 +374,10 @@ export default function PartnerDashboard(): React.ReactElement {
     if (activeTab === "funding") {
       loadFundingOpportunities();
     }
-  }, [activeTab, loadCourses, loadEnrollments, fetchAllLessonsSummary, loadFundingOpportunities]);
+    if (activeTab === "hiring") {
+      loadApplications();
+    }
+  }, [activeTab, loadCourses, loadEnrollments, fetchAllLessonsSummary, loadFundingOpportunities, loadApplications]);
 
   // Post project
   const handlePostProject = async (e: React.FormEvent) => {
@@ -427,6 +500,14 @@ export default function PartnerDashboard(): React.ReactElement {
                 <rect x="3" y="16" width="7" height="5" />
               </svg>
             )},
+            { id: "hiring", label: "Hiring Desk", icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            )},
             { id: "courses", label: "Entrepreneurship Academy", icon: (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
@@ -491,6 +572,7 @@ export default function PartnerDashboard(): React.ReactElement {
             <h2 className="dashboard-header-title">
               {activeTab === "dashboard" && "Dashboard"}
               {activeTab === "overview" && "Manage Projects"}
+              {activeTab === "hiring" && "Hiring Desk"}
               {activeTab === "courses" && "Entrepreneurship Academy"}
               {activeTab === "funding" && "Funding Opportunities"}
             </h2>
@@ -573,6 +655,21 @@ export default function PartnerDashboard(): React.ReactElement {
                     </div>
                     <button className="btn btn-primary" onClick={() => setActiveTab("overview")} style={{ width: "100%" }}>
                       Go to Projects Workspace
+                    </button>
+                  </div>
+
+                  <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+                      <span style={{ fontSize: "1.5rem" }}>💼</span>
+                      <div>
+                        <h4 style={{ fontSize: "1.05rem", margin: "0 0 0.25rem 0" }}>Hiring Desk</h4>
+                        <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>
+                          Review candidate submissions, track shortlist progress, and manage talent pipelines.
+                        </p>
+                      </div>
+                    </div>
+                    <button className="btn btn-success" onClick={() => setActiveTab("hiring")} style={{ width: "100%" }}>
+                      Open Hiring Desk
                     </button>
                   </div>
 
@@ -762,9 +859,289 @@ export default function PartnerDashboard(): React.ReactElement {
             </div>
           )}
 
+          {/* Hiring Desk Tab */}
+          {activeTab === "hiring" && (
+            <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+              {/* Hero Header */}
+              <div className="glass-panel" style={{ padding: "2.5rem 2rem", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--grad-emerald-cyan)" }} />
+                <h3 style={{ fontSize: "1.75rem", margin: 0, fontWeight: "700" }}>Hiring Desk</h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: "1rem", margin: 0, maxWidth: "700px" }}>
+                  Manage and review applications submitted by talents for your posted projects. Track candidates, view AI vector matches, and transition application statuses.
+                </p>
+              </div>
+
+              {/* Stats Overview */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "1.5rem" }}>
+                <div className="glass-panel" style={{ padding: "1.25rem", textAlign: "center" }}>
+                  <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.25rem", fontSize: "0.8rem", textTransform: "uppercase" }}>Total Applicants</h4>
+                  <p style={{ fontSize: "1.8rem", fontWeight: "bold", color: "var(--text-primary)", margin: "0.25rem 0 0 0" }}>{applications.length}</p>
+                </div>
+                <div className="glass-panel" style={{ padding: "1.25rem", textAlign: "center" }}>
+                  <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.25rem", fontSize: "0.8rem", textTransform: "uppercase" }}>Reviewing</h4>
+                  <p style={{ fontSize: "1.8rem", fontWeight: "bold", color: "var(--color-cyan)", margin: "0.25rem 0 0 0" }}>
+                    {applications.filter(a => a.status === "reviewing").length}
+                  </p>
+                </div>
+                <div className="glass-panel" style={{ padding: "1.25rem", textAlign: "center" }}>
+                  <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.25rem", fontSize: "0.8rem", textTransform: "uppercase" }}>Shortlisted</h4>
+                  <p style={{ fontSize: "1.8rem", fontWeight: "bold", color: "var(--color-purple)", margin: "0.25rem 0 0 0" }}>
+                    {applications.filter(a => a.status === "shortlisted").length}
+                  </p>
+                </div>
+                <div className="glass-panel" style={{ padding: "1.25rem", textAlign: "center" }}>
+                  <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.25rem", fontSize: "0.8rem", textTransform: "uppercase" }}>Accepted</h4>
+                  <p style={{ fontSize: "1.8rem", fontWeight: "bold", color: "var(--color-emerald)", margin: "0.25rem 0 0 0" }}>
+                    {applications.filter(a => a.status === "accepted").length}
+                  </p>
+                </div>
+                <div className="glass-panel" style={{ padding: "1.25rem", textAlign: "center" }}>
+                  <h4 style={{ color: "var(--text-secondary)", marginBottom: "0.25rem", fontSize: "0.8rem", textTransform: "uppercase" }}>Rejected</h4>
+                  <p style={{ fontSize: "1.8rem", fontWeight: "bold", color: "var(--color-rose)", margin: "0.25rem 0 0 0" }}>
+                    {applications.filter(a => a.status === "rejected").length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Filters & Search Control Panel */}
+              <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
+                {/* Search */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "rgba(255, 255, 255, 0.5)", border: "1px solid var(--glass-border)", borderRadius: "var(--radius-sm)", padding: "0.5rem 1rem", minWidth: "280px", flex: "1" }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Search applicants or projects..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ border: "none", background: "transparent", outline: "none", color: "var(--text-primary)", fontSize: "0.9rem", width: "100%" }}
+                  />
+                </div>
+
+                {/* Status Filter Buttons */}
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  {["All", "Applied", "Reviewing", "Shortlisted", "Accepted", "Rejected"].map((status) => {
+                    const count = status === "All" ? applications.length : applications.filter(a => a.status.toLowerCase() === status.toLowerCase()).length;
+                    const isActive = statusFilter === status;
+                    return (
+                      <button
+                        key={status}
+                        className={`badge ${isActive ? "badge-cyan" : "badge-neutral"}`}
+                        style={{ cursor: "pointer", border: "none", padding: "0.5rem 1rem", fontSize: "0.85rem", borderRadius: "100px", transition: "all 0.2s" }}
+                        onClick={() => setStatusFilter(status)}
+                      >
+                        {status} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Applications Area */}
+              {loadingApplications ? (
+                <div style={{ display: "flex", justifyContent: "center", padding: "3rem" }}>
+                  <p style={{ color: "var(--text-secondary)" }}>Loading candidate applications...</p>
+                </div>
+              ) : applicationsError ? (
+                <div className="badge badge-rose" style={{ padding: "1rem", borderRadius: "var(--radius-sm)" }}>
+                  {applicationsError}
+                </div>
+              ) : (() => {
+                // Apply Client-Side Filtering
+                const filteredApplications = applications.filter((app) => {
+                  const matchSearch =
+                    (app.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (app.projects?.title || "").toLowerCase().includes(searchQuery.toLowerCase());
+                  const matchStatus =
+                    statusFilter === "All" || app.status.toLowerCase() === statusFilter.toLowerCase();
+                  return matchSearch && matchStatus;
+                });
+
+                if (filteredApplications.length === 0) {
+                  return (
+                    <div className="glass-panel" style={{ padding: "4rem 2rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+                      <span style={{ fontSize: "3rem" }}>💼</span>
+                      <h4 style={{ fontSize: "1.25rem", margin: 0 }}>No applications found</h4>
+                      <p style={{ color: "var(--text-secondary)", maxWidth: "500px", margin: 0 }}>
+                        {statusFilter !== "All" || searchQuery
+                          ? "Try adjusting your search criteria or filters to see more results."
+                          : "No candidates have applied to your active project scopes yet. Post more deliverables scopes in the Projects workspace to attract elite talents."}
+                      </p>
+                      {statusFilter === "All" && !searchQuery && (
+                        <button className="btn btn-primary" onClick={() => setActiveTab("overview")}>
+                          Go to Projects Workspace
+                        </button>
+                      )}
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "1.5rem" }}>
+                    {filteredApplications.map((app) => {
+                      const talent = app.profiles || {};
+                      const project = app.projects || {};
+                      const initials = (talent.full_name || "T")[0].toUpperCase();
+                      const matchPct = app.match_percentage || 0;
+                      
+                      // Match percentage colors
+                      let matchBadgeClass = "badge-rose";
+                      let matchColor = "var(--color-rose)";
+                      if (matchPct >= 80) {
+                        matchBadgeClass = "badge-emerald";
+                        matchColor = "var(--color-emerald)";
+                      } else if (matchPct >= 50) {
+                        matchBadgeClass = "badge-cyan";
+                        matchColor = "var(--color-cyan)";
+                      } else if (matchPct > 0) {
+                        matchBadgeClass = "badge-amber";
+                        matchColor = "var(--color-amber)";
+                      }
+
+                      // Status styles
+                      let statusBadgeClass = "badge-neutral";
+                      if (app.status === "reviewing") statusBadgeClass = "badge-cyan";
+                      else if (app.status === "shortlisted") statusBadgeClass = "badge-purple";
+                      else if (app.status === "accepted") statusBadgeClass = "badge-emerald";
+                      else if (app.status === "rejected") statusBadgeClass = "badge-rose";
+
+                      return (
+                        <div key={app.id} className="glass-panel" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.25rem", transition: "all 0.3s" }}>
+                          
+                          {/* Card Top */}
+                          <div>
+                            {/* Project Reference */}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.5rem", marginBottom: "1rem" }}>
+                              <span className="badge badge-neutral" style={{ fontSize: "0.7rem", maxWidth: "200px", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }} title={project.title}>
+                                Project: {project.title}
+                              </span>
+                              <span className={`badge ${statusBadgeClass}`} style={{ fontSize: "0.7rem", textTransform: "capitalize" }}>
+                                {app.status}
+                              </span>
+                            </div>
+
+                            {/* Talent Info Row */}
+                            <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+                              <div style={{
+                                width: "42px",
+                                height: "42px",
+                                borderRadius: "50%",
+                                background: "var(--grad-cyan-purple)",
+                                color: "white",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontWeight: "700",
+                                fontSize: "1.1rem"
+                              }}>
+                                {initials}
+                              </div>
+                              <div style={{ overflow: "hidden" }}>
+                                <h4 style={{ fontSize: "1.1rem", margin: 0, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{talent.full_name || "EdgeTalent Member"}</h4>
+                                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{talent.email}</span>
+                              </div>
+                            </div>
+
+                            {/* AI Match Score Progress */}
+                            {matchPct > 0 && (
+                              <div style={{ marginBottom: "1rem" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.25rem" }}>
+                                  <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", fontWeight: "500" }}>AI Match Accuracy</span>
+                                  <span className={`badge ${matchBadgeClass}`} style={{ fontSize: "0.7rem" }}>{matchPct}% Match</span>
+                                </div>
+                                <div style={{ width: "100%", height: "6px", background: "var(--bg-tertiary)", borderRadius: "10px", overflow: "hidden" }}>
+                                  <div style={{ width: `${matchPct}%`, height: "100%", background: matchColor, borderRadius: "10px" }} />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Bio */}
+                            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: "1.5", margin: "0 0 1rem 0", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }} title={talent.bio}>
+                              {talent.bio || "No biography provided by candidate."}
+                            </p>
+
+                            {/* Skills Badges */}
+                            {talent.skills && talent.skills.length > 0 && (
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem", marginBottom: "1rem" }}>
+                                {talent.skills.slice(0, 6).map((skill: string, idx: number) => (
+                                  <span key={idx} className="badge badge-emerald" style={{ fontSize: "0.65rem", padding: "0.15rem 0.4rem" }}>{skill}</span>
+                                ))}
+                                {talent.skills.length > 6 && (
+                                  <span className="badge badge-neutral" style={{ fontSize: "0.65rem", padding: "0.15rem 0.4rem" }}>+{talent.skills.length - 6} more</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Card Footer Actions */}
+                          <div style={{ borderTop: "1px solid var(--glass-border)", paddingTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                            {/* Date applied */}
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                              <span>Applied: {new Date(app.applied_at).toLocaleDateString()}</span>
+                            </div>
+
+                            {/* Update Status Buttons */}
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                              <button
+                                className="btn btn-secondary btn-review"
+                                style={{ flex: "1", padding: "0.4rem 0.8rem", fontSize: "0.8rem", background: app.status === "reviewing" ? "rgba(8, 145, 178, 0.1)" : "", borderColor: app.status === "reviewing" ? "var(--color-cyan)" : "" }}
+                                onClick={() => handleUpdateStatus(app.id, "reviewing")}
+                              >
+                                Review
+                              </button>
+                              <button
+                                className="btn btn-secondary btn-shortlist"
+                                style={{ flex: "1", padding: "0.4rem 0.8rem", fontSize: "0.8rem", background: app.status === "shortlisted" ? "rgba(124, 58, 237, 0.1)" : "", borderColor: app.status === "shortlisted" ? "var(--color-purple)" : "" }}
+                                onClick={() => handleUpdateStatus(app.id, "shortlisted")}
+                              >
+                                Shortlist
+                              </button>
+                              <button
+                                className="btn btn-success btn-accept"
+                                style={{ flex: "1", padding: "0.4rem 0.8rem", fontSize: "0.8rem", minWidth: "70px" }}
+                                disabled={app.status === "accepted"}
+                                onClick={() => handleUpdateStatus(app.id, "accepted")}
+                              >
+                                Accept
+                              </button>
+                              <button
+                                className="btn btn-warning btn-reject"
+                                style={{ flex: "1", padding: "0.4rem 0.8rem", fontSize: "0.8rem", minWidth: "70px" }}
+                                disabled={app.status === "rejected"}
+                                onClick={() => handleUpdateStatus(app.id, "rejected")}
+                              >
+                                Reject
+                              </button>
+                            </div>
+
+                            {/* Contact button */}
+                            {talent.email && (
+                              <a
+                                href={`mailto:${talent.email}?subject=Application for ${project.title}`}
+                                className="btn btn-primary"
+                                style={{ width: "100%", padding: "0.5rem 1rem", fontSize: "0.85rem", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: "0.5rem" }}>
+                                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                  <polyline points="22,6 12,13 2,6" />
+                                </svg>
+                                Contact Candidate
+                              </a>
+                            )}
+                          </div>
+
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
           {/* Project Manager Portal */}
-
-
           {/* Entrepreneurship Academy Tab */}
           {activeTab === "courses" && (
             <div className="animate-fade-in">
