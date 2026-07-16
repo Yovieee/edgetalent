@@ -133,5 +133,30 @@ export const FundingOpportunitySchema = z.object({
 
 export type FundingOpportunity = z.infer<typeof FundingOpportunitySchema>;
 
+// 10. Event Schema
+export const EventSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(3, "Title must be at least 3 characters long"),
+  description: z.string().min(10, "Description must be at least 10 characters long"),
+  content: z.string().min(10, "Content must be at least 10 characters long"),
+  event_date: z.string().datetime("Must be a valid ISO datetime string").or(z.string().min(1, "Date cannot be empty")),
+  location: z.string().min(1, "Location cannot be empty"),
+  organizer: z.string().min(1, "Organizer cannot be empty"),
+  organizer_id: z.string().uuid().optional().nullable(),
+  category: z.enum(["Hackathon", "Webinar", "Workshop", "Networking", "Pitch Night"]),
+  capacity: z.number().int().positive().nullable().optional(),
+  link: z.string().url("Must be a valid URL").or(z.literal("")).optional().nullable(),
+  created_at: z.string().optional()
+});
 
+export type Event = z.infer<typeof EventSchema>;
 
+// 11. Event Registration Schema
+export const EventRegistrationSchema = z.object({
+  id: z.string().uuid().optional(),
+  event_id: z.string().uuid(),
+  user_id: z.string().uuid(),
+  created_at: z.string().optional()
+});
+
+export type EventRegistration = z.infer<typeof EventRegistrationSchema>;

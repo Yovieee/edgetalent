@@ -294,6 +294,77 @@ async function runE2ETests() {
     if (deleteQErr) throw new Error(`Admin failed to delete quiz question: ${deleteQErr.message}`);
     console.log("  ✅ Admin successfully deleted quiz question.");
 
+    // -------------------------------------------------------------
+    // Test 8: Events & Registrations CRUD & RLS
+    // -------------------------------------------------------------
+    console.log("\n🧪 [8/8] Testing Event Creation and RSVP registration...");
+
+    const eventPayload = {
+      title: "EdgeTalent AI Launch Party",
+      category: "Networking",
+      description: "Join us for the launch of our new AI matching engine.",
+      content: "Detailed agenda: 6PM networking, 7PM keynotes, 8PM open pitch session.",
+      event_date: new Date(Date.now() + 86400000 * 5).toISOString(),
+      location: "Jakarta Headquarters & Online",
+      organizer: "EdgeTalent Foundation",
+      capacity: 150,
+      link: "https://edgetalent.com/launch"
+    };
+
+    // 1. Create Event as Admin
+    const { data: insertedEvent, error: insertEvtErr } = await supabase
+      .from("events")
+      .insert(eventPayload)
+      .select()
+      .single();
+
+    if (insertEvtErr || !insertedEvent) throw new Error(`Failed to create event: ${insertEvtErr?.message}`);
+    console.log(`  ✅ Event created successfully. Event ID: ${insertedEvent.id}`);
+
+    // 2. RSVP (Register) for Event as Talent
+    const registrationPayload = {
+      event_id: insertedEvent.id,
+      user_id: testTalentId
+    };
+
+    const { data: insertedReg, error: insertRegErr } = await supabase
+      .from("event_registrations")
+      .insert(registrationPayload)
+      .select()
+      .single();
+
+    if (insertRegErr || !insertedReg) throw new Error(`Failed to register talent for event: ${insertRegErr?.message}`);
+    console.log(`  ✅ Talent successfully RSVPed for event. Registration ID: ${insertedReg.id}`);
+
+    // 3. Verify unique constraint: Registering same talent twice should fail
+    const { error: doubleRegErr } = await supabase
+      .from("event_registrations")
+      .insert(registrationPayload);
+
+    if (doubleRegErr) {
+      console.log("  ✅ Database correctly blocked duplicate RSVP (unique constraint passed).");
+    } else {
+      throw new Error("Database failed to block duplicate RSVP!");
+    }
+
+    // 4. Cancel RSVP
+    const { error: deleteRegErr } = await supabase
+      .from("event_registrations")
+      .delete()
+      .eq("id", insertedReg.id);
+
+    if (deleteRegErr) throw new Error(`Failed to cancel RSVP: ${deleteRegErr.message}`);
+    console.log("  ✅ RSVP canceled successfully (registration deleted).");
+
+    // 5. Cleanup event
+    const { error: deleteEvtErr } = await supabase
+      .from("events")
+      .delete()
+      .eq("id", insertedEvent.id);
+
+    if (deleteEvtErr) throw new Error(`Failed to delete event: ${deleteEvtErr.message}`);
+    console.log("  ✅ Event cleaned up successfully.");
+
     console.log("\n✨ All End-to-End (E2E) integration test cases passed successfully!");
 
   } catch (err: any) {
