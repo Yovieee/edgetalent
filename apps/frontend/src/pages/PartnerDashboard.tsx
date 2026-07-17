@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../context/SupabaseContext";
-import { ProjectSchema, FundingOpportunity } from "@edgetalent/shared";
+import { ProjectSchema, FundingOpportunity, PortfolioLinksSchema } from "@edgetalent/shared";
 import { 
-  Home, LayoutDashboard, Users, GraduationCap, DollarSign, Calendar, X, Menu, LogOut, Search, Mail 
+  Home, LayoutDashboard, Users, GraduationCap, DollarSign, Calendar, X, Menu, LogOut, Search, Mail, User 
 } from "lucide-react";
 
 export default function PartnerDashboard(): React.ReactElement {
-  const { supabase, profile, signOut } = useSupabase();
+  const { supabase, profile, fetchProfile, signOut } = useSupabase();
+  const profileId = profile?.id;
   const [activeTab, setActiveTab] = useState<string>("dashboard");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isMobileOpen, setIsMobileOpen] = useState<boolean>(false);
@@ -16,6 +17,68 @@ export default function PartnerDashboard(): React.ReactElement {
       setIsMobileOpen(!isMobileOpen);
     } else {
       setIsSidebarCollapsed(!isSidebarCollapsed);
+    }
+  };
+
+  // Profile Builder states
+  const [fullName, setFullName] = useState<string>(profile?.full_name || "");
+  const [bio, setBio] = useState<string>(profile?.bio || "");
+  const [githubUrl, setGithubUrl] = useState<string>("");
+  const [linkedinUrl, setLinkedinUrl] = useState<string>("");
+  const [websiteUrl, setWebsiteUrl] = useState<string>("");
+  const [savingProfile, setSavingProfile] = useState<boolean>(false);
+  const [profileMsg, setProfileMsg] = useState<string>("");
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
+
+  // Sync form inputs with profile updates
+  useEffect(() => {
+    if (profile) {
+      setFullName(profile.full_name || "");
+      setBio(profile.bio || "");
+      const links = profile.portfolio_links || {};
+      setGithubUrl(links.github || "");
+      setLinkedinUrl(links.linkedin || "");
+      setWebsiteUrl(links.website || "");
+    }
+  }, [profile]);
+
+  // Save manual profile edits
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profileId) return;
+    setSavingProfile(true);
+    setProfileMsg("");
+
+    try {
+      const payloadLinks = {
+        github: githubUrl.trim(),
+        linkedin: linkedinUrl.trim(),
+        website: websiteUrl.trim()
+      };
+
+      // Validate portfolio links structure with Zod
+      const validation = PortfolioLinksSchema.safeParse(payloadLinks);
+      if (!validation.success) {
+        throw new Error("Invalid URL format. Links must start with http:// or https://");
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName,
+          bio,
+          portfolio_links: validation.data,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", profileId);
+
+      if (error) throw error;
+      setProfileMsg("Profile updated successfully!");
+      await fetchProfile(profileId);
+    } catch (err: any) {
+      setProfileMsg("Error: " + err.message);
+    } finally {
+      setSavingProfile(false);
     }
   };
 
@@ -613,21 +676,6 @@ export default function PartnerDashboard(): React.ReactElement {
           ))}
         </div>
 
-        <div className="sidebar-footer">
-          <div className="sidebar-user-card">
-            <div className="sidebar-user-avatar">
-              {(profile?.full_name || "P")[0].toUpperCase()}
-            </div>
-            <div className="sidebar-user-info">
-              <span className="sidebar-user-name">{profile?.full_name || "Enterprise Partner"}</span>
-              <span className="sidebar-user-role">Partner</span>
-            </div>
-          </div>
-          <button className="btn btn-secondary sidebar-signout-btn" onClick={signOut} title="Sign Out">
-            <LogOut size={16} />
-            <span>Sign Out</span>
-          </button>
-        </div>
       </aside>
 
       {/* Main Content Area */}
@@ -644,17 +692,62 @@ export default function PartnerDashboard(): React.ReactElement {
               {activeTab === "courses" && "Entrepreneurship Academy"}
               {activeTab === "funding" && "Funding Opportunities"}
               {activeTab === "events" && "Events Hub"}
+              {activeTab === "profile" && "My Profile"}
             </h2>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }} className="user-profile-menu">
-            <div style={{ textAlign: "right" }} className="header-user-info">
-              <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>{profile?.full_name || "Enterprise Partner"}</div>
-              <span className="badge badge-cyan" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Partner</span>
+          <div style={{ position: "relative" }}>
+            <div 
+              className="user-profile-menu"
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            >
+              <div style={{ textAlign: "right" }} className="header-user-info">
+                <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>{profile?.full_name || "Enterprise Partner"}</div>
+                <span className="badge badge-cyan" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Partner</span>
+              </div>
+              <div className="avatar-badge" style={{ width: "32px", height: "32px", fontSize: "0.85rem", margin: 0 }}>
+                {(profile?.full_name || "P")[0].toUpperCase()}
+              </div>
             </div>
-            <div className="avatar-badge" style={{ width: "32px", height: "32px", fontSize: "0.85rem", margin: 0 }}>
-              {(profile?.full_name || "P")[0].toUpperCase()}
-            </div>
+
+            {isProfileMenuOpen && (
+              <>
+                <div 
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 999,
+                    background: "transparent"
+                  }}
+                  onClick={() => setIsProfileMenuOpen(false)}
+                />
+                <div className="user-profile-popover">
+                  <button 
+                    className="user-profile-popover-item"
+                    onClick={() => {
+                      setActiveTab("profile");
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    <User size={16} />
+                    <span>Profile Settings</span>
+                  </button>
+                  <button 
+                    className="user-profile-popover-item danger"
+                    onClick={() => {
+                      setIsProfileMenuOpen(false);
+                      signOut();
+                    }}
+                  >
+                    <LogOut size={16} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
@@ -1560,6 +1653,52 @@ export default function PartnerDashboard(): React.ReactElement {
                   </div>
                 );
               })()}
+            </div>
+          )}
+          {/* Profile / CV Builder */}
+          {activeTab === "profile" && (
+            <div className="animate-fade-in glass-panel" style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
+              <h3>Profile Builder</h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+                Manually update your name, biography, and web portfolio links.
+              </p>
+
+              {profileMsg && (
+                <div className={`badge ${profileMsg.startsWith("Error") || profileMsg.startsWith("Invalid") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
+                  {profileMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleSaveProfile}>
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <input type="text" className="form-input" placeholder="Your Name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                </div>
+
+                <div className="form-group">
+                  <label>Biography Summary</label>
+                  <textarea className="form-input" style={{ height: "100px" }} placeholder="Tell us about yourself..." value={bio} onChange={(e) => setBio(e.target.value)} />
+                </div>
+
+                <div className="form-group">
+                  <label>GitHub Profile URL</label>
+                  <input type="url" className="form-input" placeholder="https://github.com/your-username" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} />
+                </div>
+
+                <div className="form-group">
+                  <label>LinkedIn Profile URL</label>
+                  <input type="url" className="form-input" placeholder="https://linkedin.com/in/your-profile" value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} />
+                </div>
+
+                <div className="form-group">
+                  <label>Personal Website URL</label>
+                  <input type="url" className="form-input" placeholder="https://yourportfolio.com" value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} />
+                </div>
+
+                <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "1rem" }} disabled={savingProfile}>
+                  {savingProfile ? "Saving Details..." : "Update Profile"}
+                </button>
+              </form>
             </div>
           )}
         </main>

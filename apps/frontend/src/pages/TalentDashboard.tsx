@@ -168,6 +168,7 @@ export default function TalentDashboard(): React.ReactElement {
   const [websiteUrl, setWebsiteUrl] = useState<string>("");
   const [savingProfile, setSavingProfile] = useState<boolean>(false);
   const [profileMsg, setProfileMsg] = useState<string>("");
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
 
   // Sync form inputs with profile updates (e.g. after AI analysis updates context)
   useEffect(() => {
@@ -888,21 +889,6 @@ export default function TalentDashboard(): React.ReactElement {
           ))}
         </div>
 
-        <div className="sidebar-footer">
-          <div className="sidebar-user-card">
-            <div className="sidebar-user-avatar">
-              {(profile?.full_name || "T")[0].toUpperCase()}
-            </div>
-            <div className="sidebar-user-info">
-              <span className="sidebar-user-name">{profile?.full_name || "Talent Member"}</span>
-              <span className="sidebar-user-role">Talent</span>
-            </div>
-          </div>
-          <button className="btn btn-secondary sidebar-signout-btn" onClick={signOut} title="Sign Out">
-            <LogOut size={16} />
-            <span>Sign Out</span>
-          </button>
-        </div>
       </aside>
 
       {/* Main Content Area */}
@@ -925,14 +911,58 @@ export default function TalentDashboard(): React.ReactElement {
             </h2>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }} className="user-profile-menu">
-            <div style={{ textAlign: "right" }} className="header-user-info">
-              <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>{profile?.full_name || "Talent Member"}</div>
-              <span className="badge badge-emerald" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Talent</span>
+          <div style={{ position: "relative" }}>
+            <div 
+              className="user-profile-menu"
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            >
+              <div style={{ textAlign: "right" }} className="header-user-info">
+                <div style={{ fontSize: "0.85rem", fontWeight: "600" }}>{profile?.full_name || "Talent Member"}</div>
+                <span className="badge badge-emerald" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Talent</span>
+              </div>
+              <div className="avatar-badge" style={{ width: "32px", height: "32px", fontSize: "0.85rem", margin: 0 }}>
+                {(profile?.full_name || "T")[0].toUpperCase()}
+              </div>
             </div>
-            <div className="avatar-badge" style={{ width: "32px", height: "32px", fontSize: "0.85rem", margin: 0 }}>
-              {(profile?.full_name || "T")[0].toUpperCase()}
-            </div>
+
+            {isProfileMenuOpen && (
+              <>
+                <div 
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 999,
+                    background: "transparent"
+                  }}
+                  onClick={() => setIsProfileMenuOpen(false)}
+                />
+                <div className="user-profile-popover">
+                  <button 
+                    className="user-profile-popover-item"
+                    onClick={() => {
+                      setActiveTab("profile");
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    <User size={16} />
+                    <span>Profile Settings</span>
+                  </button>
+                  <button 
+                    className="user-profile-popover-item danger"
+                    onClick={() => {
+                      setIsProfileMenuOpen(false);
+                      signOut();
+                    }}
+                  >
+                    <LogOut size={16} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
