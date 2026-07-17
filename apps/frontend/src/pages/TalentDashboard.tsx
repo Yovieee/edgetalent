@@ -871,8 +871,7 @@ export default function TalentDashboard(): React.ReactElement {
             { id: "gigs", label: "My Gigs", icon: <CheckSquare size={20} /> },
             { id: "certificates", label: "Certificates", icon: <Award size={20} /> },
             { id: "funding", label: "Funding Opportunities", icon: <DollarSign size={20} /> },
-            { id: "events", label: "Events", icon: <Calendar size={20} /> },
-            { id: "profile", label: "My Profile", icon: <User size={20} /> }
+            { id: "events", label: "Events", icon: <Calendar size={20} /> }
           ].map((tab) => (
             <button
               key={tab.id}
