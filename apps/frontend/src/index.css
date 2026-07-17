@@ -1128,3 +1128,23 @@ tr:hover td {
     display: none !important;
   }
 }
+
+/* Sidebar hamburger button */
+.hamburger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
