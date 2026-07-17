@@ -1225,6 +1225,19 @@ export default function TalentDashboard(): React.ReactElement {
                 /* Technical Quiz Taking Panel */
                 (() => {
                   const questions = activeQuiz === "frontend" ? dbQuestions.frontend : activeQuiz === "backend" ? dbQuestions.backend : dbQuestions.ai;
+                  if (!questions || questions.length === 0) {
+                    return (
+                      <div className="glass-panel animate-fade-in" style={{ padding: "2.5rem", maxWidth: "700px", margin: "0 auto", textAlign: "center" }}>
+                        <h3 style={{ marginBottom: "1rem" }}>Quiz Unavailable</h3>
+                        <p style={{ color: "var(--text-secondary)", marginBottom: "2rem" }}>
+                          No questions are currently loaded for this category. Please check back later.
+                        </p>
+                        <button className="btn btn-secondary" onClick={() => setActiveQuiz(null)}>
+                          Back to Panel
+                        </button>
+                      </div>
+                    );
+                  }
                   const currentQuestion = questions[currentQuestionIdx];
                   const progressPct = Math.round((currentQuestionIdx / questions.length) * 100);
 

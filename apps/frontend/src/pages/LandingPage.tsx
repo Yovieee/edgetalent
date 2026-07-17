@@ -239,6 +239,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
     if (activeTab === "partner" && matchResults.length === 0) {
       handleRunSearch();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const faqs = [

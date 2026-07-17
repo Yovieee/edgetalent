@@ -15,8 +15,8 @@ BEGIN
   v_auth_header := v_headers->>'authorization';
   v_host := v_headers->>'host';
 
-  -- If host is null, fallback to local Kong proxy in Supabase emulator environment
-  IF v_host IS NULL THEN
+  -- If host is null or a local/emulator address, fallback to local Kong proxy in Supabase emulator environment
+  IF v_host IS NULL OR v_host LIKE 'localhost%' OR v_host LIKE '127.0.0.1%' OR v_host LIKE '192.168.%' OR v_host LIKE '10.%' OR v_host LIKE '172.%' THEN
     v_url := 'http://kong:8000/functions/v1/generate-project-embeddings';
   ELSE
     -- On live Supabase Cloud, construct URL using the request host
