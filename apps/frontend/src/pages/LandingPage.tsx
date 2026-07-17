@@ -270,16 +270,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
       {/* Modern Sticky Navigation */}
       <nav className="navbar animate-fade-in" id="landing-nav">
         <div className="navbar-brand" onClick={() => onNavigate("/")} id="logo-brand">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: "0.25rem" }}>
-            <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#logo-gradient)" />
-            <path d="M10 22V10L16 16L22 10V22" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-            <defs>
-              <linearGradient id="logo-gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-                <stop stopColor="var(--color-cyan)" />
-                <stop offset="1" stopColor="var(--color-purple)" />
-              </linearGradient>
-            </defs>
-          </svg>
+          <img src="/logo.png" alt="EdgeTalent Logo" style={{ width: "30px", height: "30px", marginRight: "0.5rem", objectFit: "contain" }} />
           EdgeTalent
         </div>
         <div className="navbar-tabs" style={{ gap: "1.5rem" }}>

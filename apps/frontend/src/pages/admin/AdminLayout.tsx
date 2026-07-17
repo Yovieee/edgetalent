@@ -59,7 +59,7 @@ export default function AdminLayout(): React.ReactElement {
       <aside className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""} ${isMobileOpen ? "open" : ""}`}>
         <div className="sidebar-brand">
           <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <span style={{ fontSize: "1.5rem" }}>⚡</span>
+            <img src="/logo.png" alt="EdgeTalent Logo" style={{ width: "24px", height: "24px", objectFit: "contain" }} />
             <span className="sidebar-brand-text">EdgeTalent</span>
           </span>
           {isMobileOpen && (
