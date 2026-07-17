@@ -1,11 +1,83 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSupabase } from "../context/SupabaseContext";
 
 interface LandingPageProps {
   onNavigate: (path: string) => void;
 }
 
+// Default fallback events matching the database seeds
+const DEFAULT_EVENTS = [
+  {
+    id: "default-1",
+    title: "EdgeTalent Tech Hackathon 2026",
+    description: "A 48-hour virtual hackathon focused on building open-source AI and database tools for developer productivity.",
+    content: "Join developers, designers, and innovators from around the world for a 48-hour sprint to build next-generation AI agents, pgvector integrations, and developer productivity tools. Top 3 teams win cash prizes, cloud credits, and direct introductions to venture capital partners. Hackathon participants get access to exclusive workshops and mentoring sessions hosted by industry experts.",
+    event_date: "2026-08-15T09:00:00Z",
+    location: "Virtual (Zoom / Discord)",
+    organizer: "EdgeTalent Foundation",
+    category: "Hackathon",
+    capacity: 200,
+    link: "https://edgetalent.org/hackathon2026"
+  },
+  {
+    id: "default-2",
+    title: "Building AI Agents with Gemini 2.5",
+    description: "Deep-dive technical workshop on using Gemini models, prompt engineering, and function calling to build autonomous coding agents.",
+    content: "In this hands-on workshop, you'll learn how to build robust agentic coding tools using Google's Gemini 2.5 models. We will cover tool definition, system instructions, function calling schemas, and error recovery patterns. Bring your laptop and your IDE — we will write code live!",
+    event_date: "2026-07-25T14:00:00Z",
+    location: "Virtual (Zoom)",
+    organizer: "Google Developer Group",
+    category: "Workshop",
+    capacity: 100,
+    link: "https://gdg.community.dev/events/details/google-gdg-workshops/"
+  },
+  {
+    id: "default-3",
+    title: "Tech Founders Pitch & Networking Night",
+    description: "Connect with early-stage venture capital firms, angel investors, and fellow entrepreneurs in the ecosystem.",
+    content: "Our monthly networking mixer returns! Startups can apply to present a 3-minute elevator pitch to a panel of local VCs and angel investors. Food and drinks are provided. Space is limited, so please RSVP early to reserve your spot.",
+    event_date: "2026-08-05T18:30:00Z",
+    location: "Silicon Alley Hub, Jakarta",
+    organizer: "EdgeTalent Group",
+    category: "Networking",
+    capacity: 75,
+    link: "https://edgetalent.org/pitch-night"
+  }
+];
+
 export default function LandingPage({ onNavigate }: LandingPageProps): React.ReactElement {
   const [activeTab, setActiveTab] = useState<"talent" | "partner">("talent");
+
+  const { supabase } = useSupabase();
+  const [events, setEvents] = useState<any[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState<boolean>(true);
+  const [selectedEventCategory, setSelectedEventCategory] = useState<string>("All");
+  const [searchEventQuery, setSearchEventQuery] = useState<string>("");
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [showEventDetailModal, setShowEventDetailModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function loadPublicEvents() {
+      setLoadingEvents(true);
+      try {
+        const { data, error } = await supabase
+          .from("events")
+          .select("*")
+          .order("event_date", { ascending: true });
+        if (!error && data && data.length > 0) {
+          setEvents(data);
+        } else {
+          setEvents(DEFAULT_EVENTS);
+        }
+      } catch (e) {
+        console.error("Failed to load events:", e);
+        setEvents(DEFAULT_EVENTS);
+      } finally {
+        setLoadingEvents(false);
+      }
+    }
+    loadPublicEvents();
+  }, [supabase]);
 
   // Talent Simulator State
   const [talentPreset, setTalentPreset] = useState<"frontend" | "backend" | "ai">("frontend");
@@ -248,6 +320,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
         <div className="navbar-tabs" style={{ gap: "1.5rem" }}>
           <a href="#features" className="nav-tab" style={{ border: "none" }}>Features</a>
           <a href="#pillars" className="nav-tab" style={{ border: "none" }}>Ecosystem Pillars</a>
+          <a href="#events" className="nav-tab" style={{ border: "none" }}>Events</a>
           <a href="#stats" className="nav-tab" style={{ border: "none" }}>Platform Metrics</a>
           <a href="#faqs" className="nav-tab" style={{ border: "none" }}>FAQs</a>
         </div>
@@ -704,6 +777,133 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           </div>
         </section>
 
+        {/* Public Events Section */}
+        <section id="events" style={{ margin: "6rem 0" }}>
+          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+            <span className="badge badge-rose" style={{ marginBottom: "1rem", padding: "0.4rem 0.9rem" }}>Ecosystem Hub</span>
+            <h2 style={{ fontSize: "2.75rem", marginBottom: "1rem" }}>Upcoming Public Events</h2>
+            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto" }}>
+              Explore workshops, webinars, and hackathons open to all developers and partners. Sign up to reserve your spot!
+            </p>
+          </div>
+
+          {/* Filters & Search Panel */}
+          <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between", marginBottom: "2.5rem" }}>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              {["All", "Hackathon", "Webinar", "Workshop", "Networking", "Pitch Night"].map((cat) => (
+                <button
+                  key={cat}
+                  className={`badge ${selectedEventCategory === cat ? "badge-cyan" : "badge-neutral"}`}
+                  style={{ cursor: "pointer", border: "none", padding: "0.5rem 1rem", fontSize: "0.85rem", borderRadius: "100px", transition: "all 0.2s" }}
+                  onClick={() => setSelectedEventCategory(cat)}
+                  id={`event-cat-btn-${cat.toLowerCase().replace(" ", "-")}`}
+                >
+                  {cat === "All" ? "All Events" : cat}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", width: "100%", maxWidth: "320px", position: "relative" }}>
+              <input
+                type="text"
+                placeholder="Search events..."
+                className="form-input"
+                style={{ paddingRight: "2.5rem", margin: 0, background: "rgba(255, 255, 255, 0.05)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "var(--text-primary)", width: "100%" }}
+                value={searchEventQuery}
+                onChange={(e) => setSearchEventQuery(e.target.value)}
+                id="search-public-events"
+              />
+              <span style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>🔍</span>
+            </div>
+          </div>
+
+          {/* Events Grid */}
+          {loadingEvents ? (
+            <div style={{ textAlign: "center", padding: "3rem" }}>
+              <p style={{ color: "var(--text-secondary)" }}>Loading upcoming events...</p>
+            </div>
+          ) : (() => {
+            const filtered = events.filter((evt) => {
+              const matchCat = selectedEventCategory === "All" || evt.category === selectedEventCategory;
+              const matchQuery = evt.title.toLowerCase().includes(searchEventQuery.toLowerCase()) ||
+                evt.description.toLowerCase().includes(searchEventQuery.toLowerCase());
+              return matchCat && matchQuery;
+            });
+
+            if (filtered.length === 0) {
+              return (
+                <div className="glass-panel" style={{ padding: "3rem", textAlign: "center" }}>
+                  <p style={{ color: "var(--text-secondary)", margin: 0 }}>No upcoming events matched your criteria.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
+                {filtered.map((evt) => {
+                  return (
+                    <div key={evt.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem", transition: "transform 0.2s, box-shadow 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                          <span className={`badge ${
+                            evt.category === "Hackathon" ? "badge-rose" :
+                            evt.category === "Webinar" ? "badge-purple" :
+                            evt.category === "Workshop" ? "badge-cyan" :
+                            evt.category === "Networking" ? "badge-emerald" : "badge-amber"
+                          }`} style={{ fontSize: "0.75rem" }}>
+                            {evt.category}
+                          </span>
+                        </div>
+                        <h4 style={{ fontSize: "1.2rem", margin: "0 0 0.5rem 0", fontWeight: "600", color: "var(--text-primary)" }}>{evt.title}</h4>
+                        <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", margin: "0 0 1.25rem 0", lineHeight: "1.5" }}>{evt.description}</p>
+                        
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1rem" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span style={{ color: "var(--text-secondary)" }}>Date & Time:</span>
+                            <span style={{ fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(evt.event_date).toLocaleString()}</span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span style={{ color: "var(--text-secondary)" }}>Location:</span>
+                            <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{evt.location}</span>
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span style={{ color: "var(--text-secondary)" }}>Host:</span>
+                            <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{evt.organizer}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <button
+                          className="btn btn-secondary"
+                          style={{ flex: 1, padding: "0.6rem", justifyContent: "center" }}
+                          onClick={() => {
+                            setSelectedEvent(evt);
+                            setShowEventDetailModal(true);
+                          }}
+                          id={`evt-details-${evt.id}`}
+                        >
+                          Details
+                        </button>
+                        <button
+                          className="btn btn-primary"
+                          style={{ flex: 1.5, padding: "0.6rem", justifyContent: "center" }}
+                          onClick={() => {
+                            alert("To RSVP / Register for this event, please sign in or register a new account.");
+                            onNavigate("auth");
+                          }}
+                          id={`evt-rsvp-${evt.id}`}
+                        >
+                          RSVP / Register
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </section>
+
         {/* Platform Metrics Section */}
         <section id="stats" className="stats-grid">
           <div className="glass-panel stat-card">
@@ -843,6 +1043,118 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             Built using React, Vite, Supabase Postgres Database (pgvector), and Deno Edge Functions with OpenRouter models.
           </p>
         </footer>
+
+        {/* Event Detail Modal */}
+        {showEventDetailModal && selectedEvent && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0, 0, 0, 0.6)",
+              backdropFilter: "blur(4px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1001,
+            }}
+            onClick={() => setShowEventDetailModal(false)}
+          >
+            <div
+              className="glass-panel animate-fade-in"
+              style={{
+                width: "90%",
+                maxWidth: "650px",
+                padding: "2.5rem",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                position: "relative"
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
+                <div>
+                  <span className={`badge ${
+                    selectedEvent.category === "Hackathon" ? "badge-rose" :
+                    selectedEvent.category === "Webinar" ? "badge-purple" :
+                    selectedEvent.category === "Workshop" ? "badge-cyan" :
+                    selectedEvent.category === "Networking" ? "badge-emerald" : "badge-amber"
+                  }`} style={{ fontSize: "0.75rem", marginBottom: "0.5rem" }}>
+                    {selectedEvent.category}
+                  </span>
+                  <h3 style={{ fontSize: "1.5rem", margin: 0, fontWeight: "700", color: "var(--text-primary)" }}>{selectedEvent.title}</h3>
+                </div>
+                <button
+                  className="btn-close"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--text-secondary)",
+                    fontSize: "1.5rem",
+                    cursor: "pointer",
+                    lineHeight: 1,
+                    padding: 0
+                  }}
+                  onClick={() => setShowEventDetailModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <div>
+                  <h4 style={{ fontSize: "1rem", marginBottom: "0.5rem", color: "var(--text-primary)" }}>Event Description</h4>
+                  <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: "1.6", margin: 0 }}>
+                    {selectedEvent.content}
+                  </p>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--glass-border)" }}>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Date & Time</span>
+                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(selectedEvent.event_date).toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Location</span>
+                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.location}</span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Organizer</span>
+                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.organizer}</span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Capacity Limit</span>
+                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.capacity ? `${selectedEvent.capacity} spots` : "Unlimited"}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    style={{ flex: 1, justifyContent: "center" }}
+                    onClick={() => setShowEventDetailModal(false)}
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    style={{ flex: 1.2, justifyContent: "center" }}
+                    onClick={() => {
+                      setShowEventDetailModal(false);
+                      alert("To RSVP / Register for this event, please sign in or register a new account.");
+                      onNavigate("auth");
+                    }}
+                  >
+                    RSVP / Register
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
