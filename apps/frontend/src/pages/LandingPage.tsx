@@ -4,6 +4,7 @@ import {
   ArrowRight, BookOpen, Terminal, RefreshCw, Search, GraduationCap, 
   Check, Briefcase, Star, ChevronDown
 } from "lucide-react";
+import logo from "../assets/logo.png";
 
 interface LandingPageProps {
   onNavigate: (path: string) => void;
@@ -270,7 +271,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
       {/* Modern Sticky Navigation */}
       <nav className="navbar animate-fade-in" id="landing-nav">
         <div className="navbar-brand" onClick={() => onNavigate("/")} id="logo-brand">
-          <img src="/logo.png" alt="EdgeTalent Logo" style={{ width: "30px", height: "30px", marginRight: "0.5rem", objectFit: "contain" }} />
+          <img src={logo} alt="EdgeTalent Logo" style={{ width: "30px", height: "30px", marginRight: "0.5rem", objectFit: "contain" }} />
           EdgeTalent
         </div>
         <div className="navbar-tabs" style={{ gap: "1.5rem" }}>

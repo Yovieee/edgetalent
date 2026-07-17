@@ -5,6 +5,7 @@ import {
   LayoutDashboard, Users, GraduationCap, Briefcase, HelpCircle, 
   DollarSign, Calendar, LogOut, Menu, X 
 } from "lucide-react";
+import logo from "../../assets/logo.png";
 
 export default function AdminLayout(): React.ReactElement {
   const { profile, signOut } = useSupabase();
@@ -59,7 +60,7 @@ export default function AdminLayout(): React.ReactElement {
       <aside className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""} ${isMobileOpen ? "open" : ""}`}>
         <div className="sidebar-brand">
           <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <img src="/logo.png" alt="EdgeTalent Logo" style={{ width: "24px", height: "24px", objectFit: "contain" }} />
+            <img src={logo} alt="EdgeTalent Logo" style={{ width: "24px", height: "24px", objectFit: "contain" }} />
             <span className="sidebar-brand-text">EdgeTalent</span>
           </span>
           {isMobileOpen && (
