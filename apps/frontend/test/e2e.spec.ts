@@ -439,7 +439,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const welcomeBackHeader = page.locator('h2', { hasText: 'Welcome Back' });
     await expect(welcomeBackHeader).toBeVisible();
 
-    const backToHomeBtn = page.locator('button', { hasText: '← Back to Home' });
+    const backToHomeBtn = page.locator('button', { hasText: 'Back to Home' });
     await backToHomeBtn.click();
 
     const landingBadge = page.locator('.badge', { hasText: 'EdgeTalent Ecosystem' });
@@ -579,7 +579,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const welcomeBackHeader = page.locator('h2', { hasText: 'Welcome Back' });
     await expect(welcomeBackHeader).toBeVisible();
 
-    const backToHomeBtn = page.locator('button', { hasText: '← Back to Home' });
+    const backToHomeBtn = page.locator('button', { hasText: 'Back to Home' });
     await backToHomeBtn.click();
 
     const landingBadge = page.locator('.badge', { hasText: 'EdgeTalent Ecosystem' });

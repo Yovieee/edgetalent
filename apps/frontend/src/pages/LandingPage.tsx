@@ -9,46 +9,6 @@ interface LandingPageProps {
   onNavigate: (path: string) => void;
 }
 
-// Default fallback events matching the database seeds
-const DEFAULT_EVENTS = [
-  {
-    id: "default-1",
-    title: "EdgeTalent Tech Hackathon 2026",
-    description: "A 48-hour virtual hackathon focused on building open-source AI and database tools for developer productivity.",
-    content: "Join developers, designers, and innovators from around the world for a 48-hour sprint to build next-generation AI agents, pgvector integrations, and developer productivity tools. Top 3 teams win cash prizes, cloud credits, and direct introductions to venture capital partners. Hackathon participants get access to exclusive workshops and mentoring sessions hosted by industry experts.",
-    event_date: "2026-08-15T09:00:00Z",
-    location: "Virtual (Zoom / Discord)",
-    organizer: "EdgeTalent Foundation",
-    category: "Hackathon",
-    capacity: 200,
-    link: "https://edgetalent.org/hackathon2026"
-  },
-  {
-    id: "default-2",
-    title: "Building AI Agents with Gemini 2.5",
-    description: "Deep-dive technical workshop on using Gemini models, prompt engineering, and function calling to build autonomous coding agents.",
-    content: "In this hands-on workshop, you'll learn how to build robust agentic coding tools using Google's Gemini 2.5 models. We will cover tool definition, system instructions, function calling schemas, and error recovery patterns. Bring your laptop and your IDE — we will write code live!",
-    event_date: "2026-07-25T14:00:00Z",
-    location: "Virtual (Zoom)",
-    organizer: "Google Developer Group",
-    category: "Workshop",
-    capacity: 100,
-    link: "https://gdg.community.dev/events/details/google-gdg-workshops/"
-  },
-  {
-    id: "default-3",
-    title: "Tech Founders Pitch & Networking Night",
-    description: "Connect with early-stage venture capital firms, angel investors, and fellow entrepreneurs in the ecosystem.",
-    content: "Our monthly networking mixer returns! Startups can apply to present a 3-minute elevator pitch to a panel of local VCs and angel investors. Food and drinks are provided. Space is limited, so please RSVP early to reserve your spot.",
-    event_date: "2026-08-05T18:30:00Z",
-    location: "Silicon Alley Hub, Jakarta",
-    organizer: "EdgeTalent Group",
-    category: "Networking",
-    capacity: 75,
-    link: "https://edgetalent.org/pitch-night"
-  }
-];
-
 export default function LandingPage({ onNavigate }: LandingPageProps): React.ReactElement {
   const [activeTab, setActiveTab] = useState<"talent" | "partner">("talent");
 
@@ -68,14 +28,14 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           .from("events")
           .select("*")
           .order("event_date", { ascending: true });
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           setEvents(data);
         } else {
-          setEvents(DEFAULT_EVENTS);
+          setEvents([]);
         }
       } catch (e) {
         console.error("Failed to load events:", e);
-        setEvents(DEFAULT_EVENTS);
+        setEvents([]);
       } finally {
         setLoadingEvents(false);
       }

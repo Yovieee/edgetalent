@@ -7,110 +7,11 @@ import {
 } from "lucide-react";
 
 interface Question {
-  id: number;
+  id: string;
   question: string;
   options: string[];
   answer: string;
 }
-
-const FRONTEND_QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: "Which hook in React is used to run side effects?",
-    options: ["useEffect", "useState", "useContext", "useReducer"],
-    answer: "useEffect"
-  },
-  {
-    id: 2,
-    question: "What does TypeScript do?",
-    options: ["Provides static type checking", "Compiles to machine code", "Replaces JavaScript entirely", "Manages CSS styles"],
-    answer: "Provides static type checking"
-  },
-  {
-    id: 3,
-    question: "What is the correct CSS property to align flex items along the cross-axis?",
-    options: ["align-items", "justify-content", "align-content", "flex-direction"],
-    answer: "align-items"
-  },
-  {
-    id: 4,
-    question: "Which HTML5 tag is most appropriate for navigation links?",
-    options: ["<nav>", "<header>", "<section>", "<aside>"],
-    answer: "<nav>"
-  },
-  {
-    id: 5,
-    question: "In React, what is the key prop used for?",
-    options: ["Helping React identify which items have changed/added/removed", "Styling list elements", "Storing state", "Accessing global context"],
-    answer: "Helping React identify which items have changed/added/removed"
-  }
-];
-
-const BACKEND_QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: "Which Node.js module is used to handle file paths?",
-    options: ["path", "fs", "http", "os"],
-    answer: "path"
-  },
-  {
-    id: 2,
-    question: "What is the purpose of an index in a relational database?",
-    options: ["To speed up data retrieval operations", "To enforce unique constraints", "To encrypt sensitive columns", "To define table relationships"],
-    answer: "To speed up data retrieval operations"
-  },
-  {
-    id: 3,
-    question: "Which HTTP status code represents 'Internal Server Error'?",
-    options: ["500", "400", "401", "404"],
-    answer: "500"
-  },
-  {
-    id: 4,
-    question: "What is the main characteristic of a REST API?",
-    options: ["Statelessness", "Uses XML only", "Requires WebSockets", "Single entry point query language"],
-    answer: "Statelessness"
-  },
-  {
-    id: 5,
-    question: "Which package manager is native to Node.js?",
-    options: ["npm", "pnpm", "yarn", "bower"],
-    answer: "npm"
-  }
-];
-
-const AI_QUESTIONS: Question[] = [
-  {
-    id: 1,
-    question: "What is the primary language used for Machine Learning and AI frameworks like PyTorch?",
-    options: ["Python", "JavaScript", "C++", "Java"],
-    answer: "Python"
-  },
-  {
-    id: 2,
-    question: "In vector databases, what is cosine similarity used for?",
-    options: ["Measuring the angle/semantic similarity between two vector embeddings", "Sorting text alphabetically", "Compressing image files", "Hashing passwords"],
-    answer: "Measuring the angle/semantic similarity between two vector embeddings"
-  },
-  {
-    id: 3,
-    question: "What does 'LLM' stand for in AI?",
-    options: ["Large Language Model", "Local Logic Machine", "Linear Log Matrix", "Low Latency Memory"],
-    answer: "Large Language Model"
-  },
-  {
-    id: 4,
-    question: "What is the purpose of 'embeddings' in NLP?",
-    options: ["To represent text tokens as high-dimensional numerical vectors", "To format text in HTML", "To encrypt text content", "To translate text to different languages"],
-    answer: "To represent text tokens as high-dimensional numerical vectors"
-  },
-  {
-    id: 5,
-    question: "What is 'prompt engineering'?",
-    options: ["The process of structuring instructions to guide LLM responses", "Designing processor hardware", "Running database backups", "Optimizing network routers"],
-    answer: "The process of structuring instructions to guide LLM responses"
-  }
-];
 
 export default function TalentDashboard(): React.ReactElement {
   const { supabase, profile, signOut, fetchProfile } = useSupabase();
@@ -145,9 +46,9 @@ export default function TalentDashboard(): React.ReactElement {
     backend: Question[];
     ai: Question[];
   }>({
-    frontend: FRONTEND_QUESTIONS,
-    backend: BACKEND_QUESTIONS,
-    ai: AI_QUESTIONS,
+    frontend: [],
+    backend: [],
+    ai: [],
   });
 
   useEffect(() => {
@@ -156,7 +57,7 @@ export default function TalentDashboard(): React.ReactElement {
         const { data, error } = await supabase
           .from("quiz_questions")
           .select("*");
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           const frontend: Question[] = [];
           const backend: Question[] = [];
           const ai: Question[] = [];
@@ -174,13 +75,13 @@ export default function TalentDashboard(): React.ReactElement {
           });
           
           setDbQuestions({
-            frontend: frontend.length > 0 ? frontend : FRONTEND_QUESTIONS,
-            backend: backend.length > 0 ? backend : BACKEND_QUESTIONS,
-            ai: ai.length > 0 ? ai : AI_QUESTIONS,
+            frontend,
+            backend,
+            ai,
           });
         }
       } catch (err) {
-        console.error("Failed to load questions from database, falling back to static questions.", err);
+        console.error("Failed to load questions from database.", err);
       }
     };
     fetchQuestions();
