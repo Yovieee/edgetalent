@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSupabase } from "../context/SupabaseContext";
+import { 
+  ArrowRight, BookOpen, Terminal, RefreshCw, Search, GraduationCap, 
+  Check, Briefcase, Star, ChevronDown
+} from "lucide-react";
 
 interface LandingPageProps {
   onNavigate: (path: string) => void;
@@ -306,23 +310,23 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
       <nav className="navbar animate-fade-in" id="landing-nav">
         <div className="navbar-brand" onClick={() => onNavigate("/")} id="logo-brand">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: "0.25rem" }}>
-            <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#logo-gradient)" />
+            <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#logo-gradient)" />
             <path d="M10 22V10L16 16L22 10V22" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
             <defs>
               <linearGradient id="logo-gradient" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#0891b2" />
-                <stop offset="1" stopColor="#7c3aed" />
+                <stop stopColor="var(--color-cyan)" />
+                <stop offset="1" stopColor="var(--color-purple)" />
               </linearGradient>
             </defs>
           </svg>
           EdgeTalent
         </div>
         <div className="navbar-tabs" style={{ gap: "1.5rem" }}>
-          <a href="#features" className="nav-tab" style={{ border: "none" }}>Features</a>
-          <a href="#pillars" className="nav-tab" style={{ border: "none" }}>Ecosystem Pillars</a>
-          <a href="#events" className="nav-tab" style={{ border: "none" }}>Events</a>
-          <a href="#stats" className="nav-tab" style={{ border: "none" }}>Platform Metrics</a>
-          <a href="#faqs" className="nav-tab" style={{ border: "none" }}>FAQs</a>
+          <a href="#features" className="nav-tab">Features</a>
+          <a href="#pillars" className="nav-tab">Ecosystem Pillars</a>
+          <a href="#events" className="nav-tab">Events</a>
+          <a href="#stats" className="nav-tab">Platform Metrics</a>
+          <a href="#faqs" className="nav-tab">FAQs</a>
         </div>
         <div style={{ display: "flex", gap: "0.75rem" }}>
           <button className="btn btn-secondary" onClick={() => onNavigate("auth")} id="nav-btn-login">
@@ -344,18 +348,18 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               <span className="badge badge-cyan" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem" }}>EdgeTalent Ecosystem</span>
               <span className="badge badge-purple" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem" }}>v2.0 Launched</span>
             </div>
-            <h1 style={{ fontSize: "3.75rem", lineHeight: "1.15", marginBottom: "1.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>
-              Bridging <span style={{ background: "var(--grad-cyan-purple)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Talent Development</span> & Industrial Demand
+            <h1 style={{ fontSize: "3.25rem", lineHeight: "1.15", marginBottom: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
+              Bridging <span style={{ background: "linear-gradient(135deg, var(--color-purple) 0%, var(--color-cyan) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Talent Development</span> & Industrial Demand
             </h1>
-            <p style={{ color: "var(--text-secondary)", fontSize: "1.2rem", marginBottom: "2.5rem", lineHeight: "1.65", maxWidth: "560px" }}>
+            <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem", marginBottom: "2.25rem", lineHeight: "1.6", maxWidth: "560px" }}>
               Accelerate your professional career with AI-guided roadmap diagnostics or hire elite vetted candidates matched using semantic pgvector vector similarity searches.
             </p>
             <div style={{ display: "flex", gap: "1rem" }}>
-              <button className="btn btn-primary" onClick={() => onNavigate("auth")} style={{ padding: "0.85rem 1.8rem" }} id="hero-btn-talent">
+              <button className="btn btn-primary" onClick={() => onNavigate("auth")} style={{ padding: "0.75rem 1.5rem" }} id="hero-btn-talent">
                 Join as Talent
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                <ArrowRight size={16} />
               </button>
-              <button className="btn btn-secondary" onClick={() => onNavigate("auth")} style={{ padding: "0.85rem 1.8rem" }} id="hero-btn-partner">
+              <button className="btn btn-secondary" onClick={() => onNavigate("auth")} style={{ padding: "0.75rem 1.5rem" }} id="hero-btn-partner">
                 Hire Elite Teams
               </button>
             </div>
@@ -363,42 +367,42 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
 
           {/* Floating Simulated Dashboard Mockup */}
           <div className="hero-mockup-block animate-float" style={{ position: "relative" }}>
-            <div className="glass-panel" style={{ padding: "1.5rem", width: "100%", maxWidth: "480px", margin: "0 auto", border: "1px solid rgba(255,255,255,0.15)", position: "relative" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem", borderBottom: "1px solid var(--glass-border)", paddingBottom: "0.75rem" }}>
-                <div style={{ display: "flex", gap: "0.4rem" }}>
-                  <span style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#ef4444" }}></span>
-                  <span style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#eab308" }}></span>
-                  <span style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#22c55e" }}></span>
+            <div className="glass-panel" style={{ padding: "1.25rem", width: "100%", maxWidth: "460px", margin: "0 auto", position: "relative" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", borderBottom: "1px solid var(--glass-border)", paddingBottom: "0.5rem" }}>
+                <div style={{ display: "flex", gap: "0.35rem" }}>
+                  <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ef4444" }}></span>
+                  <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#eab308" }}></span>
+                  <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#22c55e" }}></span>
                 </div>
-                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontFamily: "monospace" }}>talent_matrix_diagnostics.exe</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "monospace" }}>talent_matrix_diagnostics.exe</div>
               </div>
 
               {/* Mock Dashboard Widgets */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <div className="glass-panel" style={{ flex: 1, padding: "1rem", background: "rgba(255,255,255,0.4)" }}>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>AI Match Accuracy</div>
-                    <div style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--color-cyan)", marginTop: "0.25rem" }}>98.7%</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                <div style={{ display: "flex", gap: "0.875rem" }}>
+                  <div className="glass-panel" style={{ flex: 1, padding: "0.875rem", background: "var(--bg-tertiary)" }}>
+                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>AI Match Accuracy</div>
+                    <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-cyan)", marginTop: "0.25rem" }}>98.7%</div>
                   </div>
-                  <div className="glass-panel" style={{ flex: 1, padding: "1rem", background: "rgba(255,255,255,0.4)" }}>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Skills Vector</div>
-                    <div style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--color-purple)", marginTop: "0.25rem" }}>1,536d</div>
+                  <div className="glass-panel" style={{ flex: 1, padding: "0.875rem", background: "var(--bg-tertiary)" }}>
+                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>Skills Vector</div>
+                    <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-purple)", marginTop: "0.25rem" }}>1,536d</div>
                   </div>
                 </div>
 
-                <div className="glass-panel" style={{ padding: "1rem", background: "rgba(255,255,255,0.4)" }}>
+                <div className="glass-panel" style={{ padding: "0.875rem", background: "var(--bg-tertiary)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                    <span style={{ fontSize: "0.8rem", fontWeight: 700 }}>Upskilling Progress</span>
-                    <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--color-emerald)" }}>80% Done</span>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 600 }}>Upskilling Progress</span>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--color-emerald)" }}>80% Done</span>
                   </div>
-                  <div style={{ height: "6px", background: "rgba(0,0,0,0.08)", borderRadius: "999px", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: "80%", background: "var(--grad-emerald-cyan)", borderRadius: "999px" }}></div>
+                  <div style={{ height: "6px", background: "rgba(0,0,0,0.06)", borderRadius: "999px", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: "80%", background: "var(--color-emerald)", borderRadius: "999px" }}></div>
                   </div>
                 </div>
 
-                <div className="glass-panel" style={{ padding: "1rem", background: "rgba(255,255,255,0.4)", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                  <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#22c55e", animation: "ping 1.5s infinite" }}></div>
-                  <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+                <div className="glass-panel" style={{ padding: "0.875rem", background: "var(--bg-tertiary)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e" }}></div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
                     <strong>Partner Search:</strong> Matched 8 talents for "Python/AI Developer"
                   </div>
                 </div>
@@ -406,10 +410,10 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             </div>
 
             {/* Behind Ambient Glow Card */}
-            <div className="glass-panel animate-float-delayed" style={{ position: "absolute", top: "40px", right: "-20px", width: "160px", padding: "1rem", background: "var(--glass-bg)", zIndex: -1, opacity: 0.85, border: "1px solid rgba(255,255,255,0.2)" }}>
-              <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Talent Earnings</div>
-              <div style={{ fontSize: "1.25rem", fontWeight: 800, color: "#10b981", margin: "0.25rem 0" }}>+$12,450</div>
-              <span className="badge badge-emerald" style={{ scale: "0.8" }}>Contract Paid</span>
+            <div className="glass-panel animate-float-delayed" style={{ position: "absolute", top: "30px", right: "-15px", width: "150px", padding: "0.875rem", background: "var(--bg-secondary)", zIndex: -1, opacity: 0.9 }}>
+              <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Talent Earnings</div>
+              <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#10b981", margin: "0.2rem 0" }}>+$12,450</div>
+              <span className="badge badge-emerald" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Contract Paid</span>
             </div>
           </div>
         </header>
@@ -431,7 +435,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               onClick={() => setActiveTab("talent")}
               id="tab-btn-talent"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <BookOpen size={16} />
               Skills & Interests Assessment
             </button>
             <button
@@ -439,7 +443,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               onClick={() => setActiveTab("partner")}
               id="tab-btn-partner"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+              <Terminal size={16} />
               Semantic pgvector Matcher
             </button>
           </div>
@@ -511,7 +515,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                     ) : (
                       <>
                         Submit Quiz Diagnostics
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        <RefreshCw size={16} style={{ animation: isRunningAnalysis ? "spin 1s linear infinite" : "none" }} />
                       </>
                     )}
                   </button>
@@ -631,7 +635,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                     ) : (
                       <>
                         Search Talents Semantically
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <Search size={16} />
                       </>
                     )}
                   </button>
@@ -717,27 +721,27 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
                 <span className="badge badge-emerald" style={{ fontSize: "0.8rem", padding: "0.4rem 0.8rem" }}>Pillar 1: Upstream</span>
-                <div style={{ background: "rgba(16, 185, 129, 0.08)", padding: "0.75rem", borderRadius: "12px", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12.5V16a6 6 0 0 0 12 0v-3.5"></path></svg>
+                <div style={{ background: "#ecfdf5", padding: "0.5rem", borderRadius: "50%", border: "1px solid #d1fae5" }}>
+                  <GraduationCap size={20} color="var(--color-emerald)" />
                 </div>
               </div>
 
-              <h3 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "var(--text-primary)" }}>EdgeTalent Foundation</h3>
-              <p style={{ color: "var(--text-secondary)", lineHeight: "1.65", marginBottom: "2rem" }}>
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "0.75rem", color: "var(--text-primary)" }}>EdgeTalent Foundation</h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", lineHeight: "1.5", marginBottom: "2rem" }}>
                 Dedicated to upskilling, mentorship, customized structured courses, and career diagnostics. Upload your CV to extract missing concepts and target top pathways.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1.5rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <Check size={16} color="var(--color-emerald)" />
                   AI Skill Gap Roadmapping
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <Check size={16} color="var(--color-emerald)" />
                   Custom Training & Course Maps
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <Check size={16} color="var(--color-emerald)" />
                   Incubation & Venture Mentorship
                 </div>
               </div>
@@ -745,31 +749,31 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
 
             {/* Pillar 2: Downstream */}
             <div className="glass-panel" style={{ padding: "3rem 2.5rem", textAlign: "left", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--grad-cyan-purple)" }} />
+              <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "2px", background: "var(--color-cyan)" }} />
               
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
                 <span className="badge badge-cyan" style={{ fontSize: "0.8rem", padding: "0.4rem 0.8rem" }}>Pillar 2: Downstream</span>
-                <div style={{ background: "rgba(8, 145, 178, 0.08)", padding: "0.75rem", borderRadius: "12px", border: "1px solid rgba(8, 145, 178, 0.2)" }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <div style={{ background: "#eff6ff", padding: "0.5rem", borderRadius: "50%", border: "1px solid #dbeafe" }}>
+                  <Briefcase size={20} color="var(--color-cyan)" />
                 </div>
               </div>
 
-              <h3 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "var(--text-primary)" }}>EdgeTalent Group</h3>
-              <p style={{ color: "var(--text-secondary)", lineHeight: "1.65", marginBottom: "2rem" }}>
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "0.75rem", color: "var(--text-primary)" }}>EdgeTalent Group</h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", lineHeight: "1.5", marginBottom: "2rem" }}>
                 Designed for enterprises and commercial partnerships. We pair corporate requirements with talents using semantic queries. Includes dashboard panels to monitor contract milestones.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1.5rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <Check size={16} color="var(--color-cyan)" />
                   Semantic Talent Match Engine
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <Check size={16} color="var(--color-cyan)" />
                   Project Manager Posting Portal
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <Check size={16} color="var(--color-cyan)" />
                   Milestone tracking & Escrow Contracts
                 </div>
               </div>
@@ -807,12 +811,14 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                 type="text"
                 placeholder="Search events..."
                 className="form-input"
-                style={{ paddingRight: "2.5rem", margin: 0, background: "rgba(255, 255, 255, 0.05)", border: "1px solid var(--glass-border)", borderRadius: "8px", color: "var(--text-primary)", width: "100%" }}
+                style={{ paddingRight: "2.5rem", margin: 0, background: "var(--bg-secondary)", border: "1px solid var(--glass-border)", borderRadius: "var(--radius-sm)", color: "var(--text-primary)", width: "100%" }}
                 value={searchEventQuery}
                 onChange={(e) => setSearchEventQuery(e.target.value)}
                 id="search-public-events"
               />
-              <span style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>🔍</span>
+              <span style={{ position: "absolute", right: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", display: "flex", alignItems: "center" }}>
+                <Search size={16} />
+              </span>
             </div>
           </div>
 
@@ -938,7 +944,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             <div className="glass-panel testimonial-card">
               <div style={{ display: "flex", gap: "0.25rem", marginBottom: "1.25rem" }}>
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <Star key={i} size={14} fill="#fbbf24" stroke="none" />
                 ))}
               </div>
               <p className="testimonial-quote">
@@ -956,7 +962,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             <div className="glass-panel testimonial-card">
               <div style={{ display: "flex", gap: "0.25rem", marginBottom: "1.25rem" }}>
                 {[...Array(5)].map((_, i) => (
-                  <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <Star key={i} size={14} fill="#fbbf24" stroke="none" />
                 ))}
               </div>
               <p className="testimonial-quote">
@@ -985,15 +991,13 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                   id={`faq-summary-${idx}`}
                 >
                   <span>{faq.q}</span>
-                  <span style={{
-                    transform: openFaq === idx ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.25s ease",
-                    display: "inline-block",
-                    fontSize: "1.2rem",
-                    fontWeight: "bold"
-                  }}>
-                    ▾
-                  </span>
+                  <ChevronDown
+                    size={16}
+                    style={{
+                      transform: openFaq === idx ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.25s ease"
+                    }}
+                  />
                 </div>
                 {openFaq === idx && (
                   <div className="collapsible-content animate-fade-in" id={`faq-content-${idx}`}>

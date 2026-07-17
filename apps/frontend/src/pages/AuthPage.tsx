@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSupabase } from "../context/SupabaseContext";
 import { LoginSchema, RegisterSchema } from "@edgetalent/shared";
+import { ArrowLeft } from "lucide-react";
 
 interface AuthPageProps {
   onBack: () => void;
@@ -69,15 +70,15 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
         
         <button 
           onClick={onBack}
-          style={{ background: "none", border: "none", color: "var(--text-secondary)", cursor: "pointer", fontSize: "0.9rem", display: "flex", alignItems: "center", gap: "0.25rem", marginBottom: "1.5rem" }}
+          style={{ background: "none", border: "none", color: "var(--text-secondary)", cursor: "pointer", fontSize: "0.875rem", display: "inline-flex", alignItems: "center", gap: "0.375rem", marginBottom: "1.5rem" }}
         >
-          ← Back to Home
+          <ArrowLeft size={16} /> Back to Home
         </button>
 
-        <h2 style={{ fontSize: "2rem", marginBottom: "0.5rem", background: "var(--grad-cyan-purple)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+        <h2 style={{ fontSize: "1.75rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.5rem" }}>
           {isSignUp ? "Create Account" : "Welcome Back"}
         </h2>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "2rem" }}>
+        <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginBottom: "2rem" }}>
           {isSignUp ? "Join the EdgeTalent ecosystem today" : "Log in to manage your career or projects"}
         </p>
 
