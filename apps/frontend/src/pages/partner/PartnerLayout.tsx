@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSupabase } from "../../context/SupabaseContext";
 import { 
-  LayoutDashboard, Activity, GraduationCap, Briefcase, CheckSquare, 
-  Award, DollarSign, Calendar, User, LogOut, Menu, X 
+  LayoutDashboard, GraduationCap, Briefcase, CheckSquare, 
+  DollarSign, Calendar, User, LogOut, Menu, X 
 } from "lucide-react";
 import logo from "../../assets/logo.png";
 
