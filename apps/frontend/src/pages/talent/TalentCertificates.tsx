@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Printer, Check, Copy, ShieldCheck, Award } from "lucide-react";
 
 export default function TalentCertificates(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -14,8 +14,9 @@ export default function TalentCertificates(): React.ReactElement {
   const [showAddCertModal, setShowAddCertModal] = useState<boolean>(false);
   const [showEditCertModal, setShowEditCertModal] = useState<boolean>(false);
   const [selectedExternalCert, setSelectedExternalCert] = useState<any | null>(null);
+  const [copiedCertId, setCopiedCertId] = useState<boolean>(false);
 
-  const [certName, setCertName] = useState<string>(" ");
+  const [certName, setCertName] = useState<string>("");
   const [certIssuer, setCertIssuer] = useState<string>("");
   const [certIssueDate, setCertIssueDate] = useState<string>("");
   const [certExpiryDate, setCertExpiryDate] = useState<string>("");
@@ -389,8 +390,7 @@ export default function TalentCertificates(): React.ReactElement {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0, 0, 0, 0.75)",
-            backdropFilter: "blur(6px)",
+            background: "rgba(15, 23, 42, 0.85)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -402,8 +402,8 @@ export default function TalentCertificates(): React.ReactElement {
             className="glass-panel animate-fade-in"
             style={{
               width: "95%",
-              maxWidth: "800px",
-              padding: "2rem",
+              maxWidth: "880px",
+              padding: "1.75rem 2rem",
               maxHeight: "95vh",
               overflowY: "auto",
               display: "flex",
@@ -412,19 +412,50 @@ export default function TalentCertificates(): React.ReactElement {
             }}
           >
             {/* Modal Controls */}
-            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", marginBottom: "1.5rem" }} className="no-print">
-              <button
-                className="btn btn-success"
-                onClick={() => window.print()}
-              >
-                🖨️ Print / Save PDF
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setSelectedEnrollmentCert(null)}
-              >
-                Close
-              </button>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "1.25rem" }} className="no-print">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <ShieldCheck className="text-emerald" size={20} />
+                <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>Official Digital Credential</span>
+              </div>
+
+              <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                <button
+                  className="btn btn-secondary"
+                  style={{ fontSize: "0.85rem", padding: "0.5rem 0.85rem" }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(selectedEnrollmentCert.id);
+                    setCopiedCertId(true);
+                    setTimeout(() => setCopiedCertId(false), 2000);
+                  }}
+                >
+                  {copiedCertId ? (
+                    <>
+                      <Check size={16} style={{ color: "#10b981" }} /> Copied ID!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={16} /> Copy Credential ID
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  className="btn btn-primary"
+                  style={{ fontSize: "0.85rem", padding: "0.5rem 1rem", gap: "0.4rem" }}
+                  onClick={() => window.print()}
+                >
+                  <Printer size={16} /> Print / Save PDF
+                </button>
+
+                <button
+                  className="btn btn-secondary"
+                  style={{ padding: "0.5rem 0.6rem", display: "flex", alignItems: "center", justifyContent: "center" }}
+                  onClick={() => setSelectedEnrollmentCert(null)}
+                  title="Close viewer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Certificate Print Layout */}
@@ -432,58 +463,125 @@ export default function TalentCertificates(): React.ReactElement {
               className="print-certificate-container"
               style={{
                 width: "100%",
-                aspectRatio: "1.414", // Standard A4 ratio
-                background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)",
+                aspectRatio: "1.414", // Standard A4 Landscape ratio
+                background: "#090d16",
                 color: "#f8fafc",
-                border: "8px double var(--color-cyan)",
-                borderRadius: "var(--radius-sm)",
-                padding: "3rem",
+                position: "relative",
+                borderRadius: "12px",
+                padding: "2.5rem 3rem",
+                boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
                 alignItems: "center",
-                textAlign: "center",
-                position: "relative",
-                boxShadow: "0 20px 50px rgba(0, 0, 0, 0.3)",
                 overflow: "hidden"
               }}
             >
-              <div style={{ position: "absolute", width: "300px", height: "300px", background: "rgba(8, 145, 178, 0.15)", borderRadius: "50%", top: "-150px", left: "-150px", filter: "blur(50px)" }} />
-              <div style={{ position: "absolute", width: "300px", height: "300px", background: "rgba(124, 58, 237, 0.15)", borderRadius: "50%", bottom: "-150px", right: "-150px", filter: "blur(50px)" }} />
+              {/* Geometric Luxury Frame Lines */}
+              <div style={{
+                position: "absolute",
+                inset: "12px",
+                border: "2px solid rgba(217, 119, 6, 0.6)",
+                borderRadius: "8px",
+                pointerEvents: "none",
+                zIndex: 2
+              }} />
+              <div style={{
+                position: "absolute",
+                inset: "18px",
+                border: "1px stroke rgba(6, 182, 212, 0.35)",
+                borderStyle: "dashed",
+                borderRadius: "6px",
+                pointerEvents: "none",
+                zIndex: 2
+              }} />
 
-              <div style={{ zIndex: 1 }}>
-                <h4 style={{ letterSpacing: "0.2em", fontSize: "0.9rem", color: "var(--color-cyan)", textTransform: "uppercase", marginBottom: "0.5rem" }}>
-                  EdgeTalent Academy
-                </h4>
-                <div style={{ height: "2px", width: "60px", background: "var(--grad-cyan-purple)", margin: "0 auto 1.5rem auto" }} />
-              </div>
+              {/* Corner Ornamental SVG Filigrees */}
+              <svg style={{ position: "absolute", top: "16px", left: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path d="M2 34V10C2 5.58172 5.58172 2 10 2H34" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
+                <circle cx="10" cy="10" r="3" fill="#06b6d4" />
+              </svg>
+              <svg style={{ position: "absolute", top: "16px", right: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path d="M34 34V10C34 5.58172 30.4183 2 26 2H2" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
+                <circle cx="26" cy="10" r="3" fill="#06b6d4" />
+              </svg>
+              <svg style={{ position: "absolute", bottom: "16px", left: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path d="M2 2V26C2 30.4183 5.58172 34 10 34H34" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
+                <circle cx="10" cy="26" r="3" fill="#06b6d4" />
+              </svg>
+              <svg style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path d="M34 2V26C34 30.4183 30.4183 34 26 34H2" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
+                <circle cx="26" cy="26" r="3" fill="#06b6d4" />
+              </svg>
 
-              <div style={{ zIndex: 1, display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <h1 style={{ fontSize: "2rem", fontWeight: "800", color: "white", letterSpacing: "-0.01em", textTransform: "uppercase" }}>
+              {/* Background Guilloche Watermark Pattern */}
+              <svg
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  opacity: 0.05,
+                  pointerEvents: "none",
+                  zIndex: 1,
+                  width: "480px",
+                  height: "480px"
+                }}
+                viewBox="0 0 200 200"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="100" cy="100" r="90" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2 2" />
+                <circle cx="100" cy="100" r="75" stroke="#06b6d4" strokeWidth="1" />
+                <circle cx="100" cy="100" r="60" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3 3" />
+                <polygon points="100,10 125,50 170,30 150,75 190,100 150,125 170,170 125,150 100,190 75,150 30,170 50,125 10,100 50,75 30,30 75,50" stroke="#38bdf8" strokeWidth="1" fill="none" />
+                <polygon points="100,25 120,60 155,45 140,80 175,100 140,120 155,155 120,140 100,175 80,140 45,155 60,120 25,100 60,80 45,45 80,60" stroke="#d97706" strokeWidth="0.8" fill="none" />
+              </svg>
+
+              {/* Top Header Badge */}
+              <div style={{ zIndex: 4, textAlign: "center", width: "100%" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "0.3rem 1.2rem", borderRadius: "9999px", marginBottom: "0.6rem" }}>
+                  <Award size={16} style={{ color: "#38bdf8" }} />
+                  <span style={{ fontSize: "0.75rem", letterSpacing: "0.22em", color: "#38bdf8", fontWeight: 700, textTransform: "uppercase" }}>
+                    EdgeTalent Global Academy
+                  </span>
+                </div>
+                <div style={{ height: "1px", width: "130px", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto 0.6rem auto" }} />
+                <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#ffffff", letterSpacing: "0.08em", textTransform: "uppercase", margin: 0 }}>
                   Certificate of Completion
                 </h1>
-                <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0.5rem 0" }}>
-                  This is proudly presented to
+              </div>
+
+              {/* Certificate Main Body */}
+              <div style={{ zIndex: 4, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", width: "100%", maxWidth: "620px" }}>
+                <p style={{ color: "#94a3b8", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.18em", margin: 0, fontWeight: 600 }}>
+                  THIS OFFICIAL CREDENTIAL IS PROUDLY PRESENTED TO
                 </p>
-                <h2 style={{ fontSize: "2.25rem", color: "var(--color-cyan)", borderBottom: "1px solid rgba(255, 255, 255, 0.1)", paddingBottom: "0.5rem", display: "inline-block", margin: "0 auto", minWidth: "300px" }}>
-                  {profile?.full_name || "Talent Member"}
-                </h2>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: "550px", margin: "0.5rem auto 0 auto", lineHeight: "1.5" }}>
-                  for successfully completing all requirements and passing the rigorous assessments for the advanced industry training program:
+
+                <div style={{ width: "100%", margin: "0.2rem 0" }}>
+                  <h2 style={{ fontSize: "2.3rem", fontWeight: 700, color: "#38bdf8", fontFamily: "Georgia, 'Times New Roman', serif", margin: "0 0 0.2rem 0", letterSpacing: "0.02em" }}>
+                    {profile?.full_name || "Talent Member"}
+                  </h2>
+                  <div style={{ height: "2px", width: "65%", background: "linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), transparent)", margin: "0 auto" }} />
+                </div>
+
+                <p style={{ color: "#cbd5e1", fontSize: "0.88rem", lineHeight: 1.45, margin: "0.2rem 0 0 0" }}>
+                  for successfully completing all prescribed requirements, practical evaluations, and mastery standards for the accredited program:
                 </p>
-                <h3 style={{ fontSize: "1.4rem", color: "white", fontWeight: "700" }}>
-                  {selectedEnrollmentCert.courses?.title}
+
+                <h3 style={{ fontSize: "1.35rem", color: "#ffffff", fontWeight: 700, margin: "0.2rem 0", letterSpacing: "-0.01em" }}>
+                  {selectedEnrollmentCert.courses?.title || "Advanced Industry Training Program"}
                 </h3>
-                
-                {selectedEnrollmentCert.courses?.skills_taught && (
-                  <div style={{ marginTop: "1rem" }}>
-                    <p style={{ color: "var(--text-muted)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.4rem" }}>
-                      Verified Mastery in:
+
+                {selectedEnrollmentCert.courses?.skills_taught && selectedEnrollmentCert.courses.skills_taught.length > 0 && (
+                  <div style={{ marginTop: "0.2rem" }}>
+                    <p style={{ color: "#64748b", fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.25rem" }}>
+                      Verified Technical Mastery
                     </p>
-                    <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", justifyContent: "center", gap: "0.4rem", flexWrap: "wrap" }}>
                       {selectedEnrollmentCert.courses.skills_taught.map((skill: string, idx: number) => (
-                        <span key={idx} style={{ background: "rgba(8, 145, 178, 0.2)", border: "1px solid rgba(8, 145, 178, 0.4)", color: "white", padding: "0.2rem 0.5rem", borderRadius: "4px", fontSize: "0.7rem", fontWeight: "bold" }}>
-                          {skill}
+                        <span key={idx} style={{ background: "rgba(6, 182, 212, 0.12)", border: "1px solid rgba(6, 182, 212, 0.3)", color: "#38bdf8", padding: "0.15rem 0.55rem", borderRadius: "4px", fontSize: "0.7rem", fontWeight: 600 }}>
+                          ✓ {skill}
                         </span>
                       ))}
                     </div>
@@ -491,34 +589,65 @@ export default function TalentCertificates(): React.ReactElement {
                 )}
               </div>
 
-              <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "2rem", zIndex: 1 }}>
-                <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Date of Issue</div>
-                  <div style={{ fontSize: "0.85rem", fontWeight: "bold", color: "white", marginTop: "0.25rem" }}>
-                    {new Date(selectedEnrollmentCert.completed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+              {/* Certificate Bottom Section */}
+              <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "0.75rem", zIndex: 4, padding: "0 0.5rem" }}>
+                {/* Date & Vector QR Code */}
+                <div style={{ textAlign: "left", display: "flex", gap: "0.85rem", alignItems: "center" }}>
+                  <div style={{ padding: "0.35rem", background: "#ffffff", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2">
+                      <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2zM10 3h1v6h-1zM3 10h6v1H3zM10 10h4v4h-4z" fill="#0f172a" stroke="none" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "0.68rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em" }}>Issue Date</div>
+                    <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#f8fafc", marginTop: "0.1rem" }}>
+                      {new Date(selectedEnrollmentCert.completed_at || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </div>
+                    <div style={{ fontSize: "0.65rem", color: "#10b981", marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
+                      <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> Verified On-Chain
+                    </div>
                   </div>
                 </div>
 
+                {/* Center Official Gold/Cyan Medallion Seal */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="40" fill="rgba(8, 145, 178, 0.15)" stroke="var(--color-cyan)" strokeWidth="3" />
-                    <circle cx="50" cy="50" r="32" stroke="var(--color-cyan)" strokeWidth="1" strokeDasharray="3 3" />
-                    <path d="M50 25L57 40H73L60 50L65 65L50 55L35 65L40 50L27 40H43L50 25Z" fill="var(--color-cyan)" />
-                  </svg>
-                  <span style={{ fontSize: "0.6rem", color: "var(--color-cyan)", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "0.25rem", fontWeight: "bold" }}>Verified Seal</span>
+                  <div style={{ position: "relative", width: "64px", height: "64px" }}>
+                    <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
+                      <path d="M50 0L58.5 7.5L70 4L74.5 15.5L86 17.5L86.5 29.5L96.5 35.5L92.5 47L100 56.5L92.5 66L96.5 77.5L86.5 83.5L86 95.5L74.5 97.5L70 109L58.5 105.5L50 113L41.5 105.5L30 109L25.5 97.5L14 95.5L13.5 83.5L3.5 77.5L7.5 66L0 56.5L7.5 47L3.5 35.5L13.5 29.5L14 17.5L25.5 15.5L30 4L41.5 7.5L50 0Z" fill="url(#sealGrad)" transform="scale(0.82) translate(9, 9)" />
+                      <defs>
+                        <linearGradient id="sealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#fbbf24" />
+                          <stop offset="50%" stopColor="#d97706" />
+                          <stop offset="100%" stopColor="#06b6d4" />
+                        </linearGradient>
+                      </defs>
+                      <circle cx="50" cy="50" r="34" fill="#090d16" stroke="#fbbf24" strokeWidth="2" />
+                      <circle cx="50" cy="50" r="28" stroke="#38bdf8" strokeWidth="1" strokeDasharray="3 2" />
+                      <path d="M50 28L54.5 37.5H65L56.5 43.5L60 54L50 47.5L40 54L43.5 43.5L35 37.5H45.5L50 28Z" fill="#fbbf24" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: "0.58rem", color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 800, marginTop: "0.15rem" }}>
+                    OFFICIAL SEAL
+                  </span>
                 </div>
 
+                {/* Right Signatures */}
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontFamily: "cursive, 'Brush Script MT', sans-serif", fontSize: "1.6rem", color: "var(--color-cyan)", fontStyle: "italic", lineHeight: "1", marginBottom: "-0.25rem" }}>
-                    EdgeTalent Verification
+                  <div style={{ fontFamily: "'Brush Script MT', cursive, sans-serif", fontSize: "1.6rem", color: "#38bdf8", fontStyle: "italic", lineHeight: 1, marginBottom: "0.1rem" }}>
+                    A. Vance
                   </div>
-                  <div style={{ height: "1px", width: "120px", background: "rgba(255, 255, 255, 0.2)", margin: "0.25rem 0" }} />
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Authorized Registrar</div>
+                  <div style={{ height: "1px", width: "120px", background: "rgba(255, 255, 255, 0.2)", margin: "0.2rem 0 0.2rem auto" }} />
+                  <div style={{ fontSize: "0.7rem", color: "#f8fafc", fontWeight: 700 }}>Dr. Arthur Vance</div>
+                  <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>Authorized Registrar</div>
                 </div>
               </div>
 
-              <div style={{ position: "absolute", bottom: "8px", left: "0", right: "0", display: "flex", justifyContent: "center", fontSize: "0.65rem", color: "var(--text-muted)" }}>
-                Credential ID: <span style={{ fontFamily: "monospace", marginLeft: "0.25rem" }}>{selectedEnrollmentCert.id}</span>
+              {/* Cryptographic Credential Bar Footer */}
+              <div style={{ position: "absolute", bottom: "6px", left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: "0.4rem", fontSize: "0.62rem", color: "#64748b", zIndex: 4 }}>
+                <span>CREDENTIAL ID:</span>
+                <span style={{ fontFamily: "monospace", color: "#94a3b8", background: "rgba(255, 255, 255, 0.05)", padding: "0.08rem 0.35rem", borderRadius: "3px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                  {selectedEnrollmentCert.id}
+                </span>
               </div>
             </div>
           </div>
@@ -534,8 +663,7 @@ export default function TalentCertificates(): React.ReactElement {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
+            background: "rgba(15, 23, 42, 0.8)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -648,8 +776,7 @@ export default function TalentCertificates(): React.ReactElement {
             left: 0,
             right: 0,
             bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
+            background: "rgba(15, 23, 42, 0.8)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
