@@ -464,12 +464,12 @@ export default function TalentCertificates(): React.ReactElement {
               style={{
                 width: "100%",
                 aspectRatio: "1.414", // Standard A4 Landscape ratio
-                background: "#090d16",
-                color: "#f8fafc",
+                background: "#ffffff",
+                color: "#0f172a",
                 position: "relative",
                 borderRadius: "12px",
                 padding: "2.5rem 3rem",
-                boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1)",
+                boxShadow: "0 20px 50px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.06)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -477,11 +477,11 @@ export default function TalentCertificates(): React.ReactElement {
                 overflow: "hidden"
               }}
             >
-              {/* Geometric Luxury Frame Lines */}
+              {/* Geometric Gold & Blue Frame Lines */}
               <div style={{
                 position: "absolute",
                 inset: "12px",
-                border: "2px solid rgba(217, 119, 6, 0.6)",
+                border: "2px solid #d97706",
                 borderRadius: "8px",
                 pointerEvents: "none",
                 zIndex: 2
@@ -489,8 +489,7 @@ export default function TalentCertificates(): React.ReactElement {
               <div style={{
                 position: "absolute",
                 inset: "18px",
-                border: "1px stroke rgba(6, 182, 212, 0.35)",
-                borderStyle: "dashed",
+                border: "1px dashed #2563eb",
                 borderRadius: "6px",
                 pointerEvents: "none",
                 zIndex: 2
@@ -499,19 +498,19 @@ export default function TalentCertificates(): React.ReactElement {
               {/* Corner Ornamental SVG Filigrees */}
               <svg style={{ position: "absolute", top: "16px", left: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
                 <path d="M2 34V10C2 5.58172 5.58172 2 10 2H34" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
-                <circle cx="10" cy="10" r="3" fill="#06b6d4" />
+                <circle cx="10" cy="10" r="3" fill="#2563eb" />
               </svg>
               <svg style={{ position: "absolute", top: "16px", right: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
                 <path d="M34 34V10C34 5.58172 30.4183 2 26 2H2" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
-                <circle cx="26" cy="10" r="3" fill="#06b6d4" />
+                <circle cx="26" cy="10" r="3" fill="#2563eb" />
               </svg>
               <svg style={{ position: "absolute", bottom: "16px", left: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
                 <path d="M2 2V26C2 30.4183 5.58172 34 10 34H34" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
-                <circle cx="10" cy="26" r="3" fill="#06b6d4" />
+                <circle cx="10" cy="26" r="3" fill="#2563eb" />
               </svg>
               <svg style={{ position: "absolute", bottom: "16px", right: "16px", zIndex: 3 }} width="36" height="36" viewBox="0 0 36 36" fill="none">
                 <path d="M34 2V26C34 30.4183 30.4183 34 26 34H2" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" />
-                <circle cx="26" cy="26" r="3" fill="#06b6d4" />
+                <circle cx="26" cy="26" r="3" fill="#2563eb" />
               </svg>
 
               {/* Background Guilloche Watermark Pattern */}
@@ -521,7 +520,7 @@ export default function TalentCertificates(): React.ReactElement {
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
-                  opacity: 0.05,
+                  opacity: 0.06,
                   pointerEvents: "none",
                   zIndex: 1,
                   width: "480px",
@@ -531,45 +530,45 @@ export default function TalentCertificates(): React.ReactElement {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <circle cx="100" cy="100" r="90" stroke="#fbbf24" strokeWidth="1" strokeDasharray="2 2" />
-                <circle cx="100" cy="100" r="75" stroke="#06b6d4" strokeWidth="1" />
-                <circle cx="100" cy="100" r="60" stroke="#fbbf24" strokeWidth="0.8" strokeDasharray="3 3" />
-                <polygon points="100,10 125,50 170,30 150,75 190,100 150,125 170,170 125,150 100,190 75,150 30,170 50,125 10,100 50,75 30,30 75,50" stroke="#38bdf8" strokeWidth="1" fill="none" />
+                <circle cx="100" cy="100" r="90" stroke="#b45309" strokeWidth="1" strokeDasharray="2 2" />
+                <circle cx="100" cy="100" r="75" stroke="#0284c7" strokeWidth="1" />
+                <circle cx="100" cy="100" r="60" stroke="#b45309" strokeWidth="0.8" strokeDasharray="3 3" />
+                <polygon points="100,10 125,50 170,30 150,75 190,100 150,125 170,170 125,150 100,190 75,150 30,170 50,125 10,100 50,75 30,30 75,50" stroke="#0284c7" strokeWidth="1" fill="none" />
                 <polygon points="100,25 120,60 155,45 140,80 175,100 140,120 155,155 120,140 100,175 80,140 45,155 60,120 25,100 60,80 45,45 80,60" stroke="#d97706" strokeWidth="0.8" fill="none" />
               </svg>
 
               {/* Top Header Badge */}
               <div style={{ zIndex: 4, textAlign: "center", width: "100%" }}>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "0.3rem 1.2rem", borderRadius: "9999px", marginBottom: "0.6rem" }}>
-                  <Award size={16} style={{ color: "#38bdf8" }} />
-                  <span style={{ fontSize: "0.75rem", letterSpacing: "0.22em", color: "#38bdf8", fontWeight: 700, textTransform: "uppercase" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "#eff6ff", border: "1px solid #bfdbfe", padding: "0.3rem 1.2rem", borderRadius: "9999px", marginBottom: "0.6rem" }}>
+                  <Award size={16} style={{ color: "#1d4ed8" }} />
+                  <span style={{ fontSize: "0.75rem", letterSpacing: "0.22em", color: "#1e40af", fontWeight: 700, textTransform: "uppercase" }}>
                     EdgeTalent Global Academy
                   </span>
                 </div>
                 <div style={{ height: "1px", width: "130px", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto 0.6rem auto" }} />
-                <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#ffffff", letterSpacing: "0.08em", textTransform: "uppercase", margin: 0 }}>
+                <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", letterSpacing: "0.08em", textTransform: "uppercase", margin: 0 }}>
                   Certificate of Completion
                 </h1>
               </div>
 
               {/* Certificate Main Body */}
               <div style={{ zIndex: 4, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", width: "100%", maxWidth: "620px" }}>
-                <p style={{ color: "#94a3b8", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.18em", margin: 0, fontWeight: 600 }}>
+                <p style={{ color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.18em", margin: 0, fontWeight: 600 }}>
                   THIS OFFICIAL CREDENTIAL IS PROUDLY PRESENTED TO
                 </p>
 
                 <div style={{ width: "100%", margin: "0.2rem 0" }}>
-                  <h2 style={{ fontSize: "2.3rem", fontWeight: 700, color: "#38bdf8", fontFamily: "Georgia, 'Times New Roman', serif", margin: "0 0 0.2rem 0", letterSpacing: "0.02em" }}>
+                  <h2 style={{ fontSize: "2.3rem", fontWeight: 700, color: "#1d4ed8", fontFamily: "Georgia, 'Times New Roman', serif", margin: "0 0 0.2rem 0", letterSpacing: "0.02em" }}>
                     {profile?.full_name || "Talent Member"}
                   </h2>
-                  <div style={{ height: "2px", width: "65%", background: "linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), transparent)", margin: "0 auto" }} />
+                  <div style={{ height: "2px", width: "65%", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto" }} />
                 </div>
 
-                <p style={{ color: "#cbd5e1", fontSize: "0.88rem", lineHeight: 1.45, margin: "0.2rem 0 0 0" }}>
+                <p style={{ color: "#334155", fontSize: "0.88rem", lineHeight: 1.45, margin: "0.2rem 0 0 0" }}>
                   for successfully completing all prescribed requirements, practical evaluations, and mastery standards for the accredited program:
                 </p>
 
-                <h3 style={{ fontSize: "1.35rem", color: "#ffffff", fontWeight: 700, margin: "0.2rem 0", letterSpacing: "-0.01em" }}>
+                <h3 style={{ fontSize: "1.35rem", color: "#0f172a", fontWeight: 700, margin: "0.2rem 0", letterSpacing: "-0.01em" }}>
                   {selectedEnrollmentCert.courses?.title || "Advanced Industry Training Program"}
                 </h3>
 
@@ -580,7 +579,7 @@ export default function TalentCertificates(): React.ReactElement {
                     </p>
                     <div style={{ display: "flex", justifyContent: "center", gap: "0.4rem", flexWrap: "wrap" }}>
                       {selectedEnrollmentCert.courses.skills_taught.map((skill: string, idx: number) => (
-                        <span key={idx} style={{ background: "rgba(6, 182, 212, 0.12)", border: "1px solid rgba(6, 182, 212, 0.3)", color: "#38bdf8", padding: "0.15rem 0.55rem", borderRadius: "4px", fontSize: "0.7rem", fontWeight: 600 }}>
+                        <span key={idx} style={{ background: "#f0f9ff", border: "1px solid #bae6fd", color: "#0369a1", padding: "0.15rem 0.55rem", borderRadius: "4px", fontSize: "0.7rem", fontWeight: 600 }}>
                           ✓ {skill}
                         </span>
                       ))}
@@ -593,18 +592,18 @@ export default function TalentCertificates(): React.ReactElement {
               <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "0.75rem", zIndex: 4, padding: "0 0.5rem" }}>
                 {/* Date & Vector QR Code */}
                 <div style={{ textAlign: "left", display: "flex", gap: "0.85rem", alignItems: "center" }}>
-                  <div style={{ padding: "0.35rem", background: "#ffffff", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ padding: "0.35rem", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#0f172a" strokeWidth="2">
                       <path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 15h2v2h-2zM15 19h2v2h-2zM19 19h2v2h-2zM10 3h1v6h-1zM3 10h6v1H3zM10 10h4v4h-4z" fill="#0f172a" stroke="none" />
                     </svg>
                   </div>
                   <div>
                     <div style={{ fontSize: "0.68rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em" }}>Issue Date</div>
-                    <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#f8fafc", marginTop: "0.1rem" }}>
+                    <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", marginTop: "0.1rem" }}>
                       {new Date(selectedEnrollmentCert.completed_at || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                     </div>
-                    <div style={{ fontSize: "0.65rem", color: "#10b981", marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
-                      <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> Verified On-Chain
+                    <div style={{ fontSize: "0.65rem", color: "#059669", marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
+                      <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#059669", display: "inline-block" }} /> Verified On-Chain
                     </div>
                   </div>
                 </div>
@@ -613,31 +612,31 @@ export default function TalentCertificates(): React.ReactElement {
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <div style={{ position: "relative", width: "64px", height: "64px" }}>
                     <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
-                      <path d="M50 0L58.5 7.5L70 4L74.5 15.5L86 17.5L86.5 29.5L96.5 35.5L92.5 47L100 56.5L92.5 66L96.5 77.5L86.5 83.5L86 95.5L74.5 97.5L70 109L58.5 105.5L50 113L41.5 105.5L30 109L25.5 97.5L14 95.5L13.5 83.5L3.5 77.5L7.5 66L0 56.5L7.5 47L3.5 35.5L13.5 29.5L14 17.5L25.5 15.5L30 4L41.5 7.5L50 0Z" fill="url(#sealGrad)" transform="scale(0.82) translate(9, 9)" />
+                      <path d="M50 0L58.5 7.5L70 4L74.5 15.5L86 17.5L86.5 29.5L96.5 35.5L92.5 47L100 56.5L92.5 66L96.5 77.5L86.5 83.5L86 95.5L74.5 97.5L70 109L58.5 105.5L50 113L41.5 105.5L30 109L25.5 97.5L14 95.5L13.5 83.5L3.5 77.5L7.5 66L0 56.5L7.5 47L3.5 35.5L13.5 29.5L14 17.5L25.5 15.5L30 4L41.5 7.5L50 0Z" fill="url(#sealGradLight)" transform="scale(0.82) translate(9, 9)" />
                       <defs>
-                        <linearGradient id="sealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <linearGradient id="sealGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stopColor="#fbbf24" />
                           <stop offset="50%" stopColor="#d97706" />
-                          <stop offset="100%" stopColor="#06b6d4" />
+                          <stop offset="100%" stopColor="#2563eb" />
                         </linearGradient>
                       </defs>
-                      <circle cx="50" cy="50" r="34" fill="#090d16" stroke="#fbbf24" strokeWidth="2" />
-                      <circle cx="50" cy="50" r="28" stroke="#38bdf8" strokeWidth="1" strokeDasharray="3 2" />
-                      <path d="M50 28L54.5 37.5H65L56.5 43.5L60 54L50 47.5L40 54L43.5 43.5L35 37.5H45.5L50 28Z" fill="#fbbf24" />
+                      <circle cx="50" cy="50" r="34" fill="#ffffff" stroke="#d97706" strokeWidth="2" />
+                      <circle cx="50" cy="50" r="28" stroke="#2563eb" strokeWidth="1" strokeDasharray="3 2" />
+                      <path d="M50 28L54.5 37.5H65L56.5 43.5L60 54L50 47.5L40 54L43.5 43.5L35 37.5H45.5L50 28Z" fill="#d97706" />
                     </svg>
                   </div>
-                  <span style={{ fontSize: "0.58rem", color: "#fbbf24", textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 800, marginTop: "0.15rem" }}>
+                  <span style={{ fontSize: "0.58rem", color: "#b45309", textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 800, marginTop: "0.15rem" }}>
                     OFFICIAL SEAL
                   </span>
                 </div>
 
                 {/* Right Signatures */}
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontFamily: "'Brush Script MT', cursive, sans-serif", fontSize: "1.6rem", color: "#38bdf8", fontStyle: "italic", lineHeight: 1, marginBottom: "0.1rem" }}>
+                  <div style={{ fontFamily: "'Brush Script MT', cursive, sans-serif", fontSize: "1.6rem", color: "#1d4ed8", fontStyle: "italic", lineHeight: 1, marginBottom: "0.1rem" }}>
                     A. Vance
                   </div>
-                  <div style={{ height: "1px", width: "120px", background: "rgba(255, 255, 255, 0.2)", margin: "0.2rem 0 0.2rem auto" }} />
-                  <div style={{ fontSize: "0.7rem", color: "#f8fafc", fontWeight: 700 }}>Dr. Arthur Vance</div>
+                  <div style={{ height: "1px", width: "120px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem auto" }} />
+                  <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Dr. Arthur Vance</div>
                   <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>Authorized Registrar</div>
                 </div>
               </div>
@@ -645,7 +644,7 @@ export default function TalentCertificates(): React.ReactElement {
               {/* Cryptographic Credential Bar Footer */}
               <div style={{ position: "absolute", bottom: "6px", left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: "0.4rem", fontSize: "0.62rem", color: "#64748b", zIndex: 4 }}>
                 <span>CREDENTIAL ID:</span>
-                <span style={{ fontFamily: "monospace", color: "#94a3b8", background: "rgba(255, 255, 255, 0.05)", padding: "0.08rem 0.35rem", borderRadius: "3px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                <span style={{ fontFamily: "monospace", color: "#475569", background: "#f1f5f9", padding: "0.08rem 0.35rem", borderRadius: "3px", border: "1px solid #e2e8f0" }}>
                   {selectedEnrollmentCert.id}
                 </span>
               </div>
