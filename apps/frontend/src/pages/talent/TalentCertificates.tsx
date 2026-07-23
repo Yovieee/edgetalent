@@ -3,6 +3,7 @@ import { useSupabase } from "../../context/SupabaseContext";
 import { Plus, X, Download, Check, Copy, ShieldCheck, Award, Share2 } from "lucide-react";
 import { generateNanoId } from "../../utils/nanoid";
 import { downloadCertificateAsPdf } from "../../utils/pdf";
+import { signCertificate } from "../../utils/certificateSigning";
 import signatureImg from "../../assets/signature.png";
 import Modal from "../../components/Modal";
 
@@ -129,6 +130,16 @@ export default function TalentCertificates(): React.ReactElement {
       if (error) {
         alert("Failed to add certificate: " + error.message);
       } else {
+        // Sign the external certificate server-side with HMAC
+        signCertificate(supabase, {
+          credential_id: finalCredId,
+          recipient_name: profile?.full_name || "",
+          course_title: certName,
+          issuing_organization: certIssuer,
+          issue_date: certIssueDate,
+          cert_table: "talent_certificates",
+        }).catch(err => console.error("Background certificate signing failed:", err));
+
         setShowAddCertModal(false);
         resetCertForm();
         loadExternalCertificates();
@@ -163,6 +174,18 @@ export default function TalentCertificates(): React.ReactElement {
       if (error) {
         alert("Failed to update certificate: " + error.message);
       } else {
+        // Re-sign with updated certificate data
+        if (certCredId) {
+          signCertificate(supabase, {
+            credential_id: certCredId,
+            recipient_name: profile?.full_name || "",
+            course_title: certName,
+            issuing_organization: certIssuer,
+            issue_date: certIssueDate,
+            cert_table: "talent_certificates",
+          }).catch(err => console.error("Background certificate re-signing failed:", err));
+        }
+
         setShowEditCertModal(false);
         resetCertForm();
         loadExternalCertificates();

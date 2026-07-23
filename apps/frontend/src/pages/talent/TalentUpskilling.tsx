@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { generateNanoId } from "../../utils/nanoid";
+import { signCertificate } from "../../utils/certificateSigning";
 
 export default function TalentUpskilling(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -162,6 +163,18 @@ export default function TalentUpskilling(): React.ReactElement {
           }
           return e;
         }));
+
+        // Sign the certificate server-side with HMAC when all lessons are completed
+        if (isCompletedAll && credId) {
+          signCertificate(supabase, {
+            credential_id: credId,
+            recipient_name: profile?.full_name || "",
+            course_title: enrollment.courses?.title || "",
+            issuing_organization: enrollment.courses?.provider || "EdgeTalent Academy",
+            issue_date: completedAt || new Date().toISOString(),
+            cert_table: "course_enrollments",
+          }).catch(err => console.error("Background certificate signing failed:", err));
+        }
 
         if (activeLessonIdx < courseLessons.length - 1) {
           setActiveLessonIdx(activeLessonIdx + 1);

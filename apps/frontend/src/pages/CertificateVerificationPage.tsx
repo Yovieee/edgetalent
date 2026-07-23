@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSupabase } from "../context/SupabaseContext";
 import { 
-  ShieldCheck, Search, Award, Check, Copy, Download, ArrowLeft, ExternalLink, AlertTriangle
+  ShieldCheck, Search, Award, Check, Copy, Download, ArrowLeft, ExternalLink, AlertTriangle, Lock, Unlock, AlertCircle
 } from "lucide-react";
 import logo from "../assets/logo.png";
 import signatureImg from "../assets/signature.png";
 import { downloadCertificateAsPdf } from "../utils/pdf";
+import { verifyCertificateSignature } from "../utils/certificateSigning";
 
 interface CertificateResult {
   cert_type: "platform" | "external";
@@ -19,6 +20,7 @@ interface CertificateResult {
   expiration_date: string | null;
   skills: string[];
   credential_url: string | null;
+  digital_signature: string | null;
 }
 
 export default function CertificateVerificationPage(): React.ReactElement {
@@ -32,6 +34,7 @@ export default function CertificateVerificationPage(): React.ReactElement {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [downloadingPdf, setDownloadingPdf] = useState<boolean>(false);
+  const [signatureStatus, setSignatureStatus] = useState<"checking" | "valid" | "invalid" | "unsigned" | "error">("checking");
   const certRef = useRef<HTMLDivElement>(null);
 
   const verifyCertificateId = useCallback(async (searchId: string) => {
@@ -41,6 +44,7 @@ export default function CertificateVerificationPage(): React.ReactElement {
     setSearching(true);
     setCertificate(null);
     setErrorMsg(null);
+    setSignatureStatus("checking");
 
     try {
       // 1. First try the verify_certificate RPC function
@@ -75,7 +79,8 @@ export default function CertificateVerificationPage(): React.ReactElement {
           issue_date: match.completed_at,
           expiration_date: null,
           skills: match.courses?.skills_taught || [],
-          credential_url: null
+          credential_url: null,
+          digital_signature: match.digital_signature || null
         });
         setSearching(false);
         return;
@@ -100,7 +105,8 @@ export default function CertificateVerificationPage(): React.ReactElement {
           issue_date: match.issue_date,
           expiration_date: match.expiration_date,
           skills: [],
-          credential_url: match.credential_url
+          credential_url: match.credential_url,
+          digital_signature: match.digital_signature || null
         });
         setSearching(false);
         return;
@@ -123,6 +129,19 @@ export default function CertificateVerificationPage(): React.ReactElement {
       verifyCertificateId(cleanUrlId);
     }
   }, [urlCredId, verifyCertificateId]);
+
+  // Run cryptographic signature verification when a certificate is found
+  useEffect(() => {
+    if (!certificate) return;
+    setSignatureStatus("checking");
+    verifyCertificateSignature(supabase, certificate.credential_id)
+      .then(result => {
+        setSignatureStatus(result.signature_status || (result.verified ? "valid" : "error"));
+      })
+      .catch(() => {
+        setSignatureStatus("error");
+      });
+  }, [certificate, supabase]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -262,6 +281,23 @@ export default function CertificateVerificationPage(): React.ReactElement {
                     Verified on EdgeTalent Registry • Credential ID: <span style={{ fontFamily: "monospace", fontWeight: 700 }}>{certificate.credential_id}</span>
                   </p>
                 </div>
+              </div>
+
+              {/* Cryptographic Signature Status Indicator */}
+              <div style={{
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                padding: "0.4rem 0.85rem", borderRadius: "8px", fontSize: "0.8rem", fontWeight: 600,
+                ...(signatureStatus === "valid" ? { background: "rgba(16, 185, 129, 0.12)", color: "#059669", border: "1px solid rgba(16, 185, 129, 0.3)" }
+                  : signatureStatus === "invalid" ? { background: "rgba(239, 68, 68, 0.1)", color: "#dc2626", border: "1px solid rgba(239, 68, 68, 0.3)" }
+                  : signatureStatus === "unsigned" ? { background: "rgba(245, 158, 11, 0.1)", color: "#d97706", border: "1px solid rgba(245, 158, 11, 0.3)" }
+                  : signatureStatus === "checking" ? { background: "rgba(99, 102, 241, 0.1)", color: "#6366f1", border: "1px solid rgba(99, 102, 241, 0.3)" }
+                  : { background: "rgba(107, 114, 128, 0.1)", color: "#6b7280", border: "1px solid rgba(107, 114, 128, 0.3)" })
+              }}>
+                {signatureStatus === "valid" && <><Lock size={14} /> HMAC Signature Valid</>}
+                {signatureStatus === "invalid" && <><Unlock size={14} /> Signature Mismatch</>}
+                {signatureStatus === "unsigned" && <><AlertCircle size={14} /> Not Digitally Signed</>}
+                {signatureStatus === "checking" && <>⏳ Verifying Signature...</>}
+                {signatureStatus === "error" && <><AlertCircle size={14} /> Signature Check Unavailable</>}
               </div>
 
               {/* Action Buttons */}
