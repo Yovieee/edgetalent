@@ -310,7 +310,7 @@ export default function CertificateVerificationPage(): React.ReactElement {
                 color: "#0f172a",
                 position: "relative",
                 borderRadius: "12px",
-                padding: "2.5rem 3rem",
+                padding: "1.75rem 2.25rem",
                 boxShadow: "0 20px 50px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.06)",
                 display: "flex",
                 flexDirection: "column",
@@ -351,8 +351,8 @@ export default function CertificateVerificationPage(): React.ReactElement {
                   opacity: 0.05,
                   pointerEvents: "none",
                   zIndex: 1,
-                  width: "480px",
-                  height: "480px"
+                  width: "380px",
+                  height: "380px"
                 }}
                 viewBox="0 0 200 200"
                 fill="none"
@@ -364,47 +364,47 @@ export default function CertificateVerificationPage(): React.ReactElement {
 
               {/* Top Header */}
               <div style={{ zIndex: 4, textAlign: "center", width: "100%" }}>
-                <div style={{ display: "inline-block", background: "#eff6ff", border: "1px solid #bfdbfe", padding: "0.35rem 1.25rem", borderRadius: "20px", marginBottom: "0.6rem", textAlign: "center" }}>
-                  <Award size={16} style={{ color: "#1d4ed8", verticalAlign: "middle", marginRight: "0.4rem", display: "inline-block" }} />
-                  <span style={{ fontSize: "0.75rem", letterSpacing: "0.15em", color: "#1e40af", fontWeight: 700, textTransform: "uppercase", verticalAlign: "middle", display: "inline-block", lineHeight: "1.2" }}>
+                <div style={{ display: "inline-block", background: "#eff6ff", border: "1px solid #bfdbfe", padding: "0.25rem 1rem", borderRadius: "20px", marginBottom: "0.4rem", textAlign: "center" }}>
+                  <Award size={14} style={{ color: "#1d4ed8", verticalAlign: "middle", marginRight: "0.35rem", display: "inline-block" }} />
+                  <span style={{ fontSize: "0.7rem", letterSpacing: "0.15em", color: "#1e40af", fontWeight: 700, textTransform: "uppercase", verticalAlign: "middle", display: "inline-block", lineHeight: "1.2" }}>
                     {certificate.issuing_organization || "EdgeTalent Academy"}
                   </span>
                 </div>
-                <div style={{ height: "1px", width: "130px", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto 0.6rem auto" }} />
-                <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", letterSpacing: "0.08em", textTransform: "uppercase", margin: 0 }}>
+                <div style={{ height: "1px", width: "120px", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto 0.4rem auto" }} />
+                <h1 style={{ fontSize: "1.65rem", fontWeight: 800, color: "#0f172a", letterSpacing: "0.08em", textTransform: "uppercase", margin: 0 }}>
                   Certificate of Completion
                 </h1>
               </div>
 
               {/* Main Body */}
-              <div style={{ zIndex: 4, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", width: "100%", maxWidth: "620px" }}>
-                <p style={{ color: "#64748b", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.18em", margin: 0, fontWeight: 600 }}>
+              <div style={{ zIndex: 4, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.35rem", width: "100%", maxWidth: "600px" }}>
+                <p style={{ color: "#64748b", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.18em", margin: 0, fontWeight: 600 }}>
                   THIS OFFICIAL CREDENTIAL IS PROUDLY PRESENTED TO
                 </p>
 
-                <div style={{ width: "100%", margin: "0.2rem 0" }}>
-                  <h2 style={{ fontSize: "2.3rem", fontWeight: 700, color: "#1d4ed8", fontFamily: "Georgia, 'Times New Roman', serif", margin: "0 0 0.2rem 0", letterSpacing: "0.02em" }}>
+                <div style={{ width: "100%", margin: "0.1rem 0" }}>
+                  <h2 style={{ fontSize: "1.85rem", fontWeight: 700, color: "#1d4ed8", fontFamily: "Georgia, 'Times New Roman', serif", margin: "0 0 0.15rem 0", letterSpacing: "0.02em" }}>
                     {certificate.recipient_name}
                   </h2>
-                  <div style={{ height: "2px", width: "65%", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto" }} />
+                  <div style={{ height: "2px", width: "60%", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto" }} />
                 </div>
 
-                <p style={{ color: "#334155", fontSize: "0.88rem", lineHeight: 1.45, margin: "0.2rem 0 0 0" }}>
+                <p style={{ color: "#334155", fontSize: "0.82rem", lineHeight: 1.4, margin: "0.1rem 0 0 0" }}>
                   for successfully completing all prescribed requirements, practical evaluations, and mastery standards for:
                 </p>
 
-                <h3 style={{ fontSize: "1.35rem", color: "#0f172a", fontWeight: 700, margin: "0.2rem 0", letterSpacing: "-0.01em" }}>
+                <h3 style={{ fontSize: "1.15rem", color: "#0f172a", fontWeight: 700, margin: "0.15rem 0", letterSpacing: "-0.01em" }}>
                   {certificate.title}
                 </h3>
 
                 {certificate.skills && certificate.skills.length > 0 && (
-                  <div style={{ marginTop: "0.2rem" }}>
-                    <p style={{ color: "#64748b", fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.25rem" }}>
+                  <div style={{ marginTop: "0.15rem" }}>
+                    <p style={{ color: "#64748b", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.2rem" }}>
                       Verified Technical Mastery
                     </p>
-                    <div style={{ display: "flex", justifyContent: "center", gap: "0.4rem", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", justifyContent: "center", gap: "0.35rem", flexWrap: "wrap" }}>
                       {certificate.skills.map((skill: string, idx: number) => (
-                        <span key={idx} style={{ background: "#f0f9ff", border: "1px solid #bae6fd", color: "#0369a1", padding: "0.15rem 0.55rem", borderRadius: "4px", fontSize: "0.7rem", fontWeight: 600 }}>
+                        <span key={idx} style={{ background: "#f0f9ff", border: "1px solid #bae6fd", color: "#0369a1", padding: "0.12rem 0.45rem", borderRadius: "4px", fontSize: "0.65rem", fontWeight: 600 }}>
                           ✓ {skill}
                         </span>
                       ))}
@@ -414,32 +414,32 @@ export default function CertificateVerificationPage(): React.ReactElement {
               </div>
 
               {/* Bottom Section */}
-              <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "0.75rem", zIndex: 4, padding: "0 0.5rem" }}>
+              <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "0.5rem", zIndex: 4, padding: "0 0.5rem" }}>
                 {/* Real Scannable QR Code */}
-                <div style={{ textAlign: "left", display: "flex", gap: "0.85rem", alignItems: "center" }}>
-                  <div style={{ padding: "0.25rem", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}>
+                <div style={{ textAlign: "left", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                  <div style={{ padding: "0.2rem", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}>
                     <img 
                       src={qrCodeImageUrl} 
                       alt="Scannable Certificate Verification QR Code" 
-                      style={{ width: "81px", height: "81px", display: "block" }} 
+                      style={{ width: "65px", height: "65px", display: "block" }} 
                     />
                   </div>
                   <div>
-                    <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: "0.3rem", marginBottom: "0.2rem" }}>
+                    <div style={{ fontSize: "0.6rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: "0.3rem", marginBottom: "0.15rem" }}>
                       <span>Credential ID:</span>
-                      <span style={{ fontFamily: "monospace", color: "#0f172a", background: "#f1f5f9", padding: "0.05rem 0.35rem", borderRadius: "3px", border: "1px solid #cbd5e1", fontWeight: 700 }}>
+                      <span style={{ fontFamily: "monospace", color: "#0f172a", background: "#f1f5f9", padding: "0.05rem 0.3rem", borderRadius: "3px", border: "1px solid #cbd5e1", fontWeight: 700 }}>
                         {certificate.credential_id}
                       </span>
                     </div>
-                    <div style={{ fontSize: "0.68rem", marginTop: "0.1rem", display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+                    <div style={{ fontSize: "0.65rem", marginTop: "0.1rem", display: "flex", flexDirection: "column", gap: "0.08rem" }}>
                       <div>
-                        <span style={{ color: "#64748b", textTransform: "uppercase", fontSize: "0.6rem", letterSpacing: "0.05em", marginRight: "0.3rem" }}>Issue Date:</span>
+                        <span style={{ color: "#64748b", textTransform: "uppercase", fontSize: "0.58rem", letterSpacing: "0.05em", marginRight: "0.3rem" }}>Issue Date:</span>
                         <span style={{ fontWeight: 700, color: "#0f172a" }}>
                           {new Date(certificate.issue_date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
                       <div>
-                        <span style={{ color: "#dc2626", textTransform: "uppercase", fontSize: "0.6rem", letterSpacing: "0.05em", marginRight: "0.3rem" }}>Expiration Date:</span>
+                        <span style={{ color: "#dc2626", textTransform: "uppercase", fontSize: "0.58rem", letterSpacing: "0.05em", marginRight: "0.3rem" }}>Expiration Date:</span>
                         <span style={{ fontWeight: 700, color: "#991b1b" }}>
                           {new Date(
                             certificate.expiration_date || 
@@ -456,11 +456,11 @@ export default function CertificateVerificationPage(): React.ReactElement {
                   <img 
                     src={signatureImg} 
                     alt="Blasius Yonas Vikariandi Signature" 
-                    style={{ height: "72px", width: "auto", objectFit: "contain", transform: "translateY(-20px)", marginBottom: "-24px" }} 
+                    style={{ height: "54px", width: "auto", objectFit: "contain", transform: "translateY(-14px)", marginBottom: "-18px" }} 
                   />
-                  <div style={{ height: "1px", width: "140px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem 0" }} />
-                  <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Blasius Yonas Vikariandi</div>
-                  <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>EdgeTalent CEO</div>
+                  <div style={{ height: "1px", width: "130px", background: "#cbd5e1", margin: "0.15rem 0 0.15rem 0" }} />
+                  <div style={{ fontSize: "0.68rem", color: "#0f172a", fontWeight: 700 }}>Blasius Yonas Vikariandi</div>
+                  <div style={{ fontSize: "0.6rem", color: "#64748b", textTransform: "uppercase" }}>EdgeTalent CEO</div>
                 </div>
               </div>
             </div>

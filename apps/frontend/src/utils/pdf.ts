@@ -68,8 +68,14 @@ export async function downloadCertificateAsPdf(
     const pdfWidth = pdf.internal.pageSize.getWidth(); // 297 mm
     const pdfHeight = pdf.internal.pageSize.getHeight(); // 210 mm
 
-    // Fit image to PDF dimensions
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+    // Add standard 15mm margins around the certificate so it is elegantly framed on paper/PDF
+    const marginX = 15; // 15mm left & right margins
+    const certWidth = pdfWidth - (marginX * 2); // 267 mm width
+    const certHeight = certWidth / 1.414; // ~188.8 mm height preserving A4 landscape aspect ratio
+    const marginY = (pdfHeight - certHeight) / 2; // ~10.6 mm top & bottom margins (centered)
+
+    // Place certificate inside printable page margins
+    pdf.addImage(imgData, "PNG", marginX, marginY, certWidth, certHeight, undefined, "FAST");
 
     // Ensure filename ends with .pdf
     const cleanFilename = filename.toLowerCase().endsWith(".pdf")
