@@ -278,7 +278,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           <a href="#features" className="nav-tab">Features</a>
           <a href="#pillars" className="nav-tab">Ecosystem Pillars</a>
           <a href="#events" className="nav-tab">Events</a>
-          <a href="#stats" className="nav-tab">Platform Metrics</a>
+          <a href="/verify" className="nav-tab" style={{ color: "var(--color-cyan)", fontWeight: 600 }}>Verify Certificate</a>
           <a href="#faqs" className="nav-tab">FAQs</a>
         </div>
         <div style={{ display: "flex", gap: "0.75rem" }}>

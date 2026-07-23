@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
+import { generateNanoId } from "../../utils/nanoid";
 
 export default function TalentUpskilling(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -81,12 +82,14 @@ export default function TalentUpskilling(): React.ReactElement {
   const handleEnrollCourse = async (courseId: string) => {
     if (!profileId) return;
     try {
+      const credId = generateNanoId(8);
       const { error } = await supabase
         .from("course_enrollments")
         .insert({
           user_id: profileId,
           course_id: courseId,
-          completed_lessons: []
+          completed_lessons: [],
+          credential_id: credId
         });
       if (error) {
         alert("Enrollment failed: " + error.message);
@@ -134,14 +137,20 @@ export default function TalentUpskilling(): React.ReactElement {
     try {
       const isCompletedAll = courseLessons.every(l => updatedCompleted.includes(l.id));
       const completedAt = isCompletedAll ? new Date().toISOString() : null;
+      const credId = enrollment.credential_id || (isCompletedAll ? generateNanoId(8) : null);
+
+      const updateData: any = {
+        completed_lessons: updatedCompleted,
+        completed_at: completedAt,
+        last_accessed_at: new Date().toISOString()
+      };
+      if (credId) {
+        updateData.credential_id = credId;
+      }
 
       const { error } = await supabase
         .from("course_enrollments")
-        .update({
-          completed_lessons: updatedCompleted,
-          completed_at: completedAt,
-          last_accessed_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq("id", enrollment.id);
 
       if (error) {
@@ -149,7 +158,7 @@ export default function TalentUpskilling(): React.ReactElement {
       } else {
         setEnrollments(prev => prev.map(e => {
           if (e.id === enrollment.id) {
-            return { ...e, completed_lessons: updatedCompleted, completed_at: completedAt };
+            return { ...e, completed_lessons: updatedCompleted, completed_at: completedAt, credential_id: credId };
           }
           return e;
         }));
