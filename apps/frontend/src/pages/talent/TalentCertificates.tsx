@@ -704,14 +704,12 @@ export default function TalentCertificates(): React.ReactElement {
 
                   {/* Right Signatures */}
                   <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                    <div style={{ height: "42px", display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-                      <img 
-                        src={signatureImg} 
-                        alt="Blasius Yonas Vikariandi Signature" 
-                        style={{ height: "42px", width: "auto", objectFit: "contain", mixBlendMode: "multiply", filter: "contrast(1.1)" }} 
-                      />
-                    </div>
-                    <div style={{ height: "1px", width: "130px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem auto" }} />
+                    <img 
+                      src={signatureImg} 
+                      alt="Blasius Yonas Vikariandi Signature" 
+                      style={{ height: "48px", width: "auto", objectFit: "contain" }} 
+                    />
+                    <div style={{ height: "1px", width: "130px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem 0" }} />
                     <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Blasius Yonas Vikariandi</div>
                     <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>EdgeTalent CEO</div>
                   </div>
