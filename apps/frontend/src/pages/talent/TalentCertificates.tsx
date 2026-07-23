@@ -609,10 +609,10 @@ export default function TalentCertificates(): React.ReactElement {
 
                 {/* Top Header Badge */}
                 <div style={{ zIndex: 4, textAlign: "center", width: "100%" }}>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "#eff6ff", border: "1px solid #bfdbfe", padding: "0.3rem 1.2rem", borderRadius: "9999px", marginBottom: "0.6rem" }}>
-                    <Award size={16} style={{ color: "#1d4ed8" }} />
-                    <span style={{ fontSize: "0.75rem", letterSpacing: "0.22em", color: "#1e40af", fontWeight: 700, textTransform: "uppercase" }}>
-                      EdgeTalent Global Academy
+                  <div style={{ display: "inline-block", background: "#eff6ff", border: "1px solid #bfdbfe", padding: "0.35rem 1.25rem", borderRadius: "20px", marginBottom: "0.6rem", textAlign: "center" }}>
+                    <Award size={16} style={{ color: "#1d4ed8", verticalAlign: "middle", marginRight: "0.4rem", display: "inline-block" }} />
+                    <span style={{ fontSize: "0.75rem", letterSpacing: "0.15em", color: "#1e40af", fontWeight: 700, textTransform: "uppercase", verticalAlign: "middle", display: "inline-block", lineHeight: "1.2" }}>
+                      EdgeTalent Academy
                     </span>
                   </div>
                   <div style={{ height: "1px", width: "130px", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto 0.6rem auto" }} />
@@ -680,51 +680,24 @@ export default function TalentCertificates(): React.ReactElement {
                     </div>
                   </div>
 
-                  {/* Center Official Gold/Cyan Medallion Seal */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <div style={{ position: "relative", width: "64px", height: "64px" }}>
-                      <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
-                        <path d="M50 0L58.5 7.5L70 4L74.5 15.5L86 17.5L86.5 29.5L96.5 35.5L92.5 47L100 56.5L92.5 66L96.5 77.5L86.5 83.5L86 95.5L74.5 97.5L70 109L58.5 105.5L50 113L41.5 105.5L30 109L25.5 97.5L14 95.5L13.5 83.5L3.5 77.5L7.5 66L0 56.5L7.5 47L3.5 35.5L13.5 29.5L14 17.5L25.5 15.5L30 4L41.5 7.5L50 0Z" fill="url(#sealGradLight)" transform="scale(0.82) translate(9, 9)" />
-                        <defs>
-                          <linearGradient id="sealGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#fbbf24" />
-                            <stop offset="50%" stopColor="#d97706" />
-                            <stop offset="100%" stopColor="#2563eb" />
-                          </linearGradient>
-                        </defs>
-                        <circle cx="50" cy="50" r="34" fill="#ffffff" stroke="#d97706" strokeWidth="2" />
-                        <circle cx="50" cy="50" r="28" stroke="#2563eb" strokeWidth="1" strokeDasharray="3 2" />
-                        <path d="M50 28L54.5 37.5H65L56.5 43.5L60 54L50 47.5L40 54L43.5 43.5L35 37.5H45.5L50 28Z" fill="#d97706" />
-                      </svg>
-                    </div>
-                    <span style={{ fontSize: "0.58rem", color: "#b45309", textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 800, marginTop: "0.15rem" }}>
-                      OFFICIAL SEAL
-                    </span>
-                  </div>
-
                   {/* Right Signatures */}
                   <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
                     <img 
                       src={signatureImg} 
                       alt="Blasius Yonas Vikariandi Signature" 
-                      style={{ height: "48px", width: "auto", objectFit: "contain" }} 
+                      style={{ height: "72px", width: "auto", objectFit: "contain", marginBottom: "-8px" }} 
                     />
-                    <div style={{ height: "1px", width: "130px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem 0" }} />
+                    <div style={{ height: "1px", width: "140px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem 0" }} />
                     <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Blasius Yonas Vikariandi</div>
                     <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>EdgeTalent CEO</div>
                   </div>
                 </div>
 
-                {/* Cryptographic Credential Bar Footer */}
-                <div style={{ position: "absolute", bottom: "6px", left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: "0.4rem", fontSize: "0.62rem", color: "#64748b", zIndex: 4 }}>
+                {/* Credential ID Footer - Bottom Left */}
+                <div style={{ position: "absolute", bottom: "14px", left: "24px", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.65rem", color: "#64748b", zIndex: 4 }}>
                   <span>CREDENTIAL ID:</span>
                   <span style={{ fontFamily: "monospace", color: "#475569", background: "#f1f5f9", padding: "0.08rem 0.35rem", borderRadius: "3px", border: "1px solid #e2e8f0", fontWeight: 700 }}>
                     {modalCredId}
-                  </span>
-                  <span style={{ margin: "0 0.2rem" }}>•</span>
-                  <span>VERIFY LINK:</span>
-                  <span style={{ fontFamily: "monospace", color: "#0284c7" }}>
-                    {verificationUrl}
                   </span>
                 </div>
               </div>

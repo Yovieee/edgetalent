@@ -12,7 +12,7 @@ export async function downloadCertificateAsPdf(
   if (!element) return;
 
   try {
-    // Capture element into canvas with high resolution scale
+    // Capture element into canvas with high resolution scale and clone handler
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
@@ -21,6 +21,16 @@ export async function downloadCertificateAsPdf(
       logging: false,
       scrollX: 0,
       scrollY: 0,
+      windowWidth: element.scrollWidth || 1200,
+      windowHeight: element.scrollHeight || 850,
+      onclone: (clonedDoc) => {
+        // Ensure cloned element has explicit dimension and visible styles
+        const clonedElement = clonedDoc.querySelector(".print-certificate-container") as HTMLElement;
+        if (clonedElement) {
+          clonedElement.style.transform = "none";
+          clonedElement.style.position = "relative";
+        }
+      },
     });
 
     const imgData = canvas.toDataURL("image/png");
