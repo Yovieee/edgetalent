@@ -421,7 +421,7 @@ export default function CertificateVerificationPage(): React.ReactElement {
                     <img 
                       src={qrCodeImageUrl} 
                       alt="Scannable Certificate Verification QR Code" 
-                      style={{ width: "54px", height: "54px", display: "block" }} 
+                      style={{ width: "81px", height: "81px", display: "block" }} 
                     />
                   </div>
                   <div>
@@ -445,7 +445,7 @@ export default function CertificateVerificationPage(): React.ReactElement {
                   <img 
                     src={signatureImg} 
                     alt="Blasius Yonas Vikariandi Signature" 
-                    style={{ height: "72px", width: "auto", objectFit: "contain", marginBottom: "-8px" }} 
+                    style={{ height: "72px", width: "auto", objectFit: "contain", transform: "translateY(-20px)", marginBottom: "-24px" }} 
                   />
                   <div style={{ height: "1px", width: "140px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem 0" }} />
                   <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Blasius Yonas Vikariandi</div>
@@ -453,8 +453,8 @@ export default function CertificateVerificationPage(): React.ReactElement {
                 </div>
               </div>
 
-              {/* Credential ID Footer - Bottom Left */}
-              <div style={{ position: "absolute", bottom: "14px", left: "24px", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.65rem", color: "#64748b", zIndex: 4 }}>
+              {/* Credential ID Footer */}
+              <div style={{ position: "absolute", bottom: "24px", left: "34px", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.65rem", color: "#64748b", zIndex: 4 }}>
                 <span>CREDENTIAL ID:</span>
                 <span style={{ fontFamily: "monospace", color: "#475569", background: "#f1f5f9", padding: "0.08rem 0.35rem", borderRadius: "3px", border: "1px solid #e2e8f0", fontWeight: 700 }}>
                   {certificate.credential_id}
