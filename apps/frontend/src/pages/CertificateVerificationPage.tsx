@@ -431,21 +431,20 @@ export default function CertificateVerificationPage(): React.ReactElement {
                         {certificate.credential_id}
                       </span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.72rem", marginTop: "0.15rem", flexWrap: "nowrap" }}>
+                    <div style={{ fontSize: "0.68rem", marginTop: "0.1rem", display: "flex", flexDirection: "column", gap: "0.1rem" }}>
                       <div>
-                        <span style={{ color: "#64748b", textTransform: "uppercase", fontSize: "0.6rem", letterSpacing: "0.05em", marginRight: "0.25rem" }}>Issue Date:</span>
+                        <span style={{ color: "#64748b", textTransform: "uppercase", fontSize: "0.6rem", letterSpacing: "0.05em", marginRight: "0.3rem" }}>Issue Date:</span>
                         <span style={{ fontWeight: 700, color: "#0f172a" }}>
-                          {new Date(certificate.issue_date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {new Date(certificate.issue_date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
-                      <span style={{ color: "#cbd5e1" }}>•</span>
                       <div>
-                        <span style={{ color: "#dc2626", textTransform: "uppercase", fontSize: "0.6rem", letterSpacing: "0.05em", marginRight: "0.25rem" }}>Expires:</span>
+                        <span style={{ color: "#dc2626", textTransform: "uppercase", fontSize: "0.6rem", letterSpacing: "0.05em", marginRight: "0.3rem" }}>Expiration Date:</span>
                         <span style={{ fontWeight: 700, color: "#991b1b" }}>
                           {new Date(
                             certificate.expiration_date || 
                             new Date(new Date(certificate.issue_date || Date.now()).setFullYear(new Date(certificate.issue_date || Date.now()).getFullYear() + 2))
-                          ).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          ).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
                     </div>
