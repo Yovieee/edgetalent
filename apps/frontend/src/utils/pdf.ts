@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 
 /**
  * Captures a DOM element (e.g. certificate layout container) and automatically
- * downloads it as a high-quality PDF file with standard A4 landscape scaling.
+ * downloads it as a high-quality PDF file formatted for A5 landscape.
  */
 export async function downloadCertificateAsPdf(
   element: HTMLElement,
@@ -12,26 +12,26 @@ export async function downloadCertificateAsPdf(
   if (!element) return;
 
   try {
-    // Capture element into canvas with explicit standard A4 landscape dimensions (1123px x 794px at 96 DPI)
+    // Capture element into canvas with explicit A5 landscape dimensions (840px x 594px at 96 DPI)
     const canvas = await html2canvas(element, {
-      scale: 2, // High resolution (2246x1588) for crisp text and vector graphics
+      scale: 2, // High resolution (1680x1188) for crisp text and graphics
       useCORS: true,
       allowTaint: true,
       backgroundColor: "#ffffff",
       logging: false,
       scrollX: 0,
       scrollY: 0,
-      windowWidth: 1200,
-      windowHeight: 850,
+      windowWidth: 1000,
+      windowHeight: 700,
       onclone: (clonedDoc, clonedElement) => {
         // Target the cloned element or query the certificate container
         const target = (clonedElement || clonedDoc.querySelector(".print-certificate-container")) as HTMLElement;
         if (target) {
-          // Force standard A4 Landscape dimensions (1123px width x 794px height)
-          target.style.width = "1123px";
-          target.style.height = "794px";
-          target.style.minWidth = "1123px";
-          target.style.minHeight = "794px";
+          // Force A5 Landscape dimensions (840px width x 594px height)
+          target.style.width = "840px";
+          target.style.height = "594px";
+          target.style.minWidth = "840px";
+          target.style.minHeight = "594px";
           target.style.maxWidth = "none";
           target.style.maxHeight = "none";
           target.style.transform = "none";
@@ -44,9 +44,9 @@ export async function downloadCertificateAsPdf(
           // Unconstrain parent container wrappers in cloned document so full width is rendered
           let parent = target.parentElement;
           while (parent && parent !== clonedDoc.body) {
-            parent.style.width = "1123px";
+            parent.style.width = "840px";
             parent.style.maxWidth = "none";
-            parent.style.minWidth = "1123px";
+            parent.style.minWidth = "840px";
             parent.style.padding = "0";
             parent.style.margin = "0";
             parent.style.overflow = "visible";
@@ -58,23 +58,23 @@ export async function downloadCertificateAsPdf(
 
     const imgData = canvas.toDataURL("image/png");
 
-    // Create A4 Landscape PDF document
+    // Create A5 Landscape PDF document (210mm x 148mm)
     const pdf = new jsPDF({
       orientation: "landscape",
       unit: "mm",
-      format: "a4",
+      format: "a5",
     });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth(); // 297 mm
-    const pdfHeight = pdf.internal.pageSize.getHeight(); // 210 mm
+    const pdfWidth = pdf.internal.pageSize.getWidth(); // 210 mm
+    const pdfHeight = pdf.internal.pageSize.getHeight(); // 148 mm
 
-    // Add standard 15mm margins around the certificate so it is elegantly framed on paper/PDF
-    const marginX = 15; // 15mm left & right margins
-    const certWidth = pdfWidth - (marginX * 2); // 267 mm width
-    const certHeight = certWidth / 1.414; // ~188.8 mm height preserving A4 landscape aspect ratio
-    const marginY = (pdfHeight - certHeight) / 2; // ~10.6 mm top & bottom margins (centered)
+    // Add standard 8mm margins around the certificate for compact, elegant A5 output
+    const marginX = 8; // 8mm left & right margins
+    const certWidth = pdfWidth - (marginX * 2); // 194 mm width
+    const certHeight = certWidth / 1.414; // ~137.2 mm height preserving landscape aspect ratio
+    const marginY = (pdfHeight - certHeight) / 2; // ~5.4 mm top & bottom margins (centered)
 
-    // Place certificate inside printable page margins
+    // Place certificate inside printable A5 page margins
     pdf.addImage(imgData, "PNG", marginX, marginY, certWidth, certHeight, undefined, "FAST");
 
     // Ensure filename ends with .pdf
