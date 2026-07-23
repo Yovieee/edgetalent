@@ -36,19 +36,7 @@ export default function TalentCertificates(): React.ReactElement {
         .select("*, courses(*)")
         .eq("user_id", profileId);
       if (!error && data) {
-        // Auto-assign 8-character NanoID for completed enrollments if missing
-        const updated = await Promise.all(data.map(async (e: any) => {
-          if (e.completed_at && !e.credential_id) {
-            const newCredId = generateNanoId(8);
-            await supabase
-              .from("course_enrollments")
-              .update({ credential_id: newCredId })
-              .eq("id", e.id);
-            return { ...e, credential_id: newCredId };
-          }
-          return e;
-        }));
-        setEnrollments(updated);
+        setEnrollments(data);
       }
     } catch (e) {
       console.error(e);

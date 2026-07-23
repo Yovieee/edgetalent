@@ -133,7 +133,7 @@ export default function TalentMarketplace(): React.ReactElement {
                 <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginBottom: "1rem" }}>{project.description}</p>
                 <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
                   <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Scope: <b>{project.scope}</b></span>
-                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Budget: <b>${project.budget}</b></span>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Budget: <b>{project.budget !== null && project.budget !== undefined ? `$${project.budget}` : "Negotiable"}</b></span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
                   {project.required_skills.map((skill: string, idx: number) => (

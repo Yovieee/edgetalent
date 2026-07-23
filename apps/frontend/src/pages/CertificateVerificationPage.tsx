@@ -6,14 +6,27 @@ import {
 } from "lucide-react";
 import logo from "../assets/logo.png";
 
+interface CertificateResult {
+  cert_type: "platform" | "external";
+  id: string;
+  credential_id: string;
+  title: string;
+  recipient_name: string;
+  issuing_organization: string;
+  issue_date: string;
+  expiration_date: string | null;
+  skills: string[];
+  credential_url: string | null;
+}
+
 export default function CertificateVerificationPage(): React.ReactElement {
   const { credentialId: urlCredId } = useParams<{ credentialId?: string }>();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
 
-  const [inputCredId, setInputCredId] = useState<string>(urlCredId || "");
+  const [inputCredId, setInputCredId] = useState<string>(urlCredId?.toUpperCase() || "");
   const [searching, setSearching] = useState<boolean>(false);
-  const [certificate, setCertificate] = useState<any | null>(null);
+  const [certificate, setCertificate] = useState<CertificateResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
@@ -42,65 +55,55 @@ export default function CertificateVerificationPage(): React.ReactElement {
       const { data: enrollments } = await supabase
         .from("course_enrollments")
         .select("*, courses(*), profiles(full_name)")
-        .not("completed_at", "is", null);
+        .eq("credential_id", cleanId)
+        .not("completed_at", "is", null)
+        .limit(1);
 
-      if (enrollments) {
-        const match = enrollments.find(e => 
-          (e.credential_id && e.credential_id.toUpperCase() === cleanId) ||
-          e.id.slice(0, 8).toUpperCase() === cleanId ||
-          e.id.toUpperCase() === cleanId
-        );
-
-        if (match) {
-          setCertificate({
-            cert_type: "platform",
-            id: match.id,
-            credential_id: match.credential_id || match.id.slice(0, 8).toUpperCase(),
-            title: match.courses?.title || "Academy Course",
-            recipient_name: match.profiles?.full_name || "Talent Member",
-            issuing_organization: match.courses?.provider || "EdgeTalent Academy",
-            issue_date: match.completed_at,
-            expiration_date: null,
-            skills: match.courses?.skills_taught || [],
-            credential_url: null
-          });
-          setSearching(false);
-          return;
-        }
+      if (enrollments && enrollments.length > 0) {
+        const match = enrollments[0];
+        setCertificate({
+          cert_type: "platform",
+          id: match.id,
+          credential_id: match.credential_id || match.id.slice(0, 8).toUpperCase(),
+          title: match.courses?.title || "Academy Course",
+          recipient_name: match.profiles?.full_name || "Talent Member",
+          issuing_organization: match.courses?.provider || "EdgeTalent Academy",
+          issue_date: match.completed_at,
+          expiration_date: null,
+          skills: match.courses?.skills_taught || [],
+          credential_url: null
+        });
+        setSearching(false);
+        return;
       }
 
       // Search talent_certificates
       const { data: extCerts } = await supabase
         .from("talent_certificates")
-        .select("*, profiles(full_name)");
+        .select("*, profiles(full_name)")
+        .eq("credential_id", cleanId)
+        .limit(1);
 
-      if (extCerts) {
-        const match = extCerts.find(c => 
-          (c.credential_id && c.credential_id.toUpperCase() === cleanId) ||
-          c.id.slice(0, 8).toUpperCase() === cleanId ||
-          c.id.toUpperCase() === cleanId
-        );
-
-        if (match) {
-          setCertificate({
-            cert_type: "external",
-            id: match.id,
-            credential_id: match.credential_id || match.id.slice(0, 8).toUpperCase(),
-            title: match.name,
-            recipient_name: match.profiles?.full_name || "Talent Member",
-            issuing_organization: match.issuing_organization,
-            issue_date: match.issue_date,
-            expiration_date: match.expiration_date,
-            skills: [],
-            credential_url: match.credential_url
-          });
-          setSearching(false);
-          return;
-        }
+      if (extCerts && extCerts.length > 0) {
+        const match = extCerts[0];
+        setCertificate({
+          cert_type: "external",
+          id: match.id,
+          credential_id: match.credential_id || match.id.slice(0, 8).toUpperCase(),
+          title: match.name,
+          recipient_name: match.profiles?.full_name || "Talent Member",
+          issuing_organization: match.issuing_organization,
+          issue_date: match.issue_date,
+          expiration_date: match.expiration_date,
+          skills: [],
+          credential_url: match.credential_url
+        });
+        setSearching(false);
+        return;
       }
 
       // If no match found
-      setErrorMsg(`No certificate found matching Credential ID "${cleanId}". Please check the 8-digit code and try again.`);
+      setErrorMsg(`No certificate found matching Credential ID "${cleanId}". Please check the 8-character Credential ID and try again.`);
     } catch (err: any) {
       console.error(err);
       setErrorMsg("Error connecting to verification service. Please try again.");
@@ -111,8 +114,9 @@ export default function CertificateVerificationPage(): React.ReactElement {
 
   useEffect(() => {
     if (urlCredId) {
-      setInputCredId(urlCredId);
-      verifyCertificateId(urlCredId);
+      const cleanUrlId = urlCredId.toUpperCase();
+      setInputCredId(cleanUrlId);
+      verifyCertificateId(cleanUrlId);
     }
   }, [urlCredId, verifyCertificateId]);
 
@@ -120,8 +124,11 @@ export default function CertificateVerificationPage(): React.ReactElement {
     e.preventDefault();
     if (!inputCredId.trim()) return;
     const targetId = inputCredId.trim().toUpperCase();
-    navigate(`/verify/${targetId}`, { replace: true });
-    verifyCertificateId(targetId);
+    if (urlCredId === targetId) {
+      verifyCertificateId(targetId);
+    } else {
+      navigate(`/verify/${targetId}`, { replace: true });
+    }
   };
 
   const activeCredId = certificate?.credential_id || urlCredId || inputCredId.trim().toUpperCase();
@@ -154,7 +161,7 @@ export default function CertificateVerificationPage(): React.ReactElement {
             Verify Certificate Authenticity
           </h1>
           <p style={{ color: "var(--text-secondary)", maxWidth: "580px", margin: "0 auto", fontSize: "0.95rem" }}>
-            Enter an 8-digit Credential ID to instantly verify completion, issuer identity, and verified skills on the EdgeTalent platform.
+            Enter an 8-character Credential ID to instantly verify completion, issuer identity, and verified skills on the EdgeTalent platform.
           </p>
         </div>
 
@@ -164,10 +171,10 @@ export default function CertificateVerificationPage(): React.ReactElement {
             <div style={{ flex: 1, minWidth: "240px", position: "relative" }}>
               <input
                 type="text"
-                placeholder="Enter 8-digit Credential ID (e.g. 8X92K4M1)"
+                placeholder="Enter 8-character Credential ID (e.g. 8X92K4M1)"
                 value={inputCredId}
                 onChange={(e) => setInputCredId(e.target.value.toUpperCase())}
-                maxLength={36}
+                maxLength={8}
                 style={{
                   width: "100%",
                   padding: "0.8rem 1rem 0.8rem 2.5rem",
@@ -219,7 +226,15 @@ export default function CertificateVerificationPage(): React.ReactElement {
             <p style={{ color: "var(--text-secondary)", maxWidth: "500px", margin: "0 auto 1.5rem auto", fontSize: "0.95rem" }}>
               {errorMsg}
             </p>
-            <button className="btn btn-secondary" onClick={() => setInputCredId("")}>
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => {
+                setInputCredId("");
+                setCertificate(null);
+                setErrorMsg(null);
+                navigate("/verify", { replace: true });
+              }}
+            >
               Try Another Credential ID
             </button>
           </div>

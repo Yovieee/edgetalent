@@ -3,7 +3,7 @@ import { useSupabase } from "../../context/SupabaseContext";
 import { FundingOpportunity } from "@edgetalent/shared";
 
 export default function TalentFunding(): React.ReactElement {
-  const { supabase, profile } = useSupabase();
+  const { supabase } = useSupabase();
 
   const [fundingOpportunities, setFundingOpportunities] = useState<FundingOpportunity[]>([]);
   const [loadingFunding, setLoadingFunding] = useState<boolean>(false);

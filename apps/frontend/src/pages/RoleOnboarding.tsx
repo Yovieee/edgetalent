@@ -56,7 +56,7 @@ export default function RoleOnboarding(): React.ReactElement {
             <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "2px", background: "var(--color-emerald)" }} />
             
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
-              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#ecfdf5", display: "flex", alignItems: "center", justifyBox: "center", justifyContent: "center", color: "var(--color-emerald)", border: "1px solid #d1fae5" }}>
+              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#ecfdf5", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-emerald)", border: "1px solid #d1fae5" }}>
                 <User size={18} />
               </div>
               <span className="badge badge-emerald">Individual Growth</span>
@@ -80,7 +80,7 @@ export default function RoleOnboarding(): React.ReactElement {
             <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "2px", background: "var(--color-cyan)" }} />
             
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
-              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyBox: "center", justifyContent: "center", color: "var(--color-cyan)", border: "1px solid #dbeafe" }}>
+              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-cyan)", border: "1px solid #dbeafe" }}>
                 <Briefcase size={18} />
               </div>
               <span className="badge badge-cyan">Enterprise Execution</span>

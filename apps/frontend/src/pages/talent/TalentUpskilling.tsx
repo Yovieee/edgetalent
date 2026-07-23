@@ -418,8 +418,17 @@ export default function TalentUpskilling(): React.ReactElement {
 
                           <button
                             className="btn btn-primary"
-                            onClick={() => handleCompleteLesson(lesson.id)}
-                            style={{ background: isCompleted ? "rgba(16, 185, 129, 0.2)" : "var(--color-emerald)", borderColor: isCompleted ? "var(--color-emerald)" : "var(--color-emerald)" }}
+                            onClick={() => {
+                              if (isCompleted && activeLessonIdx < courseLessons.length - 1) {
+                                setActiveLessonIdx(activeLessonIdx + 1);
+                              } else if (!isCompleted) {
+                                handleCompleteLesson(lesson.id);
+                              }
+                            }}
+                            style={{ 
+                              background: isCompleted ? "rgba(16, 185, 129, 0.2)" : undefined, 
+                              borderColor: isCompleted ? "var(--color-emerald)" : undefined 
+                            }}
                           >
                             {isCompleted ? (activeLessonIdx < courseLessons.length - 1 ? "Next Lesson →" : "Course Completed ✓") : "Mark as Completed"}
                           </button>

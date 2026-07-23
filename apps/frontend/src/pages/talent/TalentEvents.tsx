@@ -5,12 +5,12 @@ export default function TalentEvents(): React.ReactElement {
   const { supabase, profile } = useSupabase();
 
   const [events, setEvents] = useState<any[]>([]);
-  const [loadingEvents, setLoadingEvents] = useState<boolean>(false);
+  const [loadingEvents, setLoadingEvents] = useState<boolean>(true);
   const [eventRegistrations, setEventRegistrations] = useState<any[]>([]);
   const [allRegistrations, setAllRegistrations] = useState<any[]>([]);
   
   // Search & Filter state
-  const [searchEventQuery, setSearchEventQuery] = useState<string>(" ");
+  const [searchEventQuery, setSearchEventQuery] = useState<string>("");
   const [selectedEventCategory, setSelectedEventCategory] = useState<string>("All");
   
   // Modal & Loading state

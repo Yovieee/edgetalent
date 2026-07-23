@@ -79,7 +79,7 @@ export default function App(): React.ReactElement {
           session && profile?.role ? (
             <Navigate to={`/${profile.role}`} replace />
           ) : (
-            <LandingPage onNavigate={(path) => navigate(path)} />
+            <LandingPage onNavigate={navigate} />
           )
         } 
       />
