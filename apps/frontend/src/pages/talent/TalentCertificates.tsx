@@ -670,8 +670,14 @@ export default function TalentCertificates(): React.ReactElement {
                       />
                     </div>
                     <div>
-                      <div style={{ fontSize: "0.68rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em" }}>Issue Date</div>
-                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", marginTop: "0.1rem" }}>
+                      <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: "0.3rem", marginBottom: "0.2rem" }}>
+                        <span>Credential ID:</span>
+                        <span style={{ fontFamily: "monospace", color: "#0f172a", background: "#f1f5f9", padding: "0.05rem 0.35rem", borderRadius: "3px", border: "1px solid #cbd5e1", fontWeight: 700 }}>
+                          {modalCredId}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em" }}>Issue Date</div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", marginTop: "0.05rem" }}>
                         {new Date(selectedEnrollmentCert.completed_at || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                       </div>
                       <div style={{ fontSize: "0.65rem", color: "#059669", marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
@@ -691,14 +697,6 @@ export default function TalentCertificates(): React.ReactElement {
                     <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Blasius Yonas Vikariandi</div>
                     <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>EdgeTalent CEO</div>
                   </div>
-                </div>
-
-                {/* Credential ID Footer */}
-                <div style={{ position: "absolute", bottom: "24px", left: "34px", display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.65rem", color: "#64748b", zIndex: 4 }}>
-                  <span>CREDENTIAL ID:</span>
-                  <span style={{ fontFamily: "monospace", color: "#475569", background: "#f1f5f9", padding: "0.08rem 0.35rem", borderRadius: "3px", border: "1px solid #e2e8f0", fontWeight: 700 }}>
-                    {modalCredId}
-                  </span>
                 </div>
               </div>
             </div>
