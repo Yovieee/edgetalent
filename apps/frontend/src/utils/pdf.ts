@@ -310,7 +310,7 @@ export async function downloadCertificateAsPdf(
         contactInfo: "verify@edgetalent.space",
       });
 
-      const blob = new Blob([signedPdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+      const blob = new Blob([new Uint8Array(signedPdfBytes)], { type: "application/pdf" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = cleanFilename;
@@ -319,7 +319,7 @@ export async function downloadCertificateAsPdf(
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
     } catch (signingError) {
-      console.warn("Digital signing fallback: saving unsealed PDF:", signingError);
+      console.error("Digital signing failed, falling back to unsealed PDF:", signingError);
       pdf.save(cleanFilename);
     }
   } catch (error) {

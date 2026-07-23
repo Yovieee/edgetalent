@@ -1,19 +1,23 @@
+import { Buffer } from "buffer";
 import forge from "node-forge";
 import { PDFDocument } from "pdf-lib";
 import { pdflibAddPlaceholder } from "@signpdf/placeholder-pdf-lib";
 import { SignPdf } from "@signpdf/signpdf";
 import { P12Signer } from "@signpdf/signer-p12";
 
-// Cache generated certificate & keypair to avoid regenerating RSA 2048 keys on every single download
-let cachedP12Buffer: Uint8Array | null = null;
+// Polyfill global Buffer for browser compatibility in Vite
+if (typeof window !== "undefined" && !(window as any).Buffer) {
+  (window as any).Buffer = Buffer;
+}
+
+let cachedP12Buffer: Buffer | null = null;
 const P12_PASSPHRASE = "edgetalent_eidas_seal";
 
 /**
  * Generates an eIDAS-compliant X.509 Electronic Signature / Electronic Seal Certificate
- * confirming the identity of the signer (Blasius Yonas Vikariandi, EdgeTalent CEO)
- * and the issuing legal entity (EdgeTalent Corp).
+ * as a Node Buffer object compatible with P12Signer.
  */
-export function generateEidasP12Certificate(): Uint8Array {
+export function generateEidasP12Certificate(): Buffer {
   if (cachedP12Buffer) {
     return cachedP12Buffer;
   }
@@ -83,10 +87,7 @@ export function generateEidasP12Certificate(): Uint8Array {
   });
 
   const p12DerString = forge.asn1.toDer(p12Asn1).getBytes();
-  const p12Buffer = new Uint8Array(p12DerString.length);
-  for (let i = 0; i < p12DerString.length; i++) {
-    p12Buffer[i] = p12DerString.charCodeAt(i);
-  }
+  const p12Buffer = Buffer.from(p12DerString, "binary");
 
   cachedP12Buffer = p12Buffer;
   return p12Buffer;
@@ -98,7 +99,7 @@ export function generateEidasP12Certificate(): Uint8Array {
  *
  * @param pdfBuffer - Unsigned PDF ArrayBuffer or Uint8Array
  * @param options - Custom signature metadata (signer name, reason, location)
- * @returns Digitally signed PDF Uint8Array containing native PKCS#7 / X.509 signature structure
+ * @returns Digitally signed PDF Buffer containing native PKCS#7 / X.509 signature structure
  */
 export async function signPdfWithEidasSeal(
   pdfBuffer: ArrayBuffer | Uint8Array,
@@ -108,8 +109,10 @@ export async function signPdfWithEidasSeal(
     location?: string;
     contactInfo?: string;
   } = {}
-): Promise<Uint8Array> {
-  const inputBuffer = pdfBuffer instanceof Uint8Array ? pdfBuffer : new Uint8Array(pdfBuffer);
+): Promise<Buffer> {
+  const inputBuffer = Buffer.isBuffer(pdfBuffer)
+    ? pdfBuffer
+    : Buffer.from(pdfBuffer instanceof Uint8Array ? pdfBuffer : new Uint8Array(pdfBuffer));
 
   // Load PDF with pdf-lib to add the /Sig placeholder dictionary
   const pdfDoc = await PDFDocument.load(inputBuffer);
@@ -130,6 +133,7 @@ export async function signPdfWithEidasSeal(
   });
 
   const pdfWithPlaceholder = await pdfDoc.save({ useObjectStreams: false });
+  const pdfWithPlaceholderBuffer = Buffer.from(pdfWithPlaceholder);
 
   // Generate eIDAS X.509 P12 Certificate
   const p12Buffer = generateEidasP12Certificate();
@@ -139,7 +143,7 @@ export async function signPdfWithEidasSeal(
   const signPdfInstance = new SignPdf();
 
   // Sign PDF by embedding PKCS#7 signature into ByteRange
-  const signedPdfUint8Array = await signPdfInstance.sign(pdfWithPlaceholder, signer);
+  const signedPdfBuffer = await signPdfInstance.sign(pdfWithPlaceholderBuffer, signer);
 
-  return signedPdfUint8Array;
+  return Buffer.isBuffer(signedPdfBuffer) ? signedPdfBuffer : Buffer.from(signedPdfBuffer);
 }
