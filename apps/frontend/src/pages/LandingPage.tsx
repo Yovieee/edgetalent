@@ -4,6 +4,7 @@ import {
   ArrowRight, BookOpen, Terminal, RefreshCw, Search, GraduationCap, 
   Check, Briefcase, Star, ChevronDown
 } from "lucide-react";
+import Modal from "../components/Modal";
 import logo from "../assets/logo.png";
 
 interface LandingPageProps {
@@ -1002,116 +1003,79 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
         </footer>
 
         {/* Event Detail Modal */}
-        {showEventDetailModal && selectedEvent && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(0, 0, 0, 0.6)",
-              backdropFilter: "blur(4px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1001,
-            }}
-            onClick={() => setShowEventDetailModal(false)}
-          >
-            <div
-              className="glass-panel animate-fade-in"
-              style={{
-                width: "90%",
-                maxWidth: "650px",
-                padding: "2.5rem",
-                maxHeight: "90vh",
-                overflowY: "auto",
-                position: "relative"
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
-                <div>
-                  <span className={`badge ${
-                    selectedEvent.category === "Hackathon" ? "badge-rose" :
-                    selectedEvent.category === "Webinar" ? "badge-purple" :
-                    selectedEvent.category === "Workshop" ? "badge-cyan" :
-                    selectedEvent.category === "Networking" ? "badge-emerald" : "badge-amber"
-                  }`} style={{ fontSize: "0.75rem", marginBottom: "0.5rem" }}>
-                    {selectedEvent.category}
-                  </span>
-                  <h3 style={{ fontSize: "1.5rem", margin: 0, fontWeight: "700", color: "var(--text-primary)" }}>{selectedEvent.title}</h3>
-                </div>
-                <button
-                  className="btn-close"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--text-secondary)",
-                    fontSize: "1.5rem",
-                    cursor: "pointer",
-                    lineHeight: 1,
-                    padding: 0
-                  }}
-                  onClick={() => setShowEventDetailModal(false)}
-                >
-                  &times;
-                </button>
+        <Modal
+          isOpen={showEventDetailModal && !!selectedEvent}
+          onClose={() => setShowEventDetailModal(false)}
+          size="lg"
+          title={
+            selectedEvent && (
+              <div>
+                <span className={`badge ${
+                  selectedEvent.category === "Hackathon" ? "badge-rose" :
+                  selectedEvent.category === "Webinar" ? "badge-purple" :
+                  selectedEvent.category === "Workshop" ? "badge-cyan" :
+                  selectedEvent.category === "Networking" ? "badge-emerald" : "badge-amber"
+                }`} style={{ fontSize: "0.75rem", marginBottom: "0.5rem" }}>
+                  {selectedEvent.category}
+                </span>
+                <h3 className="modal-title">{selectedEvent.title}</h3>
+              </div>
+            )
+          }
+          footer={
+            <>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ flex: 1, justifyContent: "center" }}
+                onClick={() => setShowEventDetailModal(false)}
+              >
+                Close
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 1.2, justifyContent: "center" }}
+                onClick={() => {
+                  setShowEventDetailModal(false);
+                  alert("To RSVP / Register for this event, please sign in or register a new account.");
+                  onNavigate("auth");
+                }}
+              >
+                RSVP / Register
+              </button>
+            </>
+          }
+        >
+          {selectedEvent && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              <div>
+                <h4 style={{ fontSize: "1rem", marginBottom: "0.5rem", color: "var(--text-primary)" }}>Event Description</h4>
+                <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: "1.6", margin: 0 }}>
+                  {selectedEvent.content}
+                </p>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", background: "var(--bg-tertiary)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--glass-border)" }}>
                 <div>
-                  <h4 style={{ fontSize: "1rem", marginBottom: "0.5rem", color: "var(--text-primary)" }}>Event Description</h4>
-                  <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: "1.6", margin: 0 }}>
-                    {selectedEvent.content}
-                  </p>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Date & Time</span>
+                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(selectedEvent.event_date).toLocaleString()}</span>
                 </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--glass-border)" }}>
-                  <div>
-                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Date & Time</span>
-                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(selectedEvent.event_date).toLocaleString()}</span>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Location</span>
-                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.location}</span>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Organizer</span>
-                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.organizer}</span>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Capacity Limit</span>
-                    <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.capacity ? `${selectedEvent.capacity} spots` : "Unlimited"}</span>
-                  </div>
+                <div>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Location</span>
+                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.location}</span>
                 </div>
-
-                <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    style={{ flex: 1, justifyContent: "center" }}
-                    onClick={() => setShowEventDetailModal(false)}
-                  >
-                    Close
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    style={{ flex: 1.2, justifyContent: "center" }}
-                    onClick={() => {
-                      setShowEventDetailModal(false);
-                      alert("To RSVP / Register for this event, please sign in or register a new account.");
-                      onNavigate("auth");
-                    }}
-                  >
-                    RSVP / Register
-                  </button>
+                <div>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Organizer</span>
+                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.organizer}</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Capacity Limit</span>
+                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedEvent.capacity ? `${selectedEvent.capacity} spots` : "Unlimited"}</span>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </Modal>
 
       </div>
     </div>

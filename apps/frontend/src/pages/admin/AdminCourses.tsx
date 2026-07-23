@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { CourseSchema, CourseLessonSchema } from "@edgetalent/shared";
+import Modal from "../../components/Modal";
 
 interface CourseItem {
   id: string;
@@ -327,223 +328,191 @@ export default function AdminCourses(): React.ReactElement {
       )}
 
       {/* Course Modal Form */}
-      {activeModal === "course" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-          }}
-        >
-          <div className="glass-panel" style={{ width: "90%", maxWidth: "500px", padding: "2.5rem" }}>
-            <h3 style={{ marginBottom: "1.5rem" }}>{editMode ? "Edit Course Details" : "Create New Course"}</h3>
-            <form onSubmit={handleSaveCourse}>
-              <div className="form-group">
-                <label>Course Title</label>
-                <input
-                  type="text"
-                  required
-                  value={courseTitle}
-                  onChange={(e) => setCourseTitle(e.target.value)}
-                  className="form-input"
-                  placeholder="e.g. Fullstack React & Node Roadmap"
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  value={courseDesc}
-                  onChange={(e) => setCourseDesc(e.target.value)}
-                  className="form-input"
-                  placeholder="Summarize course contents..."
-                  style={{ minHeight: "80px" }}
-                />
-              </div>
-              <div className="form-group">
-                <label>Skills Taught (comma-separated list)</label>
-                <input
-                  type="text"
-                  value={courseSkills}
-                  onChange={(e) => setCourseSkills(e.target.value)}
-                  className="form-input"
-                  placeholder="React, TypeScript, Node.js"
-                />
-              </div>
-              <div className="form-group">
-                <label>Provider</label>
-                <input
-                  type="text"
-                  value={courseProvider}
-                  onChange={(e) => setCourseProvider(e.target.value)}
-                  className="form-input"
-                  placeholder="e.g. Coursera, Udemy"
-                />
-              </div>
-              <div className="form-group">
-                <label>Link/URL</label>
-                <input
-                  type="text"
-                  value={courseLink}
-                  onChange={(e) => setCourseLink(e.target.value)}
-                  className="form-input"
-                  placeholder="https://example.com/course-link"
-                />
-              </div>
-              <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)} style={{ flex: 1 }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
-                  {editMode ? "Save Changes" : "Create Course"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={activeModal === "course"}
+        onClose={() => setActiveModal(null)}
+        title={editMode ? "Edit Course Details" : "Create New Course"}
+        size="md"
+      >
+        <form onSubmit={handleSaveCourse}>
+          <div className="form-group">
+            <label>Course Title</label>
+            <input
+              type="text"
+              required
+              value={courseTitle}
+              onChange={(e) => setCourseTitle(e.target.value)}
+              className="form-input"
+              placeholder="e.g. Fullstack React & Node Roadmap"
+            />
           </div>
-        </div>
-      )}
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              value={courseDesc}
+              onChange={(e) => setCourseDesc(e.target.value)}
+              className="form-input"
+              placeholder="Summarize course contents..."
+              style={{ minHeight: "80px" }}
+            />
+          </div>
+          <div className="form-group">
+            <label>Skills Taught (comma-separated list)</label>
+            <input
+              type="text"
+              value={courseSkills}
+              onChange={(e) => setCourseSkills(e.target.value)}
+              className="form-input"
+              placeholder="React, TypeScript, Node.js"
+            />
+          </div>
+          <div className="form-group">
+            <label>Provider</label>
+            <input
+              type="text"
+              value={courseProvider}
+              onChange={(e) => setCourseProvider(e.target.value)}
+              className="form-input"
+              placeholder="e.g. Coursera, Udemy"
+            />
+          </div>
+          <div className="form-group">
+            <label>Link/URL</label>
+            <input
+              type="text"
+              value={courseLink}
+              onChange={(e) => setCourseLink(e.target.value)}
+              className="form-input"
+              placeholder="https://example.com/course-link"
+            />
+          </div>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
+            <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)} style={{ flex: 1 }}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+              {editMode ? "Save Changes" : "Create Course"}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Lesson Manager Modal */}
-      {activeModal === "lessons" && selectedCourseForLessons && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-          }}
-        >
-          <div className="glass-panel animate-fade-in" style={{ width: "95%", maxWidth: "700px", padding: "2rem", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ margin: 0, maxWidth: "80%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Lessons for {selectedCourseForLessons.title}</h3>
-              <button className="btn btn-secondary" onClick={() => setActiveModal(null)}>Close</button>
+      <Modal
+        isOpen={activeModal === "lessons" && !!selectedCourseForLessons}
+        onClose={() => setActiveModal(null)}
+        title={selectedCourseForLessons ? `Lessons for ${selectedCourseForLessons.title}` : "Lesson Manager"}
+        size="lg"
+      >
+        {showLessonForm ? (
+          <form onSubmit={handleSaveLesson} className="glass-panel" style={{ padding: "1.5rem", marginBottom: "1.5rem" }}>
+            <h4>{lessonEditMode ? "Edit Lesson" : "Add New Lesson"}</h4>
+            <div className="form-group">
+              <label>Lesson Title</label>
+              <input
+                type="text"
+                required
+                value={lessonTitle}
+                onChange={(e) => setLessonTitle(e.target.value)}
+                className="form-input"
+                placeholder="e.g. Lesson 1: Getting Started"
+              />
             </div>
-
-            {showLessonForm ? (
-              <form onSubmit={handleSaveLesson} className="glass-panel" style={{ padding: "1.5rem", marginBottom: "1.5rem" }}>
-                <h4>{lessonEditMode ? "Edit Lesson" : "Add New Lesson"}</h4>
-                <div className="form-group">
-                  <label>Lesson Title</label>
-                  <input
-                    type="text"
-                    required
-                    value={lessonTitle}
-                    onChange={(e) => setLessonTitle(e.target.value)}
-                    className="form-input"
-                    placeholder="e.g. Lesson 1: Getting Started"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Lesson Content (Supports Markdown)</label>
-                  <textarea
-                    required
-                    value={lessonContent}
-                    onChange={(e) => setLessonContent(e.target.value)}
-                    className="form-input"
-                    placeholder="Enter lesson contents, text, or markdown code here..."
-                    style={{ minHeight: "150px" }}
-                  />
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                  <div className="form-group">
-                    <label>Sequence Order</label>
-                    <input
-                      type="number"
-                      required
-                      value={lessonSequence}
-                      onChange={(e) => setLessonSequence(Number(e.target.value))}
-                      className="form-input"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Duration (Minutes)</label>
-                    <input
-                      type="number"
-                      required
-                      value={lessonDuration}
-                      onChange={(e) => setLessonDuration(Number(e.target.value))}
-                      className="form-input"
-                    />
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowLessonForm(false)} style={{ flex: 1 }}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
-                    {lessonEditMode ? "Save Changes" : "Add Lesson"}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div style={{ marginBottom: "1.5rem" }}>
-                <button className="btn btn-primary" onClick={() => handleOpenLessonForm()} style={{ marginBottom: "1rem" }}>
-                  Add Lesson
-                </button>
+            <div className="form-group">
+              <label>Lesson Content (Supports Markdown)</label>
+              <textarea
+                required
+                value={lessonContent}
+                onChange={(e) => setLessonContent(e.target.value)}
+                className="form-input"
+                placeholder="Enter lesson contents, text, or markdown code here..."
+                style={{ minHeight: "150px" }}
+              />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div className="form-group">
+                <label>Sequence Order</label>
+                <input
+                  type="number"
+                  required
+                  value={lessonSequence}
+                  onChange={(e) => setLessonSequence(Number(e.target.value))}
+                  className="form-input"
+                />
               </div>
-            )}
-
-            {loadingLessons ? (
-              <p>Loading lessons...</p>
-            ) : lessons.length === 0 ? (
-              <p style={{ color: "var(--text-secondary)" }}>No lessons added yet. Use the button above to add the first lesson.</p>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                {lessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "1rem",
-                      background: "rgba(0, 0, 0, 0.02)",
-                      borderRadius: "6px",
-                      border: "1px solid var(--glass-border)",
-                    }}
-                  >
-                    <div>
-                      <span className="badge badge-cyan" style={{ marginRight: "0.5rem", fontSize: "0.75rem" }}>
-                        Seq {lesson.sequence_order}
-                      </span>
-                      <strong style={{ fontSize: "0.95rem" }}>{lesson.title}</strong>
-                      <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
-                        ⏱ {lesson.duration_minutes} mins | Content length: {lesson.content.length} chars
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "0.5rem" }}>
-                      <button className="btn btn-secondary" style={{ padding: "0.25rem 0.5rem", fontSize: "0.8rem" }} onClick={() => handleOpenLessonForm(lesson)}>
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-secondary"
-                        style={{ padding: "0.25rem 0.5rem", fontSize: "0.8rem", color: "var(--color-rose)" }}
-                        onClick={() => handleDeleteLesson(lesson.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              <div className="form-group">
+                <label>Duration (Minutes)</label>
+                <input
+                  type="number"
+                  required
+                  value={lessonDuration}
+                  onChange={(e) => setLessonDuration(Number(e.target.value))}
+                  className="form-input"
+                />
               </div>
-            )}
+            </div>
+            <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setShowLessonForm(false)} style={{ flex: 1 }}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+                {lessonEditMode ? "Save Changes" : "Add Lesson"}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div style={{ marginBottom: "1.5rem" }}>
+            <button className="btn btn-primary" onClick={() => handleOpenLessonForm()} style={{ marginBottom: "1rem" }}>
+              Add Lesson
+            </button>
           </div>
-        </div>
-      )}
+        )}
+
+        {loadingLessons ? (
+          <p>Loading lessons...</p>
+        ) : lessons.length === 0 ? (
+          <p style={{ color: "var(--text-secondary)" }}>No lessons added yet. Use the button above to add the first lesson.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            {lessons.map((lesson) => (
+              <div
+                key={lesson.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "1rem",
+                  background: "var(--bg-tertiary)",
+                  borderRadius: "6px",
+                  border: "1px solid var(--glass-border)",
+                }}
+              >
+                <div>
+                  <span className="badge badge-cyan" style={{ marginRight: "0.5rem", fontSize: "0.75rem" }}>
+                    Seq {lesson.sequence_order}
+                  </span>
+                  <strong style={{ fontSize: "0.95rem" }}>{lesson.title}</strong>
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
+                    ⏱ {lesson.duration_minutes} mins | Content length: {lesson.content.length} chars
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button className="btn btn-secondary" style={{ padding: "0.25rem 0.5rem", fontSize: "0.8rem" }} onClick={() => handleOpenLessonForm(lesson)}>
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    style={{ padding: "0.25rem 0.5rem", fontSize: "0.8rem", color: "var(--color-rose)" }}
+                    onClick={() => handleDeleteLesson(lesson.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

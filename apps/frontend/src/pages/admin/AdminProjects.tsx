@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { ProjectSchema } from "@edgetalent/shared";
+import Modal from "../../components/Modal";
 
 interface UserProfile {
   id: string;
@@ -256,111 +257,97 @@ export default function AdminProjects(): React.ReactElement {
       )}
 
       {/* Project Modal Form */}
-      {activeModal === "project" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-          }}
-        >
-          <div className="glass-panel" style={{ width: "90%", maxWidth: "500px", padding: "2.5rem" }}>
-            <h3 style={{ marginBottom: "1.5rem" }}>{editMode ? "Edit Project Details" : "Publish New Project"}</h3>
-            <form onSubmit={handleSaveProject}>
-              <div className="form-group">
-                <label>Project Title</label>
-                <input
-                  type="text"
-                  required
-                  value={projectTitle}
-                  onChange={(e) => setProjectTitle(e.target.value)}
-                  className="form-input"
-                  placeholder="e.g. Build an Admin Panel"
-                />
-              </div>
-              <div className="form-group">
-                <label>Description</label>
-                <textarea
-                  required
-                  value={projectDesc}
-                  onChange={(e) => setProjectDesc(e.target.value)}
-                  className="form-input"
-                  placeholder="Detail project specifications and parameters..."
-                  style={{ minHeight: "80px" }}
-                />
-              </div>
-              <div className="form-group">
-                <label>Required Skills (comma-separated list)</label>
-                <input
-                  type="text"
-                  value={projectSkills}
-                  onChange={(e) => setProjectSkills(e.target.value)}
-                  className="form-input"
-                  placeholder="React, Supabase, pgvector"
-                />
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div className="form-group">
-                  <label>Budget (USD)</label>
-                  <input
-                    type="number"
-                    value={projectBudget}
-                    onChange={(e) => setProjectBudget(e.target.value)}
-                    className="form-input"
-                    placeholder="e.g. 2500"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Project Scope</label>
-                  <select
-                    value={projectScope}
-                    onChange={(e) => setProjectScope(e.target.value as any)}
-                    className="form-input"
-                  >
-                    <option value="short-term">Short-term</option>
-                    <option value="medium-term">Medium-term</option>
-                    <option value="long-term">Long-term</option>
-                  </select>
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Belongs to Corporate Partner / Company</label>
-                <select
-                  required
-                  value={projectPartnerId}
-                  onChange={(e) => setProjectPartnerId(e.target.value)}
-                  className="form-input"
-                >
-                  <option value="">-- Select Partner --</option>
-                  {users
-                    .filter((u) => u.role === "partner")
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.full_name || p.email} ({p.id.slice(0, 8)})
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)} style={{ flex: 1 }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
-                  {editMode ? "Save Changes" : "Publish Job"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={activeModal === "project"}
+        onClose={() => setActiveModal(null)}
+        title={editMode ? "Edit Project Details" : "Publish New Project"}
+        size="md"
+      >
+        <form onSubmit={handleSaveProject}>
+          <div className="form-group">
+            <label>Project Title</label>
+            <input
+              type="text"
+              required
+              value={projectTitle}
+              onChange={(e) => setProjectTitle(e.target.value)}
+              className="form-input"
+              placeholder="e.g. Build an Admin Panel"
+            />
           </div>
-        </div>
-      )}
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              required
+              value={projectDesc}
+              onChange={(e) => setProjectDesc(e.target.value)}
+              className="form-input"
+              placeholder="Detail project specifications and parameters..."
+              style={{ minHeight: "80px" }}
+            />
+          </div>
+          <div className="form-group">
+            <label>Required Skills (comma-separated list)</label>
+            <input
+              type="text"
+              value={projectSkills}
+              onChange={(e) => setProjectSkills(e.target.value)}
+              className="form-input"
+              placeholder="React, Supabase, pgvector"
+            />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-group">
+              <label>Budget (USD)</label>
+              <input
+                type="number"
+                value={projectBudget}
+                onChange={(e) => setProjectBudget(e.target.value)}
+                className="form-input"
+                placeholder="e.g. 2500"
+              />
+            </div>
+            <div className="form-group">
+              <label>Project Scope</label>
+              <select
+                value={projectScope}
+                onChange={(e) => setProjectScope(e.target.value as any)}
+                className="form-input"
+              >
+                <option value="short-term">Short-term</option>
+                <option value="medium-term">Medium-term</option>
+                <option value="long-term">Long-term</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Belongs to Corporate Partner / Company</label>
+            <select
+              required
+              value={projectPartnerId}
+              onChange={(e) => setProjectPartnerId(e.target.value)}
+              className="form-input"
+            >
+              <option value="">-- Select Partner --</option>
+              {users
+                .filter((u) => u.role === "partner")
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.full_name || p.email} ({p.id.slice(0, 8)})
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
+            <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)} style={{ flex: 1 }}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+              {editMode ? "Save Changes" : "Publish Job"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

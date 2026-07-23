@@ -4,6 +4,7 @@ import { Plus, X, Download, Check, Copy, ShieldCheck, Award, Share2 } from "luci
 import { generateNanoId } from "../../utils/nanoid";
 import { downloadCertificateAsPdf } from "../../utils/pdf";
 import signatureImg from "../../assets/signature.png";
+import Modal from "../../components/Modal";
 
 export default function TalentCertificates(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -716,230 +717,184 @@ export default function TalentCertificates(): React.ReactElement {
       })()}
 
       {/* Add External Certificate Modal */}
-      {showAddCertModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(15, 23, 42, 0.8)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1001,
-          }}
-        >
-          <div className="glass-panel animate-fade-in" style={{ width: "90%", maxWidth: "550px", padding: "2.5rem", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ margin: 0 }}>Add External Certification</h3>
-              <button
-                className="hamburger-btn"
-                onClick={() => {
-                  setShowAddCertModal(false);
-                  resetCertForm();
-                }}
-                style={{ padding: "0.25rem", cursor: "pointer", border: "none", background: "transparent", color: "var(--text-primary)" }}
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddExternalCert} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div className="form-group">
-                <label>Certification Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. AWS Certified Solutions Architect"
-                  value={certName}
-                  onChange={(e) => setCertName(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Issuing Organization *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Amazon Web Services"
-                  value={certIssuer}
-                  onChange={(e) => setCertIssuer(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div className="form-group">
-                  <label>Issue Date *</label>
-                  <input
-                    type="date"
-                    value={certIssueDate}
-                    onChange={(e) => setCertIssueDate(e.target.value)}
-                    className="form-input"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Expiration Date</label>
-                  <input
-                    type="date"
-                    value={certExpiryDate}
-                    onChange={(e) => setCertExpiryDate(e.target.value)}
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Credential ID</label>
-                <input
-                  type="text"
-                  placeholder="Credential ID or number"
-                  value={certCredId}
-                  onChange={(e) => setCertCredId(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Credential URL</label>
-                <input
-                  type="url"
-                  placeholder="https://verify.org/credential/123"
-                  value={certCredUrl}
-                  onChange={(e) => setCertCredUrl(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setShowAddCertModal(false); resetCertForm(); }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={savingCert}>
-                  {savingCert ? "Saving..." : "Add Certificate"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showAddCertModal}
+        onClose={() => {
+          setShowAddCertModal(false);
+          resetCertForm();
+        }}
+        title="Add External Certification"
+        size="md"
+      >
+        <form onSubmit={handleAddExternalCert} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="form-group">
+            <label>Certification Name *</label>
+            <input
+              type="text"
+              placeholder="e.g. AWS Certified Solutions Architect"
+              value={certName}
+              onChange={(e) => setCertName(e.target.value)}
+              className="form-input"
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div className="form-group">
+            <label>Issuing Organization *</label>
+            <input
+              type="text"
+              placeholder="e.g. Amazon Web Services"
+              value={certIssuer}
+              onChange={(e) => setCertIssuer(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-group">
+              <label>Issue Date *</label>
+              <input
+                type="date"
+                value={certIssueDate}
+                onChange={(e) => setCertIssueDate(e.target.value)}
+                className="form-input"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Expiration Date</label>
+              <input
+                type="date"
+                value={certExpiryDate}
+                onChange={(e) => setCertExpiryDate(e.target.value)}
+                className="form-input"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Credential ID</label>
+            <input
+              type="text"
+              placeholder="Credential ID or number"
+              value={certCredId}
+              onChange={(e) => setCertCredId(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Credential URL</label>
+            <input
+              type="url"
+              placeholder="https://verify.org/credential/123"
+              value={certCredUrl}
+              onChange={(e) => setCertCredUrl(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setShowAddCertModal(false); resetCertForm(); }}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={savingCert}>
+              {savingCert ? "Saving..." : "Add Certificate"}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Edit External Certificate Modal */}
-      {showEditCertModal && selectedExternalCert && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(15, 23, 42, 0.8)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1001,
-          }}
-        >
-          <div className="glass-panel animate-fade-in" style={{ width: "90%", maxWidth: "550px", padding: "2.5rem", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ margin: 0 }}>Edit Certification</h3>
-              <button
-                className="hamburger-btn"
-                onClick={() => {
-                  setShowEditCertModal(false);
-                  resetCertForm();
-                }}
-                style={{ padding: "0.25rem", cursor: "pointer", border: "none", background: "transparent", color: "var(--text-primary)" }}
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <form onSubmit={handleEditExternalCert} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div className="form-group">
-                <label>Certification Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. AWS Certified Solutions Architect"
-                  value={certName}
-                  onChange={(e) => setCertName(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Issuing Organization *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Amazon Web Services"
-                  value={certIssuer}
-                  onChange={(e) => setCertIssuer(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div className="form-group">
-                  <label>Issue Date *</label>
-                  <input
-                    type="date"
-                    value={certIssueDate}
-                    onChange={(e) => setCertIssueDate(e.target.value)}
-                    className="form-input"
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Expiration Date</label>
-                  <input
-                    type="date"
-                    value={certExpiryDate}
-                    onChange={(e) => setCertExpiryDate(e.target.value)}
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Credential ID</label>
-                <input
-                  type="text"
-                  placeholder="Credential ID or number"
-                  value={certCredId}
-                  onChange={(e) => setCertCredId(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Credential URL</label>
-                <input
-                  type="url"
-                  placeholder="https://verify.org/credential/123"
-                  value={certCredUrl}
-                  onChange={(e) => setCertCredUrl(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setShowEditCertModal(false); resetCertForm(); }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={savingCert}>
-                  {savingCert ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showEditCertModal && !!selectedExternalCert}
+        onClose={() => {
+          setShowEditCertModal(false);
+          resetCertForm();
+        }}
+        title="Edit Certification"
+        size="md"
+      >
+        <form onSubmit={handleEditExternalCert} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="form-group">
+            <label>Certification Name *</label>
+            <input
+              type="text"
+              placeholder="e.g. AWS Certified Solutions Architect"
+              value={certName}
+              onChange={(e) => setCertName(e.target.value)}
+              className="form-input"
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div className="form-group">
+            <label>Issuing Organization *</label>
+            <input
+              type="text"
+              placeholder="e.g. Amazon Web Services"
+              value={certIssuer}
+              onChange={(e) => setCertIssuer(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-group">
+              <label>Issue Date *</label>
+              <input
+                type="date"
+                value={certIssueDate}
+                onChange={(e) => setCertIssueDate(e.target.value)}
+                className="form-input"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Expiration Date</label>
+              <input
+                type="date"
+                value={certExpiryDate}
+                onChange={(e) => setCertExpiryDate(e.target.value)}
+                className="form-input"
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Credential ID</label>
+            <input
+              type="text"
+              placeholder="Credential ID or number"
+              value={certCredId}
+              onChange={(e) => setCertCredId(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Credential URL</label>
+            <input
+              type="url"
+              placeholder="https://verify.org/credential/123"
+              value={certCredUrl}
+              onChange={(e) => setCertCredUrl(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setShowEditCertModal(false); resetCertForm(); }}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={savingCert}>
+              {savingCert ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

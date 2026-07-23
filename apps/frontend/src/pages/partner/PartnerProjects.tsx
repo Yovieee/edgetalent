@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useSupabase } from "../../context/SupabaseContext";
 import { ProjectSchema } from "@edgetalent/shared";
 import { X } from "lucide-react";
+import Modal from "../../components/Modal";
 
 export default function PartnerProjects(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -302,99 +303,73 @@ export default function PartnerProjects(): React.ReactElement {
       </div>
 
       {/* Post Project Modal */}
-      {showPostModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-          }}
-        >
-          <div className="glass-panel animate-fade-in" style={{ width: "90%", maxWidth: "600px", padding: "2.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ margin: 0 }}>Publish Industrial Project</h3>
-              <button
-                className="hamburger-btn"
-                onClick={() => {
-                  setShowPostModal(false);
-                  setPortalMsg("");
-                }}
-                style={{ padding: "0.25rem", cursor: "pointer", border: "none", background: "transparent", color: "var(--text-primary)" }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-              Add technical deliverables, required skills, and scope. This triggers our embeddings Deno agent.
-            </p>
-
-            {portalMsg && (
-              <div className={`badge ${portalMsg.startsWith("Error") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
-                {portalMsg}
-              </div>
-            )}
-
-            <form onSubmit={handlePostProject}>
-              <div className="form-group" style={{ marginBottom: "1rem" }}>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Project Title *</label>
-                <input type="text" className="form-input" placeholder="e.g. EdgeTalent Upgrades" value={title} onChange={(e) => setTitle(e.target.value)} required />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: "1rem" }}>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Description & Scope *</label>
-                <textarea className="form-input" style={{ height: "100px" }} placeholder="Describe deliverables and parameters..." value={description} onChange={(e) => setDescription(e.target.value)} required />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: "1rem" }}>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Required Skills (comma-separated) *</label>
-                <input type="text" className="form-input" placeholder="React, TypeScript, Supabase, Deno" value={requiredSkills} onChange={(e) => setRequiredSkills(e.target.value)} required />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
-                <div className="form-group">
-                  <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Budget ($)</label>
-                  <input type="number" className="form-input" placeholder="5000" value={budget} onChange={(e) => setBudget(e.target.value)} />
-                </div>
-
-                <div className="form-group">
-                  <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Scope</label>
-                  <select className="form-select" value={scope} onChange={(e) => setScope(e.target.value as any)}>
-                    <option value="short-term">Short-term</option>
-                    <option value="medium-term">Medium-term</option>
-                    <option value="long-term">Long-term</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={{ flex: 1 }}
-                  onClick={() => {
-                    setShowPostModal(false);
-                    setPortalMsg("");
-                  }}
-                  disabled={posting}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={posting}>
-                  {posting ? "Publishing Project..." : "Post Project Scope"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showPostModal}
+        onClose={() => {
+          setShowPostModal(false);
+          setPortalMsg("");
+        }}
+        title="Publish Industrial Project"
+        subtitle="Add technical deliverables, required skills, and scope. This triggers our embeddings Deno agent."
+        size="lg"
+      >
+        {portalMsg && (
+          <div className={`badge ${portalMsg.startsWith("Error") ? "badge-rose" : "badge-emerald"}`} style={{ display: "block", padding: "0.8rem", textAlign: "center", marginBottom: "1.5rem" }}>
+            {portalMsg}
           </div>
-        </div>
-      )}
+        )}
+
+        <form onSubmit={handlePostProject}>
+          <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Project Title *</label>
+            <input type="text" className="form-input" placeholder="e.g. EdgeTalent Upgrades" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Description & Scope *</label>
+            <textarea className="form-input" style={{ height: "100px" }} placeholder="Describe deliverables and parameters..." value={description} onChange={(e) => setDescription(e.target.value)} required />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Required Skills (comma-separated) *</label>
+            <input type="text" className="form-input" placeholder="React, TypeScript, Supabase, Deno" value={requiredSkills} onChange={(e) => setRequiredSkills(e.target.value)} required />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
+            <div className="form-group">
+              <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Budget ($)</label>
+              <input type="number" className="form-input" placeholder="5000" value={budget} onChange={(e) => setBudget(e.target.value)} />
+            </div>
+
+            <div className="form-group">
+              <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Scope</label>
+              <select className="form-select" value={scope} onChange={(e) => setScope(e.target.value as any)}>
+                <option value="short-term">Short-term</option>
+                <option value="medium-term">Medium-term</option>
+                <option value="long-term">Long-term</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              style={{ flex: 1 }}
+              onClick={() => {
+                setShowPostModal(false);
+                setPortalMsg("");
+              }}
+              disabled={posting}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={posting}>
+              {posting ? "Publishing Project..." : "Post Project Scope"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

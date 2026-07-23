@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { Search, X } from "lucide-react";
+import Modal from "../../components/Modal";
 
 export default function TalentGigs(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -316,56 +317,40 @@ export default function TalentGigs(): React.ReactElement {
       )}
 
       {/* Gig Details Modal */}
-      {selectedGig && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1001,
-          }}
-        >
-          <div className="glass-panel animate-fade-in" style={{ width: "90%", maxWidth: "700px", padding: "2.5rem", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
-              <div>
-                <span className={`badge ${
-                  selectedGig.status === "accepted" ? "badge-emerald" : 
-                  selectedGig.status === "rejected" ? "badge-rose" : 
-                  selectedGig.status === "shortlisted" ? "badge-amber" : 
-                  selectedGig.status === "reviewing" ? "badge-cyan" : "badge-purple"
-                }`} style={{ marginBottom: "0.5rem" }}>
-                  {selectedGig.status === "accepted" ? "Hired" : selectedGig.status}
-                </span>
-                <h3 style={{ margin: 0, fontSize: "1.75rem", color: "var(--text-primary)" }}>{selectedGig.projects?.title}</h3>
-              </div>
-              <button
-                className="hamburger-btn"
-                onClick={() => setSelectedGig(null)}
-                style={{ padding: "0.25rem", cursor: "pointer", border: "none", background: "transparent", color: "var(--text-primary)" }}
-              >
-                <X size={24} />
-              </button>
+      <Modal
+        isOpen={!!selectedGig}
+        onClose={() => setSelectedGig(null)}
+        size="lg"
+        title={
+          selectedGig && (
+            <div>
+              <span className={`badge ${
+                selectedGig.status === "accepted" ? "badge-emerald" : 
+                selectedGig.status === "rejected" ? "badge-rose" : 
+                selectedGig.status === "shortlisted" ? "badge-amber" : 
+                selectedGig.status === "reviewing" ? "badge-cyan" : "badge-purple"
+              }`} style={{ marginBottom: "0.5rem" }}>
+                {selectedGig.status === "accepted" ? "Hired" : selectedGig.status}
+              </span>
+              <h3 className="modal-title">{selectedGig.projects?.title}</h3>
             </div>
-
-            <div style={{ background: "rgba(255, 255, 255, 0.3)", padding: "1.5rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--glass-border)", marginBottom: "2rem" }}>
+          )
+        }
+      >
+        {selectedGig && (
+          <div>
+            <div style={{ background: "var(--bg-tertiary)", padding: "1.5rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--glass-border)", marginBottom: "2rem" }}>
               <h4 style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginBottom: "0.5rem", textTransform: "uppercase" }}>Application Stage</h4>
               {renderStepper(selectedGig.status)}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-                <div className="glass-panel" style={{ padding: "1rem", background: "rgba(255, 255, 255, 0.4)" }}>
+                <div className="glass-panel" style={{ padding: "1rem", background: "var(--bg-tertiary)" }}>
                   <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>⏱ Scope</span>
                   <p style={{ fontSize: "1.1rem", fontWeight: "bold", margin: "0.25rem 0 0 0" }}>{selectedGig.projects?.scope}</p>
                 </div>
-                <div className="glass-panel" style={{ padding: "1rem", background: "rgba(255, 255, 255, 0.4)" }}>
+                <div className="glass-panel" style={{ padding: "1rem", background: "var(--bg-tertiary)" }}>
                   <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>💰 Budget</span>
                   <p style={{ fontSize: "1.1rem", fontWeight: "bold", margin: "0.25rem 0 0 0" }}>${selectedGig.projects?.budget}</p>
                 </div>
@@ -424,7 +409,7 @@ export default function TalentGigs(): React.ReactElement {
                     </a>
                   </div>
                 ) : (
-                  <div className="glass-panel" style={{ padding: "1.5rem", background: "rgba(0, 0, 0, 0.02)", textAlign: "center" }}>
+                  <div className="glass-panel" style={{ padding: "1.5rem", background: "var(--bg-tertiary)", textAlign: "center" }}>
                     <h4 style={{ fontSize: "1rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>🔒 Contact Info Locked</h4>
                     <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0 }}>
                       Client details and direct contact details will unlock automatically once your application is shortlisted or accepted.
@@ -434,8 +419,8 @@ export default function TalentGigs(): React.ReactElement {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }

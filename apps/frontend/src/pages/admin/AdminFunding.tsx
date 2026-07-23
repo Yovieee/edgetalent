@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { FundingOpportunitySchema } from "@edgetalent/shared";
+import Modal from "../../components/Modal";
 
 export default function AdminFunding(): React.ReactElement {
   const { supabase } = useSupabase();
@@ -216,144 +217,118 @@ export default function AdminFunding(): React.ReactElement {
       )}
 
       {/* Funding Modal Form */}
-      {activeModal === "funding" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1001,
-          }}
-        >
-          <div className="glass-panel animate-fade-in" style={{ width: "90%", maxWidth: "600px", padding: "2.5rem", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.5rem", margin: 0 }}>
-                {editMode ? "Edit Funding Opportunity" : "Add Funding Opportunity"}
-              </h3>
-              <button
-                className="btn-close"
-                style={{ background: "none", border: "none", color: "var(--text-secondary)", fontSize: "1.5rem", cursor: "pointer" }}
-                onClick={() => setActiveModal(null)}
-              >
-                &times;
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveFunding} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <div className="form-group">
-                <label>Opportunity Title *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Y Combinator W27 Program"
-                  value={fundingTitle}
-                  onChange={(e) => setFundingTitle(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Category *</label>
-                <select
-                  value={fundingCategory}
-                  onChange={(e: any) => setFundingCategory(e.target.value)}
-                  className="form-input"
-                  required
-                >
-                  <option value="Grants">Grants</option>
-                  <option value="Equity/VC">Equity/VC</option>
-                  <option value="Accelerators">Accelerators</option>
-                  <option value="Loans/Debt">Loans/Debt</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Short Description *</label>
-                <input
-                  type="text"
-                  placeholder="Brief 1-sentence summary of the program"
-                  value={fundingDescription}
-                  onChange={(e) => setFundingDescription(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Full Program Content / Details *</label>
-                <textarea
-                  rows={5}
-                  placeholder="Detailed explanation of the program, terms, and perks..."
-                  value={fundingContent}
-                  onChange={(e) => setFundingContent(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Funding Amount</label>
-                <input
-                  type="text"
-                  placeholder="e.g. $500,000 or Up to $100k equity-free"
-                  value={fundingAmount}
-                  onChange={(e) => setFundingAmount(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Eligibility Requirements</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Tech startups, under 22 founders, US businesses"
-                  value={fundingEligibility}
-                  onChange={(e) => setFundingEligibility(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Application Deadline</label>
-                <input
-                  type="text"
-                  placeholder="e.g. September 15, 2026 or Rolling"
-                  value={fundingDeadline}
-                  onChange={(e) => setFundingDeadline(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Official Application Link / URL</label>
-                <input
-                  type="url"
-                  placeholder="https://example.com/apply"
-                  value={fundingLink}
-                  onChange={(e) => setFundingLink(e.target.value)}
-                  className="form-input"
-                />
-              </div>
-
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setActiveModal(null)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
-                  {editMode ? "Save Changes" : "Create Opportunity"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={activeModal === "funding"}
+        onClose={() => setActiveModal(null)}
+        title={editMode ? "Edit Funding Opportunity" : "Add Funding Opportunity"}
+        size="lg"
+      >
+        <form onSubmit={handleSaveFunding} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="form-group">
+            <label>Opportunity Title *</label>
+            <input
+              type="text"
+              placeholder="e.g. Y Combinator W27 Program"
+              value={fundingTitle}
+              onChange={(e) => setFundingTitle(e.target.value)}
+              className="form-input"
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div className="form-group">
+            <label>Category *</label>
+            <select
+              value={fundingCategory}
+              onChange={(e: any) => setFundingCategory(e.target.value)}
+              className="form-input"
+              required
+            >
+              <option value="Grants">Grants</option>
+              <option value="Equity/VC">Equity/VC</option>
+              <option value="Accelerators">Accelerators</option>
+              <option value="Loans/Debt">Loans/Debt</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Short Description *</label>
+            <input
+              type="text"
+              placeholder="Brief 1-sentence summary of the program"
+              value={fundingDescription}
+              onChange={(e) => setFundingDescription(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Full Program Content / Details *</label>
+            <textarea
+              rows={5}
+              placeholder="Detailed explanation of the program, terms, and perks..."
+              value={fundingContent}
+              onChange={(e) => setFundingContent(e.target.value)}
+              className="form-input"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Funding Amount</label>
+            <input
+              type="text"
+              placeholder="e.g. $500,000 or Up to $100k equity-free"
+              value={fundingAmount}
+              onChange={(e) => setFundingAmount(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Eligibility Requirements</label>
+            <input
+              type="text"
+              placeholder="e.g. Tech startups, under 22 founders, US businesses"
+              value={fundingEligibility}
+              onChange={(e) => setFundingEligibility(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Application Deadline</label>
+            <input
+              type="text"
+              placeholder="e.g. September 15, 2026 or Rolling"
+              value={fundingDeadline}
+              onChange={(e) => setFundingDeadline(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Official Application Link / URL</label>
+            <input
+              type="url"
+              placeholder="https://example.com/apply"
+              value={fundingLink}
+              onChange={(e) => setFundingLink(e.target.value)}
+              className="form-input"
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setActiveModal(null)}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+              {editMode ? "Save Changes" : "Create Opportunity"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

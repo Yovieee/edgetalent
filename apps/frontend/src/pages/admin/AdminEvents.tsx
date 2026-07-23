@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { EventSchema } from "@edgetalent/shared";
+import Modal from "../../components/Modal";
 
 interface EventItem {
   id: string;
@@ -250,160 +251,134 @@ export default function AdminEvents(): React.ReactElement {
       )}
 
       {/* Event Modal Form */}
-      {activeModal === "event" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1001,
-          }}
-        >
-          <div className="glass-panel animate-fade-in" style={{ width: "90%", maxWidth: "600px", padding: "2.5rem", maxHeight: "90vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1.5rem", margin: 0 }}>
-                {editMode ? "Edit Event" : "Create New Event"}
-              </h3>
-              <button
-                className="btn-close"
-                style={{ background: "none", border: "none", color: "var(--text-secondary)", fontSize: "1.5rem", cursor: "pointer" }}
-                onClick={() => setActiveModal(null)}
-              >
-                &times;
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEvent} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <div className="form-group">
-                <label>Event Title *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. EdgeTalent AI Hackathon"
-                  className="form-input"
-                  value={eventTitle}
-                  onChange={(e) => setEventTitle(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Category *</label>
-                <select
-                  value={eventCategory}
-                  onChange={(e: any) => setEventCategory(e.target.value)}
-                  className="form-input"
-                  required
-                >
-                  <option value="Hackathon">Hackathon</option>
-                  <option value="Webinar">Webinar</option>
-                  <option value="Workshop">Workshop</option>
-                  <option value="Networking">Networking</option>
-                  <option value="Pitch Night">Pitch Night</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Organizer Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. EdgeTalent Foundation"
-                  className="form-input"
-                  value={eventOrganizer}
-                  onChange={(e) => setEventOrganizer(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Short Description *</label>
-                <input
-                  type="text"
-                  placeholder="Brief 1-sentence summary of the event"
-                  className="form-input"
-                  value={eventDescription}
-                  onChange={(e) => setEventDescription(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Full Event Details *</label>
-                <textarea
-                  rows={4}
-                  placeholder="Describe the event itinerary, speakers, and topics..."
-                  className="form-input"
-                  value={eventContent}
-                  onChange={(e) => setEventContent(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div className="form-group">
-                  <label>Date & Time *</label>
-                  <input
-                    type="datetime-local"
-                    className="form-input"
-                    value={eventDate}
-                    onChange={(e) => setEventDate(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Location *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Zoom or Jakarta Office"
-                    className="form-input"
-                    value={eventLocation}
-                    onChange={(e) => setEventLocation(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div className="form-group">
-                  <label>Capacity (Leave empty for unlimited)</label>
-                  <input
-                    type="number"
-                    placeholder="e.g. 100"
-                    className="form-input"
-                    value={eventCapacity}
-                    onChange={(e) => setEventCapacity(e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Event Website Link / Registration Link</label>
-                  <input
-                    type="url"
-                    placeholder="https://example.com/register"
-                    className="form-input"
-                    value={eventLink}
-                    onChange={(e) => setEventLink(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setActiveModal(null)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
-                  {editMode ? "Save Changes" : "Create Event"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={activeModal === "event"}
+        onClose={() => setActiveModal(null)}
+        title={editMode ? "Edit Event" : "Create New Event"}
+        size="lg"
+      >
+        <form onSubmit={handleSaveEvent} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="form-group">
+            <label>Event Title *</label>
+            <input
+              type="text"
+              placeholder="e.g. EdgeTalent AI Hackathon"
+              className="form-input"
+              value={eventTitle}
+              onChange={(e) => setEventTitle(e.target.value)}
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div className="form-group">
+            <label>Category *</label>
+            <select
+              value={eventCategory}
+              onChange={(e: any) => setEventCategory(e.target.value)}
+              className="form-input"
+              required
+            >
+              <option value="Hackathon">Hackathon</option>
+              <option value="Webinar">Webinar</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Networking">Networking</option>
+              <option value="Pitch Night">Pitch Night</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Organizer Name *</label>
+            <input
+              type="text"
+              placeholder="e.g. EdgeTalent Foundation"
+              className="form-input"
+              value={eventOrganizer}
+              onChange={(e) => setEventOrganizer(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Short Description *</label>
+            <input
+              type="text"
+              placeholder="Brief 1-sentence summary of the event"
+              className="form-input"
+              value={eventDescription}
+              onChange={(e) => setEventDescription(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Full Event Details *</label>
+            <textarea
+              rows={4}
+              placeholder="Describe the event itinerary, speakers, and topics..."
+              className="form-input"
+              value={eventContent}
+              onChange={(e) => setEventContent(e.target.value)}
+              required
+            />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-group">
+              <label>Date & Time *</label>
+              <input
+                type="datetime-local"
+                className="form-input"
+                value={eventDate}
+                onChange={(e) => setEventDate(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Location *</label>
+              <input
+                type="text"
+                placeholder="e.g. Zoom or Jakarta Office"
+                className="form-input"
+                value={eventLocation}
+                onChange={(e) => setEventLocation(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-group">
+              <label>Capacity (Leave empty for unlimited)</label>
+              <input
+                type="number"
+                placeholder="e.g. 100"
+                className="form-input"
+                value={eventCapacity}
+                onChange={(e) => setEventCapacity(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Event Website Link / Registration Link</label>
+              <input
+                type="url"
+                placeholder="https://example.com/register"
+                className="form-input"
+                value={eventLink}
+                onChange={(e) => setEventLink(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+            <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setActiveModal(null)}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+              {editMode ? "Save Changes" : "Create Event"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

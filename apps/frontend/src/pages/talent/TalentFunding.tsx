@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { FundingOpportunity } from "@edgetalent/shared";
+import Modal from "../../components/Modal";
 
 export default function TalentFunding(): React.ReactElement {
   const { supabase } = useSupabase();
@@ -156,111 +157,74 @@ export default function TalentFunding(): React.ReactElement {
       )}
 
       {/* Funding Opportunity Detail Modal */}
-      {showOpportunityModal && selectedOpportunity && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1001,
-          }}
-          onClick={() => setShowOpportunityModal(false)}
-        >
-          <div
-            className="glass-panel animate-fade-in"
-            style={{
-              width: "90%",
-              maxWidth: "650px",
-              padding: "2.5rem",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              position: "relative"
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
-              <div>
-                <span className={`badge ${
-                  selectedOpportunity.category === "Grants" ? "badge-emerald" :
-                  selectedOpportunity.category === "Accelerators" ? "badge-purple" :
-                  selectedOpportunity.category === "Equity/VC" ? "badge-cyan" : "badge-amber"
-                }`} style={{ fontSize: "0.75rem", marginBottom: "0.5rem" }}>
-                  {selectedOpportunity.category}
-                </span>
-                <h3 style={{ fontSize: "1.5rem", margin: 0, fontWeight: "700" }}>{selectedOpportunity.title}</h3>
-              </div>
-              <button
-                className="btn-close"
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "var(--text-secondary)",
-                  fontSize: "1.5rem",
-                  cursor: "pointer",
-                  lineHeight: 1,
-                  padding: 0
-                }}
-                onClick={() => setShowOpportunityModal(false)}
+      <Modal
+        isOpen={showOpportunityModal && !!selectedOpportunity}
+        onClose={() => setShowOpportunityModal(false)}
+        size="lg"
+        title={
+          selectedOpportunity && (
+            <div>
+              <span className={`badge ${
+                selectedOpportunity.category === "Grants" ? "badge-emerald" :
+                selectedOpportunity.category === "Accelerators" ? "badge-purple" :
+                selectedOpportunity.category === "Equity/VC" ? "badge-cyan" : "badge-amber"
+              }`} style={{ fontSize: "0.75rem", marginBottom: "0.5rem" }}>
+                {selectedOpportunity.category}
+              </span>
+              <h3 className="modal-title">{selectedOpportunity.title}</h3>
+            </div>
+          )
+        }
+        footer={
+          <>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              style={{ flex: 1 }}
+              onClick={() => setShowOpportunityModal(false)}
+            >
+              Close
+            </button>
+            {selectedOpportunity && selectedOpportunity.link && (
+              <a
+                href={selectedOpportunity.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{ flex: 1, textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
               >
-                &times;
-              </button>
+                Apply on Official Website
+              </a>
+            )}
+          </>
+        }
+      >
+        {selectedOpportunity && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <div>
+              <h4 style={{ fontSize: "1rem", marginBottom: "0.5rem", color: "var(--text-primary)" }}>Program Description</h4>
+              <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: "1.6", margin: 0 }}>
+                {selectedOpportunity.content}
+              </p>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", background: "var(--bg-tertiary)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--glass-border)" }}>
               <div>
-                <h4 style={{ fontSize: "1rem", marginBottom: "0.5rem", color: "var(--text-primary)" }}>Program Description</h4>
-                <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", lineHeight: "1.6", margin: 0 }}>
-                  {selectedOpportunity.content}
-                </p>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Funding Amount</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedOpportunity.amount || "N/A"}</span>
               </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", background: "rgba(255, 255, 255, 0.03)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--glass-border)" }}>
-                <div>
-                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Funding Amount</span>
-                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{selectedOpportunity.amount || "N/A"}</span>
-                </div>
-                <div>
-                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Application Deadline</span>
-                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--color-rose)" }}>{selectedOpportunity.deadline || "N/A"}</span>
-                </div>
-                <div style={{ gridColumn: "span 2" }}>
-                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Eligibility Criteria</span>
-                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)", display: "block" }}>{selectedOpportunity.eligibility || "N/A"}</span>
-                </div>
+              <div>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Application Deadline</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--color-rose)" }}>{selectedOpportunity.deadline || "N/A"}</span>
               </div>
-
-              <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={{ flex: 1 }}
-                  onClick={() => setShowOpportunityModal(false)}
-                >
-                  Close
-                </button>
-                {selectedOpportunity.link && (
-                  <a
-                    href={selectedOpportunity.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-primary"
-                    style={{ flex: 1, textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
-                  >
-                    Apply on Official Website
-                  </a>
-                )}
+              <div style={{ gridColumn: "span 2" }}>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Eligibility Criteria</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)", display: "block" }}>{selectedOpportunity.eligibility || "N/A"}</span>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }

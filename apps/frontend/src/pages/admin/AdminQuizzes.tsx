@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { QuizQuestionSchema } from "@edgetalent/shared";
+import Modal from "../../components/Modal";
 
 interface QuizItem {
   id: string;
@@ -234,119 +235,105 @@ export default function AdminQuizzes(): React.ReactElement {
       )}
 
       {/* Quiz Modal Form */}
-      {activeModal === "quiz" && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.6)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-          }}
-        >
-          <div className="glass-panel" style={{ width: "90%", maxWidth: "550px", padding: "2.5rem" }}>
-            <h3 style={{ marginBottom: "1.5rem" }}>{editMode ? "Edit Quiz Question" : "Create Quiz Question"}</h3>
-            <form onSubmit={handleSaveQuiz}>
-              <div className="form-group">
-                <label>Category</label>
-                <select
-                  value={quizCategory}
-                  onChange={(e) => setQuizCategory(e.target.value as any)}
-                  className="form-input"
-                >
-                  <option value="frontend">Frontend Development</option>
-                  <option value="backend">Backend Development</option>
-                  <option value="ai">AI & Data Science</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Question Text</label>
-                <textarea
-                  required
-                  value={quizQuestionText}
-                  onChange={(e) => setQuizQuestionText(e.target.value)}
-                  className="form-input"
-                  placeholder="e.g. Which React hook handles state lifecycle?"
-                  style={{ minHeight: "60px" }}
-                />
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div className="form-group">
-                  <label>Option A</label>
-                  <input
-                    type="text"
-                    required
-                    value={quizOption1}
-                    onChange={(e) => setQuizOption1(e.target.value)}
-                    className="form-input"
-                    placeholder="Option A"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Option B</label>
-                  <input
-                    type="text"
-                    required
-                    value={quizOption2}
-                    onChange={(e) => setQuizOption2(e.target.value)}
-                    className="form-input"
-                    placeholder="Option B"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Option C</label>
-                  <input
-                    type="text"
-                    value={quizOption3}
-                    onChange={(e) => setQuizOption3(e.target.value)}
-                    className="form-input"
-                    placeholder="Option C"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Option D</label>
-                  <input
-                    type="text"
-                    value={quizOption4}
-                    onChange={(e) => setQuizOption4(e.target.value)}
-                    className="form-input"
-                    placeholder="Option D"
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Correct Answer (Exact option match)</label>
-                <select
-                  required
-                  value={quizAnswer}
-                  onChange={(e) => setQuizAnswer(e.target.value)}
-                  className="form-input"
-                >
-                  <option value="">-- Select Answer --</option>
-                  {quizOption1 && <option value={quizOption1}>A: {quizOption1}</option>}
-                  {quizOption2 && <option value={quizOption2}>B: {quizOption2}</option>}
-                  {quizOption3 && <option value={quizOption3}>C: {quizOption3}</option>}
-                  {quizOption4 && <option value={quizOption4}>D: {quizOption4}</option>}
-                </select>
-              </div>
-              <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)} style={{ flex: 1 }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
-                  {editMode ? "Save Changes" : "Create Question"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={activeModal === "quiz"}
+        onClose={() => setActiveModal(null)}
+        title={editMode ? "Edit Quiz Question" : "Create Quiz Question"}
+        size="md"
+      >
+        <form onSubmit={handleSaveQuiz}>
+          <div className="form-group">
+            <label>Category</label>
+            <select
+              value={quizCategory}
+              onChange={(e) => setQuizCategory(e.target.value as any)}
+              className="form-input"
+            >
+              <option value="frontend">Frontend Development</option>
+              <option value="backend">Backend Development</option>
+              <option value="ai">AI & Data Science</option>
+            </select>
           </div>
-        </div>
-      )}
+          <div className="form-group">
+            <label>Question Text</label>
+            <textarea
+              required
+              value={quizQuestionText}
+              onChange={(e) => setQuizQuestionText(e.target.value)}
+              className="form-input"
+              placeholder="e.g. Which React hook handles state lifecycle?"
+              style={{ minHeight: "60px" }}
+            />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-group">
+              <label>Option A</label>
+              <input
+                type="text"
+                required
+                value={quizOption1}
+                onChange={(e) => setQuizOption1(e.target.value)}
+                className="form-input"
+                placeholder="Option A"
+              />
+            </div>
+            <div className="form-group">
+              <label>Option B</label>
+              <input
+                type="text"
+                required
+                value={quizOption2}
+                onChange={(e) => setQuizOption2(e.target.value)}
+                className="form-input"
+                placeholder="Option B"
+              />
+            </div>
+            <div className="form-group">
+              <label>Option C</label>
+              <input
+                type="text"
+                value={quizOption3}
+                onChange={(e) => setQuizOption3(e.target.value)}
+                className="form-input"
+                placeholder="Option C"
+              />
+            </div>
+            <div className="form-group">
+              <label>Option D</label>
+              <input
+                type="text"
+                value={quizOption4}
+                onChange={(e) => setQuizOption4(e.target.value)}
+                className="form-input"
+                placeholder="Option D"
+              />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Correct Answer (Exact option match)</label>
+            <select
+              required
+              value={quizAnswer}
+              onChange={(e) => setQuizAnswer(e.target.value)}
+              className="form-input"
+            >
+              <option value="">-- Select Answer --</option>
+              {quizOption1 && <option value={quizOption1}>A: {quizOption1}</option>}
+              {quizOption2 && <option value={quizOption2}>B: {quizOption2}</option>}
+              {quizOption3 && <option value={quizOption3}>C: {quizOption3}</option>}
+              {quizOption4 && <option value={quizOption4}>D: {quizOption4}</option>}
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
+            <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)} style={{ flex: 1 }}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+              {editMode ? "Save Changes" : "Create Question"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
