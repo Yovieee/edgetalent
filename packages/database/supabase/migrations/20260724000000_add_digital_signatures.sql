@@ -6,6 +6,8 @@ ALTER TABLE public.talent_certificates
 ADD COLUMN IF NOT EXISTS digital_signature TEXT;
 
 -- Update the verify_certificate RPC to also return the digital_signature field
+-- Must DROP first because return type is changing (adding digital_signature column)
+DROP FUNCTION IF EXISTS public.verify_certificate(TEXT);
 CREATE OR REPLACE FUNCTION public.verify_certificate(p_credential_id TEXT)
 RETURNS TABLE (
   cert_type TEXT,
