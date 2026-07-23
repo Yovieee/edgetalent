@@ -431,16 +431,24 @@ export default function CertificateVerificationPage(): React.ReactElement {
                         {certificate.credential_id}
                       </span>
                     </div>
-                    <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em" }}>Issue Date</div>
-                    <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", marginTop: "0.05rem" }}>
-                      {new Date(certificate.issue_date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </div>
-                    {certificate.expiration_date && (
-                      <div style={{ fontSize: "0.68rem", color: "#dc2626", marginTop: "0.1rem" }}>
-                        Expires: {new Date(certificate.expiration_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short' })}
+                    <div style={{ display: "flex", gap: "0.85rem", marginTop: "0.1rem" }}>
+                      <div>
+                        <div style={{ fontSize: "0.6rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em" }}>Issue Date</div>
+                        <div style={{ fontSize: "0.76rem", fontWeight: 700, color: "#0f172a", marginTop: "0.02rem" }}>
+                          {new Date(certificate.issue_date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                        </div>
                       </div>
-                    )}
-                    <div style={{ fontSize: "0.65rem", color: "#059669", marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
+                      <div>
+                        <div style={{ fontSize: "0.6rem", color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.08em" }}>Expiration (2 Yrs)</div>
+                        <div style={{ fontSize: "0.76rem", fontWeight: 700, color: "#991b1b", marginTop: "0.02rem" }}>
+                          {new Date(
+                            certificate.expiration_date || 
+                            new Date(new Date(certificate.issue_date || Date.now()).setFullYear(new Date(certificate.issue_date || Date.now()).getFullYear() + 2))
+                          ).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: "0.63rem", color: "#059669", marginTop: "0.15rem", display: "flex", alignItems: "center", gap: "0.2rem", fontWeight: 600 }}>
                       <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#059669", display: "inline-block" }} /> Scan to Verify Online
                     </div>
                   </div>
