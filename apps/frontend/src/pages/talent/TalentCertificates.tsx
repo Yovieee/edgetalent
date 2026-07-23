@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
-import { Plus, X, Printer, Check, Copy, ShieldCheck, Award, Share2 } from "lucide-react";
+import { Plus, X, Download, Check, Copy, ShieldCheck, Award, Share2 } from "lucide-react";
 import { generateNanoId } from "../../utils/nanoid";
+import { downloadCertificateAsPdf } from "../../utils/pdf";
 
 export default function TalentCertificates(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -17,6 +18,8 @@ export default function TalentCertificates(): React.ReactElement {
   const [selectedExternalCert, setSelectedExternalCert] = useState<any | null>(null);
   const [copiedCertId, setCopiedCertId] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
+  const [downloadingPdf, setDownloadingPdf] = useState<boolean>(false);
+  const certRef = useRef<HTMLDivElement>(null);
 
   const [certName, setCertName] = useState<string>("");
   const [certIssuer, setCertIssuer] = useState<string>("");
@@ -495,9 +498,21 @@ export default function TalentCertificates(): React.ReactElement {
                   <button
                     className="btn btn-primary"
                     style={{ fontSize: "0.85rem", padding: "0.5rem 1rem", gap: "0.4rem" }}
-                    onClick={() => window.print()}
+                    disabled={downloadingPdf}
+                    onClick={async () => {
+                      if (!certRef.current || !selectedEnrollmentCert) return;
+                      setDownloadingPdf(true);
+                      try {
+                        const recipientName = profile?.full_name || profile?.email || "Talent";
+                        const courseTitle = selectedEnrollmentCert.courses?.title || "Course";
+                        const fileName = `${recipientName}_${courseTitle}_Certificate.pdf`.replace(/[^a-zA-Z0-9._-]/g, "_");
+                        await downloadCertificateAsPdf(certRef.current, fileName);
+                      } finally {
+                        setDownloadingPdf(false);
+                      }
+                    }}
                   >
-                    <Printer size={16} /> Print / Save PDF
+                    <Download size={16} /> {downloadingPdf ? "Saving PDF..." : "Save PDF"}
                   </button>
 
                   <button
@@ -513,6 +528,7 @@ export default function TalentCertificates(): React.ReactElement {
 
               {/* Certificate Print Layout */}
               <div
+                ref={certRef}
                 className="print-certificate-container"
                 style={{
                   width: "100%",

@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSupabase } from "../context/SupabaseContext";
 import { 
-  ShieldCheck, Search, Award, Check, Copy, Printer, ArrowLeft, ExternalLink, AlertTriangle
+  ShieldCheck, Search, Award, Check, Copy, Download, ArrowLeft, ExternalLink, AlertTriangle
 } from "lucide-react";
 import logo from "../assets/logo.png";
+import { downloadCertificateAsPdf } from "../utils/pdf";
 
 interface CertificateResult {
   cert_type: "platform" | "external";
@@ -29,6 +30,8 @@ export default function CertificateVerificationPage(): React.ReactElement {
   const [certificate, setCertificate] = useState<CertificateResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
+  const [downloadingPdf, setDownloadingPdf] = useState<boolean>(false);
+  const certRef = useRef<HTMLDivElement>(null);
 
   const verifyCertificateId = useCallback(async (searchId: string) => {
     const cleanId = searchId.trim().toUpperCase();
@@ -278,15 +281,26 @@ export default function CertificateVerificationPage(): React.ReactElement {
                 <button
                   className="btn btn-primary"
                   style={{ fontSize: "0.85rem", padding: "0.5rem 1rem", gap: "0.4rem" }}
-                  onClick={() => window.print()}
+                  disabled={downloadingPdf}
+                  onClick={async () => {
+                    if (!certRef.current || !certificate) return;
+                    setDownloadingPdf(true);
+                    try {
+                      const fileName = `${certificate.recipient_name}_${certificate.title}_Certificate.pdf`.replace(/[^a-zA-Z0-9._-]/g, "_");
+                      await downloadCertificateAsPdf(certRef.current, fileName);
+                    } finally {
+                      setDownloadingPdf(false);
+                    }
+                  }}
                 >
-                  <Printer size={16} /> Print / Save PDF
+                  <Download size={16} /> {downloadingPdf ? "Saving PDF..." : "Save PDF"}
                 </button>
               </div>
             </div>
 
             {/* Print Certificate Layout */}
             <div
+              ref={certRef}
               className="print-certificate-container"
               style={{
                 width: "100%",
