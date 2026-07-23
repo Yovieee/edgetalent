@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useSupabase } from "../../context/SupabaseContext";
 import { Plus, X, Download, Check, Copy, ShieldCheck, Award, Share2 } from "lucide-react";
 import { generateNanoId } from "../../utils/nanoid";
@@ -443,7 +444,7 @@ export default function TalentCertificates(): React.ReactElement {
         const verificationUrl = `${window.location.origin}/verify/${modalCredId}`;
         const qrCodeImg = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(verificationUrl)}`;
 
-        return (
+        return createPortal(
           <div
             className="modal-overlay no-print-backdrop"
             onClick={() => setSelectedEnrollmentCert(null)}
@@ -541,13 +542,12 @@ export default function TalentCertificates(): React.ReactElement {
                 </div>
               </div>
 
-              {/* Certificate Print Layout */}
-              <div
+              {/* Printable Certificate Card */}
+              <div 
                 ref={certRef}
-                className="print-certificate-container"
                 style={{
                   width: "100%",
-                  aspectRatio: "1.414", // Standard A4 Landscape ratio
+                  maxWidth: "800px",
                   background: "#ffffff",
                   color: "#0f172a",
                   position: "relative",
@@ -556,12 +556,15 @@ export default function TalentCertificates(): React.ReactElement {
                   boxShadow: "0 20px 50px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.06)",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-between",
                   alignItems: "center",
+                  justifyContent: "space-between",
+                  boxSizing: "border-box",
+                  aspectRatio: "1.414 / 1",
                   overflow: "hidden"
                 }}
+                className="certificate-print-container"
               >
-                {/* Geometric Gold & Blue Frame Lines */}
+                {/* Certificate Gold Outer Border */}
                 <div style={{
                   position: "absolute",
                   inset: "12px",
@@ -570,6 +573,7 @@ export default function TalentCertificates(): React.ReactElement {
                   pointerEvents: "none",
                   zIndex: 2
                 }} />
+                {/* Certificate Inner Dashed Border */}
                 <div style={{
                   position: "absolute",
                   inset: "18px",
@@ -597,29 +601,22 @@ export default function TalentCertificates(): React.ReactElement {
                   <circle cx="26" cy="26" r="3" fill="#2563eb" />
                 </svg>
 
-                {/* Background Guilloche Watermark Pattern */}
-                <svg
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    opacity: 0.06,
-                    pointerEvents: "none",
-                    zIndex: 1,
-                    width: "475px",
-                    height: "475px"
-                  }}
-                  viewBox="0 0 200 200"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="100" cy="100" r="90" stroke="#b45309" strokeWidth="1" strokeDasharray="2 2" />
-                  <circle cx="100" cy="100" r="75" stroke="#0284c7" strokeWidth="1" />
-                  <circle cx="100" cy="100" r="60" stroke="#b45309" strokeWidth="0.8" strokeDasharray="3 3" />
-                  <polygon points="100,10 125,50 170,30 150,75 190,100 150,125 170,170 125,150 100,190 75,150 30,170 50,125 10,100 50,75 30,30 75,50" stroke="#0284c7" strokeWidth="1" fill="none" />
-                  <polygon points="100,25 120,60 155,45 140,80 175,100 140,120 155,155 120,140 100,175 80,140 45,155 60,120 25,100 60,80 45,45 80,60" stroke="#d97706" strokeWidth="0.8" fill="none" />
-                </svg>
+                {/* Subtle Background Seal Watermark */}
+                <div style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  opacity: 0.04,
+                  pointerEvents: "none",
+                  zIndex: 1
+                }}>
+                  <svg width="475" height="475" viewBox="0 0 200 200" fill="none">
+                    <circle cx="100" cy="100" r="90" stroke="#1d4ed8" strokeWidth="4" />
+                    <circle cx="100" cy="100" r="70" stroke="#d97706" strokeWidth="2" strokeDasharray="4 4" />
+                    <path d="M100 30L120 80H170L130 110L145 160L100 130L55 160L70 110L30 80H80L100 30Z" fill="#1d4ed8" />
+                  </svg>
+                </div>
 
                 {/* Top Header Badge */}
                 <div style={{ zIndex: 4, textAlign: "center", width: "100%" }}>
@@ -645,7 +642,6 @@ export default function TalentCertificates(): React.ReactElement {
                     <h2 style={{ fontSize: "2.3rem", fontWeight: 700, color: "#1d4ed8", fontFamily: "Georgia, 'Times New Roman', serif", margin: "0 0 0.2rem 0", letterSpacing: "0.02em" }}>
                       {profile?.full_name || "Talent Member"}
                     </h2>
-                    <div style={{ height: "2px", width: "65%", background: "linear-gradient(90deg, transparent, #d97706, transparent)", margin: "0 auto" }} />
                   </div>
 
                   <p style={{ color: "#334155", fontSize: "1.02rem", lineHeight: 1.45, margin: "0.15rem 0 0 0" }}>
@@ -679,8 +675,8 @@ export default function TalentCertificates(): React.ReactElement {
                     <div style={{ padding: "0.25rem", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 4px rgba(0,0,0,0.05)" }}>
                       <img 
                         src={qrCodeImg} 
-                        alt="Scannable Certificate Verification QR Code" 
-                        style={{ width: "81px", height: "81px", display: "block" }} 
+                        alt="Scannable Credential QR Code" 
+                        style={{ width: "62px", height: "62px" }} 
                       />
                     </div>
                     <div>
@@ -725,7 +721,8 @@ export default function TalentCertificates(): React.ReactElement {
                 </div>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         );
       })()}
 
