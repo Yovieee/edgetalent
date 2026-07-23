@@ -1,3 +1,6 @@
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 /**
  * Computes a SHA-256 cryptographic signature hex digest for the certificate payload.
  */
