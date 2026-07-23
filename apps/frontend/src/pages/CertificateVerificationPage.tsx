@@ -450,11 +450,11 @@ export default function CertificateVerificationPage(): React.ReactElement {
                 {/* Right Signatures */}
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontFamily: "'Brush Script MT', cursive, sans-serif", fontSize: "1.6rem", color: "#1d4ed8", fontStyle: "italic", lineHeight: 1, marginBottom: "0.1rem" }}>
-                    A. Vance
+                    B. Yonas Vikariandi
                   </div>
                   <div style={{ height: "1px", width: "120px", background: "#cbd5e1", margin: "0.2rem 0 0.2rem auto" }} />
-                  <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Dr. Arthur Vance</div>
-                  <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>Authorized Registrar</div>
+                  <div style={{ fontSize: "0.7rem", color: "#0f172a", fontWeight: 700 }}>Blasius Yonas Vikariandi</div>
+                  <div style={{ fontSize: "0.62rem", color: "#64748b", textTransform: "uppercase" }}>EdgeTalent CEO</div>
                 </div>
               </div>
 
