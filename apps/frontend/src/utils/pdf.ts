@@ -1,5 +1,6 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { signPdfWithEidasSeal } from "./pdfSigner";
 
 /**
  * Computes a SHA-256 content fingerprint hex digest for the certificate payload.
@@ -297,7 +298,30 @@ export async function downloadCertificateAsPdf(
       ? filename
       : `${filename}.pdf`;
 
-    pdf.save(cleanFilename);
+    // Export raw PDF ArrayBuffer
+    const pdfArrayBuffer = pdf.output("arraybuffer");
+
+    try {
+      // Embed eIDAS Article 3(10) Electronic Signature & Article 3(25) Electronic Seal (PKCS#7 / X.509 Certificate)
+      const signedPdfBytes = await signPdfWithEidasSeal(pdfArrayBuffer, {
+        signerName: "Blasius Yonas Vikariandi, EdgeTalent CEO",
+        reason: "Official EdgeTalent Certificate Authenticity & Integrity Seal (eIDAS Art 3(10) & 3(25) Compliant)",
+        location: "EdgeTalent Verification Portal (https://edgetalent.space)",
+        contactInfo: "verify@edgetalent.space",
+      });
+
+      const blob = new Blob([signedPdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = cleanFilename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (signingError) {
+      console.warn("Digital signing fallback: saving unsealed PDF:", signingError);
+      pdf.save(cleanFilename);
+    }
   } catch (error) {
     console.error("Error generating certificate PDF:", error);
     alert("Failed to download PDF certificate. Please try again.");

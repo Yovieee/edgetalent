@@ -11,10 +11,15 @@
   },
   "dependencies": {
     "@edgetalent/shared": "workspace:*",
+    "@signpdf/placeholder-pdf-lib": "^3.3.0",
+    "@signpdf/signer-p12": "^3.3.0",
+    "@signpdf/signpdf": "^3.3.0",
     "@supabase/supabase-js": "^2.110.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.25.0",
+    "node-forge": "^1.4.0",
+    "pdf-lib": "^1.17.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.1.5",
@@ -22,6 +27,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "@types/node-forge": "^1.3.14",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
