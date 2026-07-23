@@ -445,19 +445,8 @@ export default function TalentCertificates(): React.ReactElement {
 
         return (
           <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(15, 23, 42, 0.85)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1001,
-            }}
-            className="no-print-backdrop"
+            className="modal-overlay no-print-backdrop"
+            onClick={() => setSelectedEnrollmentCert(null)}
           >
             <div
               className="glass-panel animate-fade-in"
@@ -471,6 +460,7 @@ export default function TalentCertificates(): React.ReactElement {
                 flexDirection: "column",
                 alignItems: "center"
               }}
+              onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Controls */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "1.25rem" }} className="no-print">
