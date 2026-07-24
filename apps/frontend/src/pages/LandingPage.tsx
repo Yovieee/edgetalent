@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSupabase } from "../context/SupabaseContext";
 import { 
   ArrowRight, BookOpen, Terminal, RefreshCw, Search, GraduationCap, 
-  Check, Briefcase, Star, ChevronDown
+  Briefcase, Star, ChevronDown, Award, Zap, ShieldCheck, 
+  Users, Sparkles, CheckCircle2
 } from "lucide-react";
 import Modal from "../components/Modal";
 import logo from "../assets/logo.png";
@@ -21,6 +22,9 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
   const [searchEventQuery, setSearchEventQuery] = useState<string>("");
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [showEventDetailModal, setShowEventDetailModal] = useState<boolean>(false);
+
+  // Certificate Quick-Verify State
+  const [verifyIdInput, setVerifyIdInput] = useState<string>("");
 
   useEffect(() => {
     async function loadPublicEvents() {
@@ -236,13 +240,19 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
     }, 1500);
   };
 
-  // Run initial search to show user some output right away when they open Partner tab
+  // Run initial search when partner tab opens
   useEffect(() => {
     if (activeTab === "partner" && matchResults.length === 0) {
       handleRunSearch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  const handleQuickVerifySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verifyIdInput.trim()) return;
+    onNavigate(`verify`);
+  };
 
   const faqs = [
     {
@@ -265,28 +275,29 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
 
   return (
     <div className="landing-wrapper" style={{ position: "relative", overflow: "hidden" }}>
-      {/* Decorative Blur Ambient Elements */}
+      {/* Subtle Ambient Background Glows */}
       <div className="ambient-glow glow-cyan-left"></div>
       <div className="ambient-glow glow-purple-right"></div>
 
       {/* Modern Sticky Navigation */}
       <nav className="navbar animate-fade-in" id="landing-nav">
         <div className="navbar-brand" onClick={() => onNavigate("/")} id="logo-brand">
-          <img src={logo} alt="EdgeTalent Logo" style={{ width: "30px", height: "30px", marginRight: "0.5rem", objectFit: "contain" }} />
+          <img src={logo} alt="EdgeTalent Logo" style={{ width: "32px", height: "32px", marginRight: "0.5rem", objectFit: "contain" }} />
           EdgeTalent
         </div>
         <div className="navbar-tabs" style={{ gap: "1.5rem" }}>
           <a href="#features" className="nav-tab">Features</a>
           <a href="#pillars" className="nav-tab">Ecosystem Pillars</a>
+          <a href="#verify-certificate" className="nav-tab">Quick Verify</a>
           <a href="#events" className="nav-tab">Events</a>
-          <a href="/verify" className="nav-tab" style={{ color: "var(--color-cyan)", fontWeight: 600 }}>Verify Certificate</a>
+          <a href="#stats" className="nav-tab">Metrics</a>
           <a href="#faqs" className="nav-tab">FAQs</a>
         </div>
         <div style={{ display: "flex", gap: "0.75rem" }}>
-          <button className="btn btn-secondary" onClick={() => onNavigate("auth")} id="nav-btn-login">
+          <button className="btn btn-secondary" onClick={() => onNavigate("/auth")} id="nav-btn-login">
             Login
           </button>
-          <button className="btn btn-primary" onClick={() => onNavigate("auth")} id="nav-btn-register">
+          <button className="btn btn-primary" onClick={() => onNavigate("/auth")} id="nav-btn-register">
             Get Started
           </button>
         </div>
@@ -296,7 +307,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
       <div className="landing-container animate-fade-in" style={{ maxWidth: "1200px", margin: "0 auto", padding: "1rem 2rem 4rem 2rem", position: "relative", zIndex: 1 }}>
         
         {/* Hero Section */}
-        <header className="landing-grid" style={{ marginBottom: "6rem", minHeight: "60vh" }}>
+        <header className="landing-grid" style={{ marginBottom: "5rem", minHeight: "60vh", alignItems: "center" }}>
           <div className="hero-text-block">
             <div style={{ display: "inline-flex", gap: "0.5rem", alignItems: "center", marginBottom: "1.5rem" }}>
               <span className="badge badge-cyan" style={{ fontSize: "0.85rem", padding: "0.4rem 0.9rem" }}>EdgeTalent Ecosystem</span>
@@ -305,85 +316,106 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             <h1 style={{ fontSize: "3.25rem", lineHeight: "1.15", marginBottom: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)" }}>
               Bridging <span style={{ background: "linear-gradient(135deg, var(--color-purple) 0%, var(--color-cyan) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Talent Development</span> & Industrial Demand
             </h1>
-            <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem", marginBottom: "2.25rem", lineHeight: "1.6", maxWidth: "560px" }}>
+            <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginBottom: "2.25rem", lineHeight: "1.6", maxWidth: "580px" }}>
               Accelerate your professional career with AI-guided roadmap diagnostics or hire elite vetted candidates matched using semantic pgvector vector similarity searches.
             </p>
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <button className="btn btn-primary" onClick={() => onNavigate("auth")} style={{ padding: "0.75rem 1.5rem" }} id="hero-btn-talent">
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "2.5rem" }}>
+              <button className="btn btn-primary" onClick={() => onNavigate("/auth")} style={{ padding: "0.85rem 1.75rem", fontSize: "0.95rem" }} id="hero-btn-talent">
                 Join as Talent
-                <ArrowRight size={16} />
+                <ArrowRight size={18} />
               </button>
-              <button className="btn btn-secondary" onClick={() => onNavigate("auth")} style={{ padding: "0.75rem 1.5rem" }} id="hero-btn-partner">
+              <button className="btn btn-secondary" onClick={() => onNavigate("/auth")} style={{ padding: "0.85rem 1.75rem", fontSize: "0.95rem" }} id="hero-btn-partner">
                 Hire Elite Teams
               </button>
+            </div>
+
+            {/* Quick Stat Highlights Pill Bar */}
+            <div className="glass-panel" style={{ padding: "0.875rem 1.25rem", display: "inline-flex", gap: "1.75rem", alignItems: "center", background: "rgba(255,255,255,0.75)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Users size={16} color="var(--color-purple)" />
+                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}><strong>10,000+</strong> Talents</span>
+              </div>
+              <div style={{ width: "1px", height: "16px", background: "var(--glass-border)" }}></div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Zap size={16} color="var(--color-cyan)" />
+                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}><strong>98.7%</strong> Vector Accuracy</span>
+              </div>
+              <div style={{ width: "1px", height: "16px", background: "var(--glass-border)" }}></div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <ShieldCheck size={16} color="var(--color-emerald)" />
+                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}><strong>1,536d</strong> Embeddings</span>
+              </div>
             </div>
           </div>
 
           {/* Floating Simulated Dashboard Mockup */}
           <div className="hero-mockup-block animate-float" style={{ position: "relative" }}>
-            <div className="glass-panel" style={{ padding: "1.25rem", width: "100%", maxWidth: "460px", margin: "0 auto", position: "relative" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", borderBottom: "1px solid var(--glass-border)", paddingBottom: "0.5rem" }}>
-                <div style={{ display: "flex", gap: "0.35rem" }}>
+            <div className="glass-panel" style={{ padding: "1.5rem", width: "100%", maxWidth: "480px", margin: "0 auto", position: "relative", boxShadow: "0 20px 40px -15px rgba(0,0,0,0.08)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem", borderBottom: "1px solid var(--glass-border)", paddingBottom: "0.75rem" }}>
+                <div style={{ display: "flex", gap: "0.4rem" }}>
                   <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#ef4444" }}></span>
                   <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#eab308" }}></span>
                   <span style={{ width: "10px", height: "10px", borderRadius: "50%", background: "#22c55e" }}></span>
                 </div>
-                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "monospace" }}>talent_matrix_diagnostics.exe</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "monospace", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <Sparkles size={12} color="var(--color-purple)" />
+                  talent_matrix_diagnostics.exe
+                </div>
               </div>
 
               {/* Mock Dashboard Widgets */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
-                <div style={{ display: "flex", gap: "0.875rem" }}>
-                  <div className="glass-panel" style={{ flex: 1, padding: "0.875rem", background: "var(--bg-tertiary)" }}>
-                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>AI Match Accuracy</div>
-                    <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-cyan)", marginTop: "0.25rem" }}>98.7%</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div style={{ display: "flex", gap: "1rem" }}>
+                  <div className="glass-panel" style={{ flex: 1, padding: "1rem", background: "var(--bg-tertiary)" }}>
+                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>AI Match Accuracy</div>
+                    <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--color-cyan)", marginTop: "0.25rem" }}>98.7%</div>
                   </div>
-                  <div className="glass-panel" style={{ flex: 1, padding: "0.875rem", background: "var(--bg-tertiary)" }}>
-                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>Skills Vector</div>
-                    <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--color-purple)", marginTop: "0.25rem" }}>1,536d</div>
+                  <div className="glass-panel" style={{ flex: 1, padding: "1rem", background: "var(--bg-tertiary)" }}>
+                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>Skills Vector</div>
+                    <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--color-purple)", marginTop: "0.25rem" }}>1,536d</div>
                   </div>
                 </div>
 
-                <div className="glass-panel" style={{ padding: "0.875rem", background: "var(--bg-tertiary)" }}>
+                <div className="glass-panel" style={{ padding: "1rem", background: "var(--bg-tertiary)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                    <span style={{ fontSize: "0.75rem", fontWeight: 600 }}>Upskilling Progress</span>
-                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--color-emerald)" }}>80% Done</span>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 600 }}>Upskilling Progress</span>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--color-emerald)" }}>80% Complete</span>
                   </div>
-                  <div style={{ height: "6px", background: "rgba(0,0,0,0.06)", borderRadius: "999px", overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: "80%", background: "var(--color-emerald)", borderRadius: "999px" }}></div>
+                  <div style={{ height: "7px", background: "rgba(0,0,0,0.06)", borderRadius: "999px", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: "80%", background: "var(--color-emerald)", borderRadius: "999px", transition: "width 1s ease" }}></div>
                   </div>
                 </div>
 
-                <div className="glass-panel" style={{ padding: "0.875rem", background: "var(--bg-tertiary)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e" }}></div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
-                    <strong>Partner Search:</strong> Matched 8 talents for "Python/AI Developer"
+                <div className="glass-panel" style={{ padding: "0.875rem", background: "var(--bg-tertiary)", display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                  <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#22c55e", flexShrink: 0 }}></div>
+                  <div style={{ fontSize: "0.775rem", color: "var(--text-secondary)" }}>
+                    <strong>Partner Search:</strong> Matched 8 candidates for "Python/AI Specialist"
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Behind Ambient Glow Card */}
-            <div className="glass-panel animate-float-delayed" style={{ position: "absolute", top: "30px", right: "-15px", width: "150px", padding: "0.875rem", background: "var(--bg-secondary)", zIndex: -1, opacity: 0.9 }}>
-              <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Talent Earnings</div>
-              <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#10b981", margin: "0.2rem 0" }}>+$12,450</div>
-              <span className="badge badge-emerald" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>Contract Paid</span>
+            {/* Floating Side Badge */}
+            <div className="glass-panel animate-float-delayed" style={{ position: "absolute", top: "25px", right: "-10px", width: "160px", padding: "0.9rem", background: "var(--bg-secondary)", zIndex: -1, opacity: 0.95, boxShadow: "0 10px 25px rgba(0,0,0,0.05)" }}>
+              <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>Contract Earnings</div>
+              <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#10b981", margin: "0.2rem 0" }}>+$12,450</div>
+              <span className="badge badge-emerald" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem" }}>Escrow Verified</span>
             </div>
           </div>
         </header>
 
         {/* Interactive Feature Showcase Section */}
-        <section id="features" className="showcase-container">
-          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-            <span className="badge badge-cyan" style={{ marginBottom: "1rem", padding: "0.4rem 0.9rem" }}>Live Playground</span>
+        <section id="features" className="showcase-container" style={{ margin: "5rem 0" }}>
+          <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
+            <span className="badge badge-cyan" style={{ marginBottom: "1rem", padding: "0.4rem 0.9rem" }}>Live Interactive Playground</span>
             <h2 style={{ fontSize: "2.75rem", marginBottom: "1rem" }}>Experience EdgeTalent in Action</h2>
-            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto" }}>
-              Interact with our simulated core interfaces to see how we parse skill-gaps and compute vector-similarity matches.
+            <p style={{ color: "var(--text-secondary)", maxWidth: "620px", margin: "0 auto", fontSize: "1rem", lineHeight: "1.6" }}>
+              Interact with our live simulated interfaces to test AI skill gap diagnostics and pgvector cosine similarity candidate search.
             </p>
           </div>
 
           {/* Selector Tabs */}
-          <div className="showcase-tabs">
+          <div className="showcase-tabs" style={{ marginBottom: "1.5rem" }}>
             <button
               className={`showcase-tab-btn ${activeTab === "talent" ? "active-talent" : ""}`}
               onClick={() => setActiveTab("talent")}
@@ -402,22 +434,22 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             </button>
           </div>
 
-          {/* Interactive Panels */}
-          <div className="glass-panel" style={{ padding: "2.5rem", minHeight: "450px" }}>
+          {/* Interactive Panels Container */}
+          <div className="glass-panel" style={{ padding: "2.5rem", minHeight: "460px" }}>
             
             {/* 1. TALENT ANALYZER PLAYGROUND */}
             {activeTab === "talent" && (
               <div className="showcase-panel">
                 <div>
-                  <h3 style={{ fontSize: "1.75rem", marginBottom: "1rem", color: "var(--text-primary)" }}>
+                  <h3 style={{ fontSize: "1.65rem", marginBottom: "0.75rem", color: "var(--text-primary)" }}>
                     Skills & Interests Diagnostics
                   </h3>
-                  <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem", lineHeight: "1.6" }}>
-                    Select a target profile direction below. The simulator will pass simulated quiz scores and career interests to a mock Deno Edge Function client to index the skills and identify gaps.
+                  <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem", lineHeight: "1.6", fontSize: "0.9rem" }}>
+                    Select a target profile preset below. The simulator passes quiz scores and career interests to our Deno Edge Function client to index verified skills and flag missing learning roadmaps.
                   </p>
 
-                  <div className="form-group" style={{ marginBottom: "1.5rem" }}>
-                    <label style={{ fontWeight: 700, fontSize: "0.8rem" }}>Choose Target Role Preset:</label>
+                  <div className="form-group" style={{ marginBottom: "1.25rem" }}>
+                    <label style={{ fontWeight: 700, fontSize: "0.75rem" }}>Choose Target Role Preset:</label>
                     <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
                       {(["frontend", "backend", "ai"] as const).map((role) => (
                         <button
@@ -436,8 +468,8 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                     </div>
                   </div>
 
-                  <div className="form-group" style={{ marginBottom: "2rem" }}>
-                    <label style={{ fontWeight: 700, fontSize: "0.8rem" }}>Simulated CV / Description Input:</label>
+                  <div className="form-group" style={{ marginBottom: "1.75rem" }}>
+                    <label style={{ fontWeight: 700, fontSize: "0.75rem" }}>Simulated Quiz & Target Profile Payload:</label>
                     <textarea
                       className="form-textarea"
                       style={{ height: "90px", resize: "none", fontSize: "0.85rem", background: "rgba(0,0,0,0.02)" }}
@@ -450,7 +482,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                     className="btn btn-success"
                     onClick={handleRunAnalysis}
                     disabled={isRunningAnalysis}
-                    style={{ width: "100%", padding: "0.8rem", justifyContent: "center" }}
+                    style={{ width: "100%", padding: "0.85rem", justifyContent: "center", fontSize: "0.9rem" }}
                     id="btn-run-analysis"
                   >
                     {isRunningAnalysis ? (
@@ -476,9 +508,9 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                 </div>
 
                 {/* Right Side Terminal & Results */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                   <div className="form-group">
-                    <label style={{ fontWeight: 700, fontSize: "0.8rem", color: "var(--text-muted)" }}>Edge Execution Console Logs:</label>
+                    <label style={{ fontWeight: 700, fontSize: "0.75rem", color: "var(--text-muted)" }}>Edge Execution Console Logs:</label>
                     <div className="sim-terminal" ref={terminalRef} id="talent-terminal-logs">
                       {talentLogs.length === 0 && (
                         <div style={{ color: "var(--text-muted)", fontStyle: "italic" }}>
@@ -500,8 +532,8 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
 
                   {/* Diagnostic Output */}
                   {analysisResult && (
-                    <div className="glass-panel animate-fade-in" style={{ padding: "1.25rem", background: "rgba(255,255,255,0.4)" }} id="talent-analysis-results">
-                      <h4 style={{ fontSize: "1rem", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <div className="glass-panel animate-fade-in" style={{ padding: "1.25rem", background: "rgba(255,255,255,0.5)" }} id="talent-analysis-results">
+                      <h4 style={{ fontSize: "0.95rem", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10b981" }}></span>
                         Diagnostic Mapping Complete
                       </h4>
@@ -517,7 +549,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                         </div>
 
                         <div>
-                          <div style={{ fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.25rem", color: "var(--text-secondary)" }}>Identified Skill Gaps:</div>
+                          <div style={{ fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.3rem", color: "var(--text-secondary)" }}>Identified Skill Gaps:</div>
                           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
                             {analysisResult.skillGaps.map((gap, i) => (
                               <span key={i} className="badge badge-rose" style={{ fontSize: "0.7rem" }}>{gap}</span>
@@ -544,21 +576,22 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             {activeTab === "partner" && (
               <div className="showcase-panel">
                 <div>
-                  <h3 style={{ fontSize: "1.75rem", marginBottom: "1rem", color: "var(--text-primary)" }}>
-                    pgvector Vector Similarity search
+                  <h3 style={{ fontSize: "1.65rem", marginBottom: "0.75rem", color: "var(--text-primary)" }}>
+                    pgvector Vector Similarity Search
                   </h3>
-                  <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem", lineHeight: "1.6" }}>
-                    Post a project scope or type a search query. The database will perform a high-speed cosine vector match query to rank candidates.
+                  <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem", lineHeight: "1.6", fontSize: "0.9rem" }}>
+                    Select a target project requirement preset. The database executes a high-speed cosine vector match query on 1,536-dimensional embeddings to rank optimal talent profiles.
                   </p>
 
                   <div className="form-group" style={{ marginBottom: "1.5rem" }}>
-                    <label style={{ fontWeight: 700, fontSize: "0.8rem" }}>Select Semantic Query Preset:</label>
+                    <label style={{ fontWeight: 700, fontSize: "0.75rem" }}>Select Semantic Query Preset:</label>
                     <select
                       className="form-select"
                       value={searchPreset}
                       onChange={(e) => setSearchPreset(e.target.value)}
                       disabled={isSearching}
                       id="select-search-query"
+                      style={{ fontSize: "0.875rem" }}
                     >
                       <option value="Senior React Developer with cloud skills">React UI Developer + Cloud</option>
                       <option value="Python developer for AI embedding pipeline">Python Backend & Vector Databases</option>
@@ -570,7 +603,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                     className="btn btn-primary"
                     onClick={handleRunSearch}
                     disabled={isSearching}
-                    style={{ width: "100%", padding: "0.8rem", justifyContent: "center" }}
+                    style={{ width: "100%", padding: "0.85rem", justifyContent: "center", fontSize: "0.9rem" }}
                     id="btn-run-search"
                   >
                     {isSearching ? (
@@ -598,12 +631,12 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                 {/* Right Side Match Cards */}
                 <div>
                   <div className="form-group">
-                    <label style={{ fontWeight: 700, fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>
+                    <label style={{ fontWeight: 700, fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>
                       pgvector Match Rankings (Cosine Distance &lt;=&gt;):
                     </label>
                     
                     {isSearching ? (
-                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px", flexDirection: "column", gap: "0.5rem" }}>
+                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "220px", flexDirection: "column", gap: "0.75rem" }}>
                         <div style={{
                           width: "36px",
                           height: "36px",
@@ -658,17 +691,17 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           </div>
         </section>
 
-        {/* Pillars Section */}
+        {/* Ecosystem Blueprint Section */}
         <section id="pillars" style={{ margin: "6rem 0" }}>
           <div style={{ textAlign: "center", marginBottom: "4rem" }}>
             <span className="badge badge-purple" style={{ marginBottom: "1rem", padding: "0.4rem 0.9rem" }}>Ecosystem Blueprint</span>
             <h2 style={{ fontSize: "2.75rem", marginBottom: "1rem" }}>The Double-Sided EdgeTalent Network</h2>
-            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto" }}>
+            <p style={{ color: "var(--text-secondary)", maxWidth: "620px", margin: "0 auto", fontSize: "1rem", lineHeight: "1.6" }}>
               Our platform bridges talent growth pathways with actual market delivery structures for seamless matching.
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "3rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2.5rem" }}>
             {/* Pillar 1: Upstream */}
             <div className="glass-panel" style={{ padding: "3rem 2.5rem", textAlign: "left", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--grad-emerald-cyan)" }} />
@@ -676,60 +709,132 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
                 <span className="badge badge-emerald" style={{ fontSize: "0.8rem", padding: "0.4rem 0.8rem" }}>Pillar 1: Upstream</span>
                 <div style={{ background: "#ecfdf5", padding: "0.5rem", borderRadius: "50%", border: "1px solid #d1fae5" }}>
-                  <GraduationCap size={20} color="var(--color-emerald)" />
+                  <GraduationCap size={22} color="var(--color-emerald)" />
                 </div>
               </div>
 
-              <h3 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "0.75rem", color: "var(--text-primary)" }}>EdgeTalent Foundation</h3>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", lineHeight: "1.5", marginBottom: "2rem" }}>
-                Dedicated to upskilling, mentorship, customized structured courses, and career diagnostics. Upload your CV to extract missing concepts and target top pathways.
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.75rem", color: "var(--text-primary)" }}>EdgeTalent Foundation</h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: "1.6", marginBottom: "2rem" }}>
+                Dedicated to upskilling, mentorship, customized structured courses, and career diagnostics. Upload your CV or complete quizzes to identify skill gaps and accelerate your path.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1.5rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  <Check size={16} color="var(--color-emerald)" />
-                  AI Skill Gap Roadmapping
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <CheckCircle2 size={16} color="var(--color-emerald)" />
+                  AI Skill Gap Roadmapping & Quizzes
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  <Check size={16} color="var(--color-emerald)" />
-                  Custom Training & Course Maps
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <CheckCircle2 size={16} color="var(--color-emerald)" />
+                  Custom Training & Verified Academy Courses
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  <Check size={16} color="var(--color-emerald)" />
-                  Incubation & Venture Mentorship
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <CheckCircle2 size={16} color="var(--color-emerald)" />
+                  Incubation & Digital Badge Certification
                 </div>
               </div>
             </div>
 
             {/* Pillar 2: Downstream */}
             <div className="glass-panel" style={{ padding: "3rem 2.5rem", textAlign: "left", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "2px", background: "var(--color-cyan)" }} />
+              <div style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "4px", background: "var(--color-cyan)" }} />
               
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
                 <span className="badge badge-cyan" style={{ fontSize: "0.8rem", padding: "0.4rem 0.8rem" }}>Pillar 2: Downstream</span>
                 <div style={{ background: "#eff6ff", padding: "0.5rem", borderRadius: "50%", border: "1px solid #dbeafe" }}>
-                  <Briefcase size={20} color="var(--color-cyan)" />
+                  <Briefcase size={22} color="var(--color-cyan)" />
                 </div>
               </div>
 
-              <h3 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "0.75rem", color: "var(--text-primary)" }}>EdgeTalent Group</h3>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", lineHeight: "1.5", marginBottom: "2rem" }}>
-                Designed for enterprises and commercial partnerships. We pair corporate requirements with talents using semantic queries. Includes dashboard panels to monitor contract milestones.
+              <h3 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.75rem", color: "var(--text-primary)" }}>EdgeTalent Group</h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: "1.6", marginBottom: "2rem" }}>
+                Designed for enterprises and commercial partnerships. We pair corporate requirements with verified talents using pgvector semantic queries and track contract delivery.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1.5rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  <Check size={16} color="var(--color-cyan)" />
-                  Semantic Talent Match Engine
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <CheckCircle2 size={16} color="var(--color-cyan)" />
+                  Semantic Talent Match Engine (pgvector)
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  <Check size={16} color="var(--color-cyan)" />
-                  Project Manager Posting Portal
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <CheckCircle2 size={16} color="var(--color-cyan)" />
+                  Project Scope & Bounty Posting Portal
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
-                  <Check size={16} color="var(--color-cyan)" />
-                  Milestone tracking & Escrow Contracts
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                  <CheckCircle2 size={16} color="var(--color-cyan)" />
+                  Milestone Management & Escrow Security
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Quick Certificate Verification Section */}
+        <section id="verify-certificate" style={{ margin: "6rem 0" }}>
+          <div className="glass-panel" style={{ padding: "3rem 2.5rem", background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(244,244,245,0.8) 100%)", position: "relative", overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem", alignItems: "center" }}>
+              <div>
+                <div style={{ display: "inline-flex", gap: "0.5rem", alignItems: "center", marginBottom: "1rem" }}>
+                  <span className="badge badge-emerald" style={{ padding: "0.35rem 0.8rem" }}>Cryptographic Proof</span>
+                  <span className="badge badge-cyan" style={{ padding: "0.35rem 0.8rem" }}>Instant Verification</span>
+                </div>
+                <h3 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "0.75rem", color: "var(--text-primary)" }}>
+                  Verify Any EdgeTalent Certificate
+                </h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.6", marginBottom: "1.5rem" }}>
+                  All EdgeTalent course completions and skill accreditations are issued with unique tamper-proof certificate identifiers. Check authenticity in seconds.
+                </p>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Sample IDs:</span>
+                  {["ET-8821-REACT", "ET-9903-AI", "ET-4412-NODE"].map((sample) => (
+                    <button
+                      key={sample}
+                      type="button"
+                      onClick={() => setVerifyIdInput(sample)}
+                      style={{ background: "none", border: "1px dashed var(--text-muted)", borderRadius: "4px", padding: "0.15rem 0.5rem", fontSize: "0.75rem", cursor: "pointer", color: "var(--text-secondary)" }}
+                    >
+                      {sample}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <form onSubmit={handleQuickVerifySubmit} className="glass-panel" style={{ padding: "1.75rem", background: "var(--bg-secondary)" }}>
+                  <div className="form-group" style={{ marginBottom: "1.25rem" }}>
+                    <label style={{ fontWeight: 700, fontSize: "0.75rem" }}>Enter Certificate ID:</label>
+                    <div style={{ position: "relative", marginTop: "0.35rem" }}>
+                      <input
+                        type="text"
+                        placeholder="e.g. ET-8821-REACT"
+                        className="form-input"
+                        value={verifyIdInput}
+                        onChange={(e) => setVerifyIdInput(e.target.value)}
+                        style={{ paddingLeft: "2.5rem", fontSize: "0.9rem" }}
+                        id="quick-verify-input"
+                      />
+                      <Award size={18} style={{ position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)", color: "var(--color-emerald)" }} />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: "0.75rem" }}>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      style={{ flex: 1, padding: "0.75rem", justifyContent: "center" }}
+                      id="quick-verify-btn"
+                    >
+                      Verify Now
+                      <ArrowRight size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => onNavigate("/verify")}
+                      style={{ padding: "0.75rem 1rem" }}
+                    >
+                      Browse Verification Portal
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -737,16 +842,16 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
 
         {/* Public Events Section */}
         <section id="events" style={{ margin: "6rem 0" }}>
-          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+          <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
             <span className="badge badge-rose" style={{ marginBottom: "1rem", padding: "0.4rem 0.9rem" }}>Ecosystem Hub</span>
             <h2 style={{ fontSize: "2.75rem", marginBottom: "1rem" }}>Upcoming Public Events</h2>
-            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto" }}>
+            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto", fontSize: "1rem", lineHeight: "1.6" }}>
               Explore workshops, webinars, and hackathons open to all developers and partners. Sign up to reserve your spot!
             </p>
           </div>
 
           {/* Filters & Search Panel */}
-          <div className="glass-panel" style={{ padding: "1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between", marginBottom: "2.5rem" }}>
+          <div className="glass-panel" style={{ padding: "1.25rem 1.5rem", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between", marginBottom: "2.5rem" }}>
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               {["All", "Hackathon", "Webinar", "Workshop", "Networking", "Pitch Night"].map((cat) => (
                 <button
@@ -801,7 +906,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
                 {filtered.map((evt) => {
                   return (
-                    <div key={evt.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem", transition: "transform 0.2s, box-shadow 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
+                    <div key={evt.id} className="glass-panel animate-fade-in" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "1.5rem", transition: "transform 0.2s, box-shadow 0.2s" }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.06)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
                       <div>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
                           <span className={`badge ${
@@ -849,11 +954,11 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                           style={{ flex: 1.5, padding: "0.6rem", justifyContent: "center" }}
                           onClick={() => {
                             alert("To RSVP / Register for this event, please sign in or register a new account.");
-                            onNavigate("auth");
+                            onNavigate("/auth");
                           }}
                           id={`evt-rsvp-${evt.id}`}
                         >
-                          RSVP / Register
+                          RSVP Event
                         </button>
                       </div>
                     </div>
@@ -875,12 +980,12 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             <div className="stat-label">Corporate Partners</div>
           </div>
           <div className="glass-panel stat-card">
-            <div className="stat-number purple" style={{ background: "var(--grad-cyan-purple)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>98%</div>
-            <div className="stat-label">Match Accuracy</div>
+            <div className="stat-number purple" style={{ background: "var(--grad-cyan-purple)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>98.7%</div>
+            <div className="stat-label">Vector Match Accuracy</div>
           </div>
           <div className="glass-panel stat-card">
             <div className="stat-number amber">$1.5M+</div>
-            <div className="stat-label">Talent Paid</div>
+            <div className="stat-label">Talent Contracts Paid</div>
           </div>
         </section>
 
@@ -889,7 +994,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           <div style={{ textAlign: "center", marginBottom: "4rem" }}>
             <span className="badge badge-amber" style={{ marginBottom: "1rem", padding: "0.4rem 0.9rem" }}>Ecosystem Success</span>
             <h2 style={{ fontSize: "2.75rem", marginBottom: "1rem" }}>Trusted by Talents and Enterprises</h2>
-            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto" }}>
+            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto", fontSize: "1rem" }}>
               Hear from developers who advanced their skillsets and team leads who automated their recruitment search loops.
             </p>
           </div>
@@ -976,10 +1081,10 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               Sign up today to test your skill profile against market demands or publish your projects for high-fidelity pgvector matching.
             </p>
             <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-              <button className="btn btn-primary" onClick={() => onNavigate("auth")} style={{ padding: "0.85rem 2rem" }} id="bottom-btn-talent">
+              <button className="btn btn-primary" onClick={() => onNavigate("/auth")} style={{ padding: "0.85rem 2rem" }} id="bottom-btn-talent">
                 Get Started Now
               </button>
-              <button className="btn btn-secondary" onClick={() => onNavigate("auth")} style={{ padding: "0.85rem 2rem" }} id="bottom-btn-partner">
+              <button className="btn btn-secondary" onClick={() => onNavigate("/auth")} style={{ padding: "0.85rem 2rem" }} id="bottom-btn-partner">
                 Contact Enterprise Sales
               </button>
             </div>
@@ -991,6 +1096,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", marginBottom: "1.5rem" }}>
             <a href="#features" style={{ color: "var(--text-muted)" }}>Features</a>
             <a href="#pillars" style={{ color: "var(--text-muted)" }}>Pillars</a>
+            <a href="#verify-certificate" style={{ color: "var(--text-muted)" }}>Quick Verify</a>
             <a href="#stats" style={{ color: "var(--text-muted)" }}>Metrics</a>
             <a href="#faqs" style={{ color: "var(--text-muted)" }}>FAQs</a>
           </div>
@@ -1038,10 +1144,10 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                 onClick={() => {
                   setShowEventDetailModal(false);
                   alert("To RSVP / Register for this event, please sign in or register a new account.");
-                  onNavigate("auth");
+                  onNavigate("/auth");
                 }}
               >
-                RSVP / Register
+                RSVP Event
               </button>
             </>
           }
