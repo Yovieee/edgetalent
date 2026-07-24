@@ -94,9 +94,9 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
       {
         id: "00000000-0000-0000-0000-000000000099",
         title: "Y Combinator W27 Funding Program",
-        description: "YC invests $500,000 in startup founders twice a year.",
-        content: "Y Combinator is a startup accelerator that launches twice a year. We invest a standard $500,000 in every startup we accept.",
-        amount: "$500,000",
+        description: "YC invests Rp 7.500.000.000 in startup founders twice a year.",
+        content: "Y Combinator is a startup accelerator that launches twice a year. We invest a standard Rp 7.500.000.000 in every startup we accept.",
+        amount: "Rp 7.500.000.000",
         eligibility: "Open to founders globally across all tech and business verticals.",
         deadline: "September 15, 2026",
         link: "https://www.ycombinator.com/apply",
@@ -814,8 +814,8 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     await page.locator('input[placeholder*="Y Combinator W27"]').fill('Thiel Fellowship W27');
     await page.locator('form select').selectOption('Grants');
     await page.locator('input[placeholder*="Brief 1-sentence summary"]').fill('A fellowship program for young builders.');
-    await page.locator('textarea[placeholder*="Detailed explanation"]').fill('Thiel Fellowship is a two-year program giving $100k.');
-    await page.locator('input[placeholder*="$500,000"]').fill('$100,000');
+    await page.locator('textarea[placeholder*="Detailed explanation"]').fill('Thiel Fellowship is a two-year program giving Rp 1.500.000.000.');
+    await page.locator('input[placeholder*="Rp 500.000.000"]').fill('Rp 1.500.000.000');
     await page.locator('input[placeholder*="Tech startups"]').fill('Under 22 years old');
     await page.locator('input[placeholder*="September 15, 2026"]').fill('Rolling');
     await page.locator('input[placeholder*="example.com/apply"]').fill('https://www.thielfellowship.org/');

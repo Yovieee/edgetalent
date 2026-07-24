@@ -279,7 +279,7 @@ export default function AdminFunding(): React.ReactElement {
             <label>Funding Amount</label>
             <input
               type="text"
-              placeholder="e.g. $500,000 or Up to $100k equity-free"
+              placeholder="e.g. Rp 500.000.000 or Up to Rp 100jt equity-free"
               value={fundingAmount}
               onChange={(e) => setFundingAmount(e.target.value)}
               className="form-input"

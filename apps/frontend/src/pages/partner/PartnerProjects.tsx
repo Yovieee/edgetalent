@@ -223,7 +223,7 @@ export default function PartnerProjects(): React.ReactElement {
                         )}
                       </div>
                       <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0.25rem 0" }}>
-                        Scope: <b>{proj.scope}</b> | Budget: <b>${proj.budget}</b>
+                        Scope: <b>{proj.scope}</b> | Budget: <b>{proj.budget ? `Rp ${proj.budget.toLocaleString("id-ID")}` : "N/A"}</b>
                       </p>
                       <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
                         {proj.description}
@@ -336,8 +336,8 @@ export default function PartnerProjects(): React.ReactElement {
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
             <div className="form-group">
-              <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Budget ($)</label>
-              <input type="number" className="form-input" placeholder="5000" value={budget} onChange={(e) => setBudget(e.target.value)} />
+              <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>Budget (Rp)</label>
+              <input type="number" className="form-input" placeholder="5000000" value={budget} onChange={(e) => setBudget(e.target.value)} />
             </div>
 
             <div className="form-group">

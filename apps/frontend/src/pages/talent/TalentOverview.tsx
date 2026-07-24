@@ -382,7 +382,7 @@ export default function TalentOverview(): React.ReactElement {
                           <Building2 size={13} /> {proj.profiles?.full_name || "Enterprise Partner"}
                         </span>
                         <span>•</span>
-                        <span><b>${proj.budget || "Negotiable"}</b></span>
+                        <span><b>{proj.budget ? `Rp ${proj.budget.toLocaleString("id-ID")}` : "Negotiable"}</b></span>
                       </div>
                     </div>
                     {proj.similarity ? (

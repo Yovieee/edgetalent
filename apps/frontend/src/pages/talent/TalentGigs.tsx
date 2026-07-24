@@ -290,7 +290,7 @@ export default function TalentGigs(): React.ReactElement {
 
                   <div style={{ display: "flex", gap: "1rem", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
                     <span>⏱️ <b>{project.scope}</b></span>
-                    <span>💰 <b>${project.budget}</b></span>
+                    <span>💰 <b>{project.budget ? `Rp ${project.budget.toLocaleString("id-ID")}` : "N/A"}</b></span>
                   </div>
                 </div>
 
@@ -352,7 +352,7 @@ export default function TalentGigs(): React.ReactElement {
                 </div>
                 <div className="glass-panel" style={{ padding: "1rem", background: "var(--bg-tertiary)" }}>
                   <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>💰 Budget</span>
-                  <p style={{ fontSize: "1.1rem", fontWeight: "bold", margin: "0.25rem 0 0 0" }}>${selectedGig.projects?.budget}</p>
+                  <p style={{ fontSize: "1.1rem", fontWeight: "bold", margin: "0.25rem 0 0 0" }}>{selectedGig.projects?.budget ? `Rp ${selectedGig.projects.budget.toLocaleString("id-ID")}` : "N/A"}</p>
                 </div>
               </div>
 

@@ -405,7 +405,7 @@ export default function PartnerDashboardView(): React.ReactElement {
                   <div>
                     <h4 style={{ fontSize: "0.95rem", fontWeight: "600", margin: "0 0 0.25rem 0" }}>{proj.title}</h4>
                     <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", display: "flex", gap: "0.5rem" }}>
-                      <span>Budget: <b>${proj.budget}</b></span>
+                      <span>Budget: <b>{proj.budget ? `Rp ${proj.budget.toLocaleString("id-ID")}` : "N/A"}</b></span>
                       <span>•</span>
                       <span>Scope: <b style={{ textTransform: "capitalize" }}>{proj.scope}</b></span>
                     </div>

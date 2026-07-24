@@ -277,7 +277,7 @@ VALUES
   'Autonomous AI Customer Support Agent with RAG & pgvector',
   'Build a state-of-the-art retrieval-augmented generation (RAG) agent using PostgreSQL pgvector and OpenRouter LLMs with sub-500ms latency.',
   ARRAY['ai', 'Python', 'pgvector', 'LLM', 'Prompt Engineering', 'LangChain'],
-  4500.00,
+  45000000.00,
   'medium-term',
   ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
 ),
@@ -287,7 +287,7 @@ VALUES
   'LLM Fine-Tuning & Multi-Modal Vision Model Pipeline',
   'Fine-tune open-weight vision-language models for automated document inspection and key-value metadata extraction.',
   ARRAY['ai', 'Python', 'PyTorch', 'LLM'],
-  7000.00,
+  70000000.00,
   'long-term',
   ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
 ),
@@ -297,7 +297,7 @@ VALUES
   'High-Throughput Global Payments Ledger & Microservices',
   'Architect and implement transactional ledger microservices in Node.js / TypeScript handling concurrent balance updates and bank API webhooks.',
   ARRAY['backend', 'Node.js', 'TypeScript', 'PostgreSQL', 'Redis', 'FinTech'],
-  6000.00,
+  60000000.00,
   'medium-term',
   ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
 ),
@@ -307,7 +307,7 @@ VALUES
   'React & Tailwind Merchant Analytics Dashboard',
   'Build an interactive, responsive analytics portal for merchants featuring transaction charts, settlement reports, and refund workflows.',
   ARRAY['frontend', 'React', 'TypeScript', 'TailwindCSS', 'UI/UX Design'],
-  3500.00,
+  35000000.00,
   'short-term',
   ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
 ),
@@ -317,7 +317,7 @@ VALUES
   'AI Tele-Health Diagnostic & Symptom Checker Web App',
   'Build an intuitive patient web intake application integrated with AI diagnostic suggestion engines adhering to healthcare privacy standards.',
   ARRAY['frontend', 'React', 'TypeScript', 'HealthTech', 'UI/UX Design'],
-  5000.00,
+  50000000.00,
   'medium-term',
   ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
 )
@@ -523,9 +523,9 @@ VALUES
 (
   '70000000-0000-0000-0000-000000000001',
   'Y Combinator Winter 2027 Accelerator',
-  'YC invests $500,000 in early-stage tech founders twice a year. Gain access to elite founder networks and global venture capital demo day.',
-  'Y Combinator is a world-renowned startup accelerator. Every accepted startup receives $500,000 investment split across post-money safe and uncapped MFN terms.',
-  '$500,000',
+  'YC invests Rp 7.500.000.000 in early-stage tech founders twice a year. Gain access to elite founder networks and global venture capital demo day.',
+  'Y Combinator is a world-renowned startup accelerator. Every accepted startup receives Rp 7.500.000.000 investment split across post-money safe and uncapped MFN terms.',
+  'Rp 7.500.000.000',
   'Open to early-stage technology founders globally.',
   'October 15, 2026',
   'https://www.ycombinator.com/apply',
@@ -534,9 +534,9 @@ VALUES
 (
   '70000000-0000-0000-0000-000000000002',
   'Google for Startups Accelerator: AI First',
-  'Equity-free program providing up to $100,000 in Google Cloud credits, technical AI mentorship, and access to Google machine learning experts.',
+  'Equity-free program providing up to Rp 1.500.000.000 in Google Cloud credits, technical AI mentorship, and access to Google machine learning experts.',
   'The Google for Startups Accelerator: AI First targets high-potential startups developing core products with Artificial Intelligence and Machine Learning.',
-  'Up to $100,000 in Cloud Credits + Equity-Free Support',
+  'Hingga Rp 1.500.000.000 dalam Kredit Cloud + Equity-Free Support',
   'Seed to Series-A startups with AI/ML integrated into their core product.',
   'September 30, 2026',
   'https://startup.google.com/accelerator/',
@@ -545,9 +545,9 @@ VALUES
 (
   '70000000-0000-0000-0000-000000000003',
   'Thiel Fellowship for Young Entrepreneurs',
-  '$100,000 equity-free grant awarded to young innovators building breakthrough technologies outside traditional academia.',
-  'The Thiel Fellowship is a two-year program founded by Peter Thiel giving $100,000 to young people who want to build new things instead of attending college.',
-  '$100,000 (Equity-Free Grant)',
+  'Rp 1.500.000.000 equity-free grant awarded to young innovators building breakthrough technologies outside traditional academia.',
+  'The Thiel Fellowship is a two-year program founded by Peter Thiel giving Rp 1.500.000.000 to young people who want to build new things instead of attending college.',
+  'Rp 1.500.000.000 (Equity-Free Grant)',
   'Entrepreneurs aged 22 or under willing to pursue their startup full-time.',
   'Rolling Applications',
   'https://www.thielfellowship.org/',
@@ -567,7 +567,7 @@ VALUES
   '80000000-0000-0000-0000-000000000001',
   'EdgeTalent Global AI & Vector Search Hackathon 2026',
   'A 48-hour global virtual hackathon focused on building open-source AI agents and pgvector developer extensions.',
-  'Join developers, AI researchers, and designers for a 48-hour hackathon. Top 3 winning teams receive $10,000 in cash prizes.',
+  'Join developers, AI researchers, and designers for a 48-hour hackathon. Top 3 winning teams receive Rp 150.000.000 in cash prizes.',
   NOW() + INTERVAL '14 days',
   'Virtual (Discord / Zoom)',
   'EdgeTalent Foundation',

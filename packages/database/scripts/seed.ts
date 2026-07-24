@@ -203,7 +203,7 @@ async function seedDatabase() {
         title: "Autonomous AI Customer Support Agent with RAG & pgvector",
         description: "Build a state-of-the-art retrieval-augmented generation (RAG) agent using PostgreSQL pgvector and OpenRouter LLMs with sub-500ms latency.",
         required_skills: ["ai", "Python", "pgvector", "LLM", "Prompt Engineering", "LangChain"],
-        budget: 4500,
+        budget: 45000000,
         scope: "medium-term",
         embedding: mockVector
       },
@@ -213,7 +213,7 @@ async function seedDatabase() {
         title: "LLM Fine-Tuning & Multi-Modal Vision Model Pipeline",
         description: "Fine-tune open-weight vision-language models for automated document inspection and key-value metadata extraction.",
         required_skills: ["ai", "Python", "PyTorch", "LLM"],
-        budget: 7000,
+        budget: 70000000,
         scope: "long-term",
         embedding: mockVector
       },
@@ -223,7 +223,7 @@ async function seedDatabase() {
         title: "High-Throughput Global Payments Ledger & Microservices",
         description: "Architect and implement transactional ledger microservices in Node.js / TypeScript handling concurrent balance updates and bank API webhooks.",
         required_skills: ["backend", "Node.js", "TypeScript", "PostgreSQL", "Redis", "FinTech"],
-        budget: 6000,
+        budget: 60000000,
         scope: "medium-term",
         embedding: mockVector
       },
@@ -233,7 +233,7 @@ async function seedDatabase() {
         title: "React & Tailwind Merchant Analytics Dashboard",
         description: "Build an interactive, responsive analytics portal for merchants featuring transaction charts, settlement reports, and refund workflows.",
         required_skills: ["frontend", "React", "TypeScript", "TailwindCSS", "UI/UX Design"],
-        budget: 3500,
+        budget: 35000000,
         scope: "short-term",
         embedding: mockVector
       },
@@ -243,7 +243,7 @@ async function seedDatabase() {
         title: "AI Tele-Health Diagnostic & Symptom Checker Web App",
         description: "Build an intuitive patient web intake application integrated with AI diagnostic suggestion engines adhering to healthcare privacy standards.",
         required_skills: ["frontend", "React", "TypeScript", "HealthTech", "UI/UX Design"],
-        budget: 5000,
+        budget: 50000000,
         scope: "medium-term",
         embedding: mockVector
       }
@@ -453,9 +453,9 @@ async function seedDatabase() {
       {
         id: "70000000-0000-0000-0000-000000000001",
         title: "Y Combinator Winter 2027 Accelerator",
-        description: "YC invests $500,000 in early-stage tech founders twice a year. Gain access to elite founder networks and global venture capital demo day.",
-        content: "Y Combinator is a world-renowned startup accelerator. Every accepted startup receives $500,000 investment split across post-money safe and uncapped MFN terms.",
-        amount: "$500,000",
+        description: "YC invests Rp 7.500.000.000 in early-stage tech founders twice a year. Gain access to elite founder networks and global venture capital demo day.",
+        content: "Y Combinator is a world-renowned startup accelerator. Every accepted startup receives Rp 7.500.000.000 investment split across post-money safe and uncapped MFN terms.",
+        amount: "Rp 7.500.000.000",
         eligibility: "Open to early-stage technology founders globally.",
         deadline: "October 15, 2026",
         link: "https://www.ycombinator.com/apply",
@@ -464,9 +464,9 @@ async function seedDatabase() {
       {
         id: "70000000-0000-0000-0000-000000000002",
         title: "Google for Startups Accelerator: AI First",
-        description: "Equity-free program providing up to $100,000 in Google Cloud credits, technical AI mentorship, and access to Google machine learning experts.",
+        description: "Equity-free program providing up to Rp 1.500.000.000 in Google Cloud credits, technical AI mentorship, and access to Google machine learning experts.",
         content: "The Google for Startups Accelerator: AI First targets high-potential startups developing core products with Artificial Intelligence and Machine Learning.",
-        amount: "Up to $100,000 in Cloud Credits + Equity-Free Support",
+        amount: "Hingga Rp 1.500.000.000 dalam Kredit Cloud + Equity-Free Support",
         eligibility: "Seed to Series-A startups with AI/ML integrated into their core product.",
         deadline: "September 30, 2026",
         link: "https://startup.google.com/accelerator/",
@@ -475,9 +475,9 @@ async function seedDatabase() {
       {
         id: "70000000-0000-0000-0000-000000000003",
         title: "Thiel Fellowship for Young Entrepreneurs",
-        description: "$100,000 equity-free grant awarded to young innovators building breakthrough technologies outside traditional academia.",
-        content: "The Thiel Fellowship is a two-year program founded by Peter Thiel giving $100,000 to young people who want to build new things instead of attending college.",
-        amount: "$100,000 (Equity-Free Grant)",
+        description: "Rp 1.500.000.000 equity-free grant awarded to young innovators building breakthrough technologies outside traditional academia.",
+        content: "The Thiel Fellowship is a two-year program founded by Peter Thiel giving Rp 1.500.000.000 to young people who want to build new things instead of attending college.",
+        amount: "Rp 1.500.000.000 (Equity-Free Grant)",
         eligibility: "Entrepreneurs aged 22 or under willing to pursue their startup full-time.",
         deadline: "Rolling Applications",
         link: "https://www.thielfellowship.org/",
@@ -498,7 +498,7 @@ async function seedDatabase() {
         id: "80000000-0000-0000-0000-000000000001",
         title: "EdgeTalent Global AI & Vector Search Hackathon 2026",
         description: "A 48-hour global virtual hackathon focused on building open-source AI agents and pgvector developer extensions.",
-        content: "Join developers, AI researchers, and designers for a 48-hour hackathon. Top 3 winning teams receive $10,000 in cash prizes.",
+        content: "Join developers, AI researchers, and designers for a 48-hour hackathon. Top 3 winning teams receive Rp 150.000.000 in cash prizes.",
         event_date: new Date(Date.now() + 86400000 * 14).toISOString(),
         location: "Virtual (Discord / Zoom)",
         organizer: "EdgeTalent Foundation",

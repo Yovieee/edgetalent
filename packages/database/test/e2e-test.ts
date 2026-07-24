@@ -161,7 +161,7 @@ async function runE2ETests() {
 
     if (projInsertErr || !newProj) throw new Error(`Database project insert failed: ${projInsertErr?.message}`);
     testProjectId = newProj.id;
-    console.log(`  ✅ Project inserted. Project ID: ${testProjectId} | Budget: $${newProj.budget}`);
+    console.log(`  ✅ Project inserted. Project ID: ${testProjectId} | Budget: Rp ${newProj.budget}`);
 
     // -------------------------------------------------------------
     // Test 4: Mock pgvector calculations & updates

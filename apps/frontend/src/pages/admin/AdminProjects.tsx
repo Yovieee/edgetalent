@@ -218,7 +218,7 @@ export default function AdminProjects(): React.ReactElement {
                   <tr key={p.id} style={{ borderBottom: "1px solid var(--glass-border)" }}>
                     <td style={{ padding: "1rem", fontWeight: 600 }}>{p.title}</td>
                     <td style={{ padding: "1rem", color: "var(--color-emerald)", fontWeight: 600 }}>
-                      {p.budget ? `$${p.budget.toLocaleString()}` : "N/A"}
+                      {p.budget ? `Rp ${p.budget.toLocaleString("id-ID")}` : "N/A"}
                     </td>
                     <td style={{ padding: "1rem" }}>
                       <span className="badge badge-secondary" style={{ textTransform: "uppercase" }}>
@@ -303,13 +303,13 @@ export default function AdminProjects(): React.ReactElement {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             <div className="form-group">
-              <label>Budget (USD)</label>
+              <label>Budget (Rp)</label>
               <input
                 type="number"
                 value={projectBudget}
                 onChange={(e) => setProjectBudget(e.target.value)}
                 className="form-input"
-                placeholder="e.g. 2500"
+                placeholder="e.g. 25000000"
               />
             </div>
             <div className="form-group">
