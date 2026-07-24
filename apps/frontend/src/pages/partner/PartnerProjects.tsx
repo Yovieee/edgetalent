@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useSupabase } from "../../context/SupabaseContext";
 import { ProjectSchema } from "@edgetalent/shared";
 import Modal from "../../components/Modal";
+import { formatRupiah } from "../../utils/currency";
 
 export default function PartnerProjects(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -223,7 +224,7 @@ export default function PartnerProjects(): React.ReactElement {
                         )}
                       </div>
                       <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: "0.25rem 0" }}>
-                        Scope: <b>{proj.scope}</b> | Budget: <b>{proj.budget ? `Rp ${proj.budget.toLocaleString("id-ID")}` : "N/A"}</b>
+                        Scope: <b>{proj.scope}</b> | Budget: <b>{formatRupiah(proj.budget)}</b>
                       </p>
                       <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginTop: "0.5rem" }}>
                         {proj.description}

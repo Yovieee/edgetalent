@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
+import { formatRupiah } from "../../utils/currency";
 
 export default function TalentMarketplace(): React.ReactElement {
   const { supabase, profile } = useSupabase();
@@ -133,7 +134,7 @@ export default function TalentMarketplace(): React.ReactElement {
                 <p style={{ fontSize: "0.95rem", color: "var(--text-secondary)", marginBottom: "1rem" }}>{project.description}</p>
                 <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
                   <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Scope: <b>{project.scope}</b></span>
-                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Budget: <b>{project.budget !== null && project.budget !== undefined ? `Rp ${project.budget.toLocaleString("id-ID")}` : "Negotiable"}</b></span>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Budget: <b>{formatRupiah(project.budget)}</b></span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
                   {(project.required_skills || []).map((skill: string, idx: number) => (

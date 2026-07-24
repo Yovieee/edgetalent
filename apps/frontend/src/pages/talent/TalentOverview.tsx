@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSupabase } from "../../context/SupabaseContext";
+import { formatRupiah } from "../../utils/currency";
 import {
   Sparkles,
   Briefcase,
@@ -382,7 +383,7 @@ export default function TalentOverview(): React.ReactElement {
                           <Building2 size={13} /> {proj.profiles?.full_name || "Enterprise Partner"}
                         </span>
                         <span>•</span>
-                        <span><b>{proj.budget ? `Rp ${proj.budget.toLocaleString("id-ID")}` : "Negotiable"}</b></span>
+                        <span><b>{formatRupiah(proj.budget)}</b></span>
                       </div>
                     </div>
                     {proj.similarity ? (

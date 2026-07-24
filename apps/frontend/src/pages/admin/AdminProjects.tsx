@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
 import { ProjectSchema } from "@edgetalent/shared";
 import Modal from "../../components/Modal";
+import { formatRupiah } from "../../utils/currency";
 
 interface UserProfile {
   id: string;
@@ -218,7 +219,7 @@ export default function AdminProjects(): React.ReactElement {
                   <tr key={p.id} style={{ borderBottom: "1px solid var(--glass-border)" }}>
                     <td style={{ padding: "1rem", fontWeight: 600 }}>{p.title}</td>
                     <td style={{ padding: "1rem", color: "var(--color-emerald)", fontWeight: 600 }}>
-                      {p.budget ? `Rp ${p.budget.toLocaleString("id-ID")}` : "N/A"}
+                      {formatRupiah(p.budget)}
                     </td>
                     <td style={{ padding: "1rem" }}>
                       <span className="badge badge-secondary" style={{ textTransform: "uppercase" }}>
