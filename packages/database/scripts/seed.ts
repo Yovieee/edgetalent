@@ -2,11 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
 
-// Load environment variables manually if not using dotenv
 function getEnv(key: string, fallback: string = ""): string {
   if (process.env[key]) return process.env[key]!;
   
-  // Try loading from root .env or database .env
   const envPaths = [
     path.resolve(__dirname, "../.env"),
     path.resolve(__dirname, "../../.env"),
@@ -45,6 +43,36 @@ const mockVector = Array(1536).fill(0.025);
 
 async function seedDatabase() {
   try {
+    // -------------------------------------------------------------
+    // 0. Pre-create auth users (if running with Service Role Key)
+    // -------------------------------------------------------------
+    const authUsers = [
+      { id: "10000000-0000-0000-0000-000000000001", email: "sarah.chen@ai-edge.org", full_name: "Dr. Sarah Chen" },
+      { id: "10000000-0000-0000-0000-000000000002", email: "marcus.vance@devstudio.com", full_name: "Marcus Vance" },
+      { id: "10000000-0000-0000-0000-000000000003", email: "elena.rostova@uxcraft.design", full_name: "Elena Rostova" },
+      { id: "10000000-0000-0000-0000-000000000004", email: "alex.rivera@mobileedge.io", full_name: "Alex Rivera" },
+      { id: "10000000-0000-0000-0000-000000000005", email: "david.kalu@cloudops.net", full_name: "David Kalu" },
+      { id: "20000000-0000-0000-0000-000000000001", email: "contact@nexusailabs.io", full_name: "Nexus AI Labs" },
+      { id: "20000000-0000-0000-0000-000000000002", email: "partnerships@quantumpay.com", full_name: "QuantumPay FinTech" },
+      { id: "20000000-0000-0000-0000-000000000003", email: "info@elevatehealth.org", full_name: "ElevateHealth Tech" },
+      { id: "30000000-0000-0000-0000-000000000001", email: "admin@edgetalent.com", full_name: "EdgeTalent Master Admin" }
+    ];
+
+    if (supabase.auth?.admin) {
+      console.log("\n🔐 [0/9] Ensuring Auth Users exist...");
+      for (const u of authUsers) {
+        try {
+          await supabase.auth.admin.createUser({
+            id: u.id,
+            email: u.email,
+            password: "password123",
+            email_confirm: true,
+            user_metadata: { full_name: u.full_name }
+          }).catch(() => {});
+        } catch (_) {}
+      }
+    }
+
     // -------------------------------------------------------------
     // 1. Profiles (Talents, Partners, Admin)
     // -------------------------------------------------------------

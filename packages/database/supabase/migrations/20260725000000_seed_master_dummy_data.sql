@@ -5,6 +5,141 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- -------------------------------------------------------------------------
+-- 0. SEED AUTH USERS FIRST (to satisfy profiles_id_fkey constraint)
+-- -------------------------------------------------------------------------
+INSERT INTO auth.users (
+  id,
+  instance_id,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  role,
+  aud
+) VALUES
+(
+  '10000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'sarah.chen@ai-edge.org',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Dr. Sarah Chen"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '10000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'marcus.vance@devstudio.com',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Marcus Vance"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '10000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'elena.rostova@uxcraft.design',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Elena Rostova"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '10000000-0000-0000-0000-000000000004',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'alex.rivera@mobileedge.io',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Alex Rivera"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '10000000-0000-0000-0000-000000000005',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'david.kalu@cloudops.net',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"David Kalu"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '20000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'contact@nexusailabs.io',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Nexus AI Labs"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '20000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'partnerships@quantumpay.com',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"QuantumPay FinTech"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '20000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'info@elevatehealth.org',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"ElevateHealth Tech"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '30000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'admin@edgetalent.com',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"EdgeTalent Master Admin"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- -------------------------------------------------------------------------
 -- 1. SEED PROFILES
 -- -------------------------------------------------------------------------
 INSERT INTO public.profiles (id, full_name, email, avatar_url, role, bio, portfolio_links, skills, skill_gaps, skills_embedding)
@@ -122,6 +257,7 @@ VALUES
 )
 ON CONFLICT (id) DO UPDATE 
 SET full_name = EXCLUDED.full_name,
+    role = EXCLUDED.role,
     bio = EXCLUDED.bio,
     avatar_url = EXCLUDED.avatar_url,
     skills = EXCLUDED.skills,
