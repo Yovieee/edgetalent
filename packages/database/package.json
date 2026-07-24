@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test:e2e": "npx tsx test/e2e-test.ts"
+    "test:e2e": "npx tsx test/e2e-test.ts",
+    "seed": "npx tsx scripts/seed.ts"
   },
   "dependencies": {
     "@edgetalent/shared": "workspace:*",
