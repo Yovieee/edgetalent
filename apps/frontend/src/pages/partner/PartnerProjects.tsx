@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useSupabase } from "../../context/SupabaseContext";
 import { ProjectSchema } from "@edgetalent/shared";
-import { X } from "lucide-react";
 import Modal from "../../components/Modal";
 
 export default function PartnerProjects(): React.ReactElement {

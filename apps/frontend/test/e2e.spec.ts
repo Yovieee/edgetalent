@@ -594,7 +594,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
               {
                 id: "00000000-0000-0000-0000-000000000003",
                 full_name: "Mock Administrator",
-                email: "admin@edgetalent.com",
+                email: "edgetalentindonesia@gmail.com",
                 role: "admin",
                 skills: [],
                 skill_gaps: [],
@@ -619,7 +619,7 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
             body: JSON.stringify({
               id: "00000000-0000-0000-0000-000000000003",
               full_name: "Mock Administrator",
-              email: "admin@edgetalent.com",
+              email: "edgetalentindonesia@gmail.com",
               role: "admin",
               created_at: new Date().toISOString()
             })

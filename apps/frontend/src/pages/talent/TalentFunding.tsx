@@ -4,7 +4,7 @@ import { FundingOpportunity } from "@edgetalent/shared";
 import Modal from "../../components/Modal";
 
 export default function TalentFunding(): React.ReactElement {
-  const { supabase } = useSupabase();
+  const { supabase, profile } = useSupabase();
 
   const [fundingOpportunities, setFundingOpportunities] = useState<FundingOpportunity[]>([]);
   const [loadingFunding, setLoadingFunding] = useState<boolean>(false);

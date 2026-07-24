@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "../../context/SupabaseContext";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import Modal from "../../components/Modal";
 
 export default function TalentGigs(): React.ReactElement {

@@ -20,7 +20,7 @@ export default function PartnerProfile(): React.ReactElement {
     if (profile) {
       setFullName(profile.full_name || "");
       setBio(profile.bio || "");
-      const links = profile.portfolio_links || {};
+      const links = (profile.portfolio_links as { github?: string; linkedin?: string; website?: string } | null) || {};
       setGithubUrl(links.github || "");
       setLinkedinUrl(links.linkedin || "");
       setWebsiteUrl(links.website || "");
