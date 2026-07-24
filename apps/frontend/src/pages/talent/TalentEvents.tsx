@@ -202,7 +202,7 @@ export default function TalentEvents(): React.ReactElement {
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", borderTop: "1px solid var(--glass-border)", paddingTop: "1rem" }}>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                       <span style={{ color: "var(--text-secondary)" }}>Date & Time:</span>
-                      <span style={{ fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(evt.event_date).toLocaleString()}</span>
+                      <span style={{ fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(evt.event_date).toLocaleString("en-US")}</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                       <span style={{ color: "var(--text-secondary)" }}>Location:</span>
@@ -309,7 +309,7 @@ export default function TalentEvents(): React.ReactElement {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", background: "var(--bg-tertiary)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--glass-border)" }}>
                 <div>
                   <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Date & Time</span>
-                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(selectedEvent.event_date).toLocaleString()}</span>
+                  <span style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--color-cyan)" }}>{new Date(selectedEvent.event_date).toLocaleString("en-US")}</span>
                 </div>
                 <div>
                   <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Location</span>

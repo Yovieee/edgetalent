@@ -471,14 +471,14 @@ export default function CertificateVerificationPage(): React.ReactElement {
                       <div>
                         <span style={{ color: "#64748b", textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.05em", marginRight: "0.35rem" }}>Issue Date:</span>
                         <span style={{ fontWeight: 700, color: "#0f172a" }}>
-                          {new Date(certificate.issue_date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                          {new Date(certificate.issue_date || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                       </div>
                       <div>
                         <span style={{ color: "#dc2626", textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.05em", marginRight: "0.35rem" }}>Expiration Date:</span>
                         <span style={{ fontWeight: 700, color: "#991b1b" }}>
                           {certificate.expiration_date
-                            ? new Date(certificate.expiration_date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+                            ? new Date(certificate.expiration_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
                             : 'No Expiration'}
                         </span>
                       </div>

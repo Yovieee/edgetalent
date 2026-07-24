@@ -299,7 +299,7 @@ export default function TalentGigs(): React.ReactElement {
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--glass-border)" }}>
                     <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                      Applied {new Date(app.applied_at).toLocaleDateString()}
+                      Applied {new Date(app.applied_at).toLocaleDateString("en-US")}
                     </span>
                     <button
                       className="btn btn-secondary"

@@ -586,7 +586,7 @@ export default function TalentOverview(): React.ReactElement {
                   <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "0.35rem", fontSize: "0.825rem", color: "var(--text-secondary)" }}>
                     <span>Partner: <b>{app.projects?.profiles?.full_name || "Enterprise Client"}</b></span>
                     <span>•</span>
-                    <span>Applied on {new Date(app.applied_at).toLocaleDateString()}</span>
+                    <span>Applied on {new Date(app.applied_at).toLocaleDateString("en-US")}</span>
                   </div>
                 </div>
 

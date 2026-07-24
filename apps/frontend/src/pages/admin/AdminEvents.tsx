@@ -225,7 +225,7 @@ export default function AdminEvents(): React.ReactElement {
                   </td>
                   <td style={{ padding: "1rem" }}>{evt.organizer}</td>
                   <td style={{ padding: "1rem", color: "var(--color-cyan)" }}>
-                    {new Date(evt.event_date).toLocaleString()}
+                    {new Date(evt.event_date).toLocaleString("en-US")}
                   </td>
                   <td style={{ padding: "1rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
                     {evt.location}

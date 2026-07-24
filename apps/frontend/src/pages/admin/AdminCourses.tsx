@@ -290,7 +290,7 @@ export default function AdminCourses(): React.ReactElement {
                     {c.provider || "Self-study"}
                   </span>
                   <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                    {new Date(c.created_at).toLocaleDateString()}
+                    {new Date(c.created_at).toLocaleDateString("en-US")}
                   </span>
                 </div>
                 <h4 style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>{c.title}</h4>

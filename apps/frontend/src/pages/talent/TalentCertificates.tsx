@@ -315,7 +315,7 @@ export default function TalentCertificates(): React.ReactElement {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
                         <span className="badge badge-emerald" style={{ fontSize: "0.7rem" }}>{course.provider || "EdgeTalent Academy"}</span>
                         <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                          {new Date(enrollment.completed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {new Date(enrollment.completed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                         </span>
                       </div>
                       <h5 style={{ fontSize: "1.1rem", marginBottom: "0.5rem", color: "var(--text-primary)" }}>{course.title || "Academy Course"}</h5>
@@ -409,9 +409,9 @@ export default function TalentCertificates(): React.ReactElement {
                     {cert.issuing_organization}
                   </p>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
-                    Issued: <b>{new Date(cert.issue_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short' })}</b>
+                    Issued: <b>{new Date(cert.issue_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</b>
                     {cert.expiration_date && (
-                      <> | Expires: <b>{new Date(cert.expiration_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short' })}</b></>
+                      <> | Expires: <b>{new Date(cert.expiration_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</b></>
                     )}
                   </div>
                   {cert.credential_id && (
@@ -690,7 +690,7 @@ export default function TalentCertificates(): React.ReactElement {
                         <div>
                           <span style={{ color: "#64748b", textTransform: "uppercase", fontSize: "0.72rem", letterSpacing: "0.05em", marginRight: "0.35rem" }}>Issue Date:</span>
                           <span style={{ fontWeight: 700, color: "#0f172a" }}>
-                            {new Date(selectedEnrollmentCert.completed_at || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                            {new Date(selectedEnrollmentCert.completed_at || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                           </span>
                         </div>
                         <div>
@@ -700,7 +700,7 @@ export default function TalentCertificates(): React.ReactElement {
                               new Date(selectedEnrollmentCert.completed_at || Date.now()).setFullYear(
                                 new Date(selectedEnrollmentCert.completed_at || Date.now()).getFullYear() + 2
                               )
-                            ).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                            ).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                           </span>
                         </div>
                       </div>

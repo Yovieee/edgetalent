@@ -151,7 +151,7 @@ export default function AdminUsers(): React.ReactElement {
                     )}
                   </td>
                   <td style={{ padding: "1rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                    {new Date(u.created_at).toLocaleDateString()}
+                    {new Date(u.created_at).toLocaleDateString("en-US")}
                   </td>
                   <td style={{ padding: "1rem", textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: "0.5rem", alignItems: "center" }}>

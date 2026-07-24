@@ -279,7 +279,7 @@ export default function PartnerHiring(): React.ReactElement {
 
                 <div style={{ borderTop: "1px solid var(--glass-border)", paddingTop: "1rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                    <span>Applied: {new Date(app.applied_at).toLocaleDateString()}</span>
+                    <span>Applied: {new Date(app.applied_at).toLocaleDateString("en-US")}</span>
                   </div>
 
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
