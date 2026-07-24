@@ -231,7 +231,7 @@ export default function TalentGigs(): React.ReactElement {
           <div>
             <h3 style={{ marginBottom: "0.5rem" }}>Start your industrial gig journey!</h3>
             <p style={{ color: "var(--text-secondary)", maxWidth: "500px", margin: "0 auto" }}>
-              You haven't applied to any projects yet. Check out the project marketplace to find high-match industrial projects.
+              You haven't applied to any projects yet. Check out Job Match to find high-match industrial projects.
             </p>
           </div>
         </div>

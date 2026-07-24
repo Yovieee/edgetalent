@@ -33,9 +33,9 @@ export default function TalentLayout(): React.ReactElement {
     { to: "/talent/overview", label: "Overview", icon: <LayoutDashboard size={20} /> },
     { to: "/talent/analyzer", label: "Skills & Interests", icon: <Activity size={20} /> },
     { to: "/talent/upskilling", label: "Upskilling", icon: <GraduationCap size={20} /> },
-    { to: "/talent/marketplace", label: "Marketplace", icon: <Briefcase size={20} /> },
+    { to: "/talent/marketplace", label: "Job Match", icon: <Briefcase size={20} /> },
     { to: "/talent/gigs", label: "My Gigs", icon: <CheckSquare size={20} /> },
-    { to: "/talent/certificates", label: "Certificates", icon: <Award size={20} /> },
+    { to: "/talent/certificates", label: "Digital Credentials", icon: <Award size={20} /> },
     { to: "/talent/events", label: "Events", icon: <Calendar size={20} /> }
   ];
 
@@ -44,9 +44,9 @@ export default function TalentLayout(): React.ReactElement {
     if (path.includes("overview")) return "Overview";
     if (path.includes("analyzer")) return "Skills & Interests";
     if (path.includes("upskilling")) return "Upskilling Hub";
-    if (path.includes("marketplace")) return "Project Marketplace";
+    if (path.includes("marketplace")) return "Job Match";
     if (path.includes("gigs")) return "My Gigs";
-    if (path.includes("certificates")) return "Certificates";
+    if (path.includes("certificates")) return "Digital Credentials";
     if (path.includes("events")) return "Events Hub";
     if (path.includes("profile")) return "My Profile";
     return "Talent Dashboard";

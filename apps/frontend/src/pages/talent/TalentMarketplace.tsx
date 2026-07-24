@@ -118,7 +118,7 @@ export default function TalentMarketplace(): React.ReactElement {
       {loadingProjects ? (
         <p style={{ color: "var(--text-secondary)" }}>Matching portfolios with job demands...</p>
       ) : matchedProjects.length === 0 ? (
-        <p style={{ color: "var(--text-secondary)" }}>No projects available in the marketplace currently.</p>
+        <p style={{ color: "var(--text-secondary)" }}>No projects available in Job Match currently.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {matchedProjects.map((project) => (

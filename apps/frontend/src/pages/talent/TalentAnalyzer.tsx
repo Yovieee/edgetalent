@@ -126,7 +126,7 @@ export default function TalentAnalyzer(): React.ReactElement {
             <div className="glass-panel" style={{ padding: "2rem" }}>
               <h3>Skills & Interests Assessment</h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-                Complete the technical quizzes and define your career interests. Your scores and selections will determine your verified skills, identify upskilling gaps, and unlock project matching in the marketplace.
+                Complete the technical quizzes and define your career interests. Your scores and selections will determine your verified skills, identify upskilling gaps, and unlock project matching in Job Match.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -228,7 +228,7 @@ export default function TalentAnalyzer(): React.ReactElement {
             <div className="glass-panel" style={{ padding: "2rem" }}>
               <h3>Generate Profile</h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "1.5rem" }}>
-                Submit your combined quiz results and preferences to run vector analysis, which computes your profile biography and matches you against marketplace projects.
+                Submit your combined quiz results and preferences to run vector analysis, which computes your profile biography and matches you against Job Match projects.
               </p>
 
               <button

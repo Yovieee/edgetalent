@@ -53,7 +53,7 @@ export default function TalentOverview(): React.ReactElement {
         {loading ? (
           <p style={{ color: "var(--text-secondary)" }}>Loading applications...</p>
         ) : applications.length === 0 ? (
-          <p style={{ color: "var(--text-secondary)" }}>No applications submitted yet. Browse jobs in the Marketplace!</p>
+          <p style={{ color: "var(--text-secondary)" }}>No applications submitted yet. Browse jobs in Job Match!</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {applications.map((app) => (

@@ -220,7 +220,7 @@ export default function TalentCertificates(): React.ReactElement {
       {/* Header */}
       <div className="glass-panel" style={{ padding: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1.5rem" }}>
         <div>
-          <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>My Credentials & Certificates</h3>
+          <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>My Digital Credentials</h3>
           <p style={{ color: "var(--text-secondary)" }}>
             Verify your expertise with official platform credentials and external industry certifications.
           </p>

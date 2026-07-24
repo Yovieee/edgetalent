@@ -393,8 +393,8 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const courseCard = page.locator('h4', { hasText: 'PostgreSQL & pgvector Deep Dive' });
     await expect(courseCard).toBeVisible();
 
-    // 8. Go to Marketplace and apply for a project
-    const marketplaceTabBtn = page.locator('button', { hasText: 'Marketplace' });
+    // 8. Go to Job Match and apply for a project
+    const marketplaceTabBtn = page.locator('a, button', { hasText: 'Job Match' });
     await marketplaceTabBtn.click();
 
     const applyBtn = page.locator('button', { hasText: 'Apply' }).first();
