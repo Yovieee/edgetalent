@@ -152,8 +152,8 @@ export async function downloadCertificateAsPdf(
         const m = (el: Element | null, align: "center" | "left" | "right" = "center", textOverride?: string) =>
           measureElement(el, cRect, clonedDoc, align, textOverride);
 
-        // 1. Organization name (span inside the blue badge)
-        const orgSpan = target.querySelector('span[style*="letter-spacing"]');
+        // 1. Organization name (span inside the top badge)
+        const orgSpan = target.querySelector('span[style*="letter-spacing"]') || target.querySelector('span[style*="LETTER-SPACING"]');
         const orgLayer = m(orgSpan);
         if (orgLayer) textLayers.push(orgLayer);
 
@@ -163,14 +163,12 @@ export async function downloadCertificateAsPdf(
         if (h1Layer) textLayers.push(h1Layer);
 
         // 3. "THIS OFFICIAL CREDENTIAL IS PROUDLY PRESENTED TO" subtitle
-        //    It's the first <p> with uppercase tracking inside the main body section
-        const allPs = target.querySelectorAll("p");
+        const allPs = Array.from(target.querySelectorAll("p"));
         for (const p of allPs) {
           const txt = p.textContent?.trim() || "";
           if (txt.startsWith("THIS OFFICIAL CREDENTIAL")) {
             const layer = m(p);
             if (layer) textLayers.push(layer);
-            break;
           }
         }
 
@@ -185,7 +183,6 @@ export async function downloadCertificateAsPdf(
           if (txt.startsWith("for successfully completing")) {
             const layer = m(p);
             if (layer) textLayers.push(layer);
-            break;
           }
         }
 
@@ -194,47 +191,93 @@ export async function downloadCertificateAsPdf(
         const h3Layer = m(h3);
         if (h3Layer) textLayers.push(h3Layer);
 
-        // 7. Skill badges (each ✓ Skill span)
-        const skillSpans = target.querySelectorAll('span[style*="border: 1px solid"]');
-        for (const span of skillSpans) {
-          const layer = m(span);
-          if (layer) textLayers.push(layer);
-        }
-
-        // 8. Credential ID label + value (left-aligned, bottom area)
-        const monoSpans = target.querySelectorAll('span[style*="monospace"]');
-        for (const ms of monoSpans) {
-          // The credential ID container div holds the label and value
-          const container = ms.closest("div");
-          if (container) {
-            const layer = m(container, "left");
+        // 7. Verified Technical Mastery header & skill badges
+        for (const p of allPs) {
+          const txt = p.textContent?.trim() || "";
+          if (txt.includes("Verified Technical Mastery")) {
+            const layer = m(p);
             if (layer) textLayers.push(layer);
             break;
           }
         }
 
-        // 9. Issue date and expiration date rows
-        //    Find divs containing "Issue Date:" or "Expiration Date:" text
-        const bottomDivs = target.querySelectorAll("div");
-        for (const div of bottomDivs) {
-          const txt = div.textContent?.trim() || "";
-          if ((txt.includes("Issue Date:") || txt.includes("Expiration Date:")) && div.children.length <= 3) {
-            const layer = m(div, "left");
+        const skillSpans = target.querySelectorAll('span[style*="border"]');
+        for (const span of skillSpans) {
+          const txt = span.textContent?.trim() || "";
+          if (txt.startsWith("✓") || txt.includes("✓")) {
+            const layer = m(span);
             if (layer) textLayers.push(layer);
           }
         }
 
-        // 10. Signatory name (right-aligned)
-        const allDivs = target.querySelectorAll("div");
-        for (const div of allDivs) {
-          const txt = div.textContent?.trim() || "";
-          if (txt === "Blasius Yonas Vikariandi" && div.children.length === 0) {
-            const layer = m(div, "right");
+        // 8. Credential ID (left-aligned, leaf element)
+        const allElems = Array.from(target.querySelectorAll("*"));
+
+        const credIdElem = allElems.find((el) => {
+          const txt = el.textContent?.trim() || "";
+          return (
+            el.children.length <= 2 &&
+            txt.includes("Credential ID:") &&
+            !txt.includes("Issue Date:") &&
+            !txt.includes("Expiration Date:")
+          );
+        });
+        if (credIdElem) {
+          const layer = m(credIdElem, "left");
+          if (layer) textLayers.push(layer);
+        }
+
+        // 9. Issue date (left-aligned, leaf element)
+        const issueDateElem = allElems.find((el) => {
+          const txt = el.textContent?.trim() || "";
+          return (
+            el.children.length <= 2 &&
+            txt.includes("Issue Date:") &&
+            !txt.includes("Expiration Date:") &&
+            !txt.includes("Credential ID:")
+          );
+        });
+        if (issueDateElem) {
+          const layer = m(issueDateElem, "left");
+          if (layer) textLayers.push(layer);
+        }
+
+        // 10. Expiration date (left-aligned, leaf element)
+        const expDateElem = allElems.find((el) => {
+          const txt = el.textContent?.trim() || "";
+          return (
+            el.children.length <= 2 &&
+            txt.includes("Expiration Date:") &&
+            !txt.includes("Issue Date:") &&
+            !txt.includes("Credential ID:")
+          );
+        });
+        if (expDateElem) {
+          const layer = m(expDateElem, "left");
+          if (layer) textLayers.push(layer);
+        }
+
+        // 11. Signatory name & title (right-aligned)
+        const rightSigContainer = allElems.find((el) => {
+          const styleAttr = el.getAttribute("style") || "";
+          return (styleAttr.includes("text-align: right") || styleAttr.includes("textAlign: \"right\"")) && el.querySelector("img");
+        });
+
+        if (rightSigContainer) {
+          const sigLeafs = Array.from(rightSigContainer.querySelectorAll("div")).filter(
+            (d) => d.children.length === 0 && d.textContent?.trim()
+          );
+          for (const leaf of sigLeafs) {
+            const layer = m(leaf, "right");
             if (layer) textLayers.push(layer);
           }
-          if (txt === "EdgeTalent CEO" && div.children.length === 0) {
-            const layer = m(div, "right");
-            if (layer) textLayers.push(layer);
+        } else {
+          for (const el of allElems) {
+            const txt = el.textContent?.trim() || "";
+            if ((txt === "Blasius Yonas Vikariandi" || txt === "EdgeTalent CEO") && el.children.length === 0) {
+              const layer = m(el, "right");
+              if (layer) textLayers.push(layer);
+            }
           }
         }
       },
