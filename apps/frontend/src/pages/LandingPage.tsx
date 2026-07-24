@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSupabase } from "../context/SupabaseContext";
 import { 
   ArrowRight, BookOpen, Terminal, RefreshCw, Search, GraduationCap, 
-  Briefcase, Star, ChevronDown, Award, Zap, ShieldCheck, 
-  Users, Sparkles, CheckCircle2
+  Briefcase, ChevronDown, Award, Sparkles, CheckCircle2
 } from "lucide-react";
 import Modal from "../components/Modal";
 import logo from "../assets/logo.png";
@@ -290,7 +289,6 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           <a href="#pillars" className="nav-tab">Ecosystem Pillars</a>
           <a href="#verify-certificate" className="nav-tab">Quick Verify</a>
           <a href="#events" className="nav-tab">Events</a>
-          <a href="#stats" className="nav-tab">Metrics</a>
           <a href="#faqs" className="nav-tab">FAQs</a>
         </div>
         <div style={{ display: "flex", gap: "0.75rem" }}>
@@ -319,7 +317,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginBottom: "2.25rem", lineHeight: "1.6", maxWidth: "580px" }}>
               Accelerate your professional career with AI-guided roadmap diagnostics or hire elite vetted candidates matched using semantic pgvector vector similarity searches.
             </p>
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "2.5rem" }}>
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
               <button className="btn btn-primary" onClick={() => onNavigate("/auth")} style={{ padding: "0.85rem 1.75rem", fontSize: "0.95rem" }} id="hero-btn-talent">
                 Join as Talent
                 <ArrowRight size={18} />
@@ -327,24 +325,6 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               <button className="btn btn-secondary" onClick={() => onNavigate("/auth")} style={{ padding: "0.85rem 1.75rem", fontSize: "0.95rem" }} id="hero-btn-partner">
                 Hire Elite Teams
               </button>
-            </div>
-
-            {/* Quick Stat Highlights Pill Bar */}
-            <div className="glass-panel" style={{ padding: "0.875rem 1.25rem", display: "inline-flex", gap: "1.75rem", alignItems: "center", background: "rgba(255,255,255,0.75)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Users size={16} color="var(--color-purple)" />
-                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}><strong>10,000+</strong> Talents</span>
-              </div>
-              <div style={{ width: "1px", height: "16px", background: "var(--glass-border)" }}></div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Zap size={16} color="var(--color-cyan)" />
-                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}><strong>98.7%</strong> Vector Accuracy</span>
-              </div>
-              <div style={{ width: "1px", height: "16px", background: "var(--glass-border)" }}></div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <ShieldCheck size={16} color="var(--color-emerald)" />
-                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}><strong>1,536d</strong> Embeddings</span>
-              </div>
             </div>
           </div>
 
@@ -367,19 +347,19 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 <div style={{ display: "flex", gap: "1rem" }}>
                   <div className="glass-panel" style={{ flex: 1, padding: "1rem", background: "var(--bg-tertiary)" }}>
-                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>AI Match Accuracy</div>
-                    <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--color-cyan)", marginTop: "0.25rem" }}>98.7%</div>
+                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>AI Skill Diagnostics</div>
+                    <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--color-cyan)", marginTop: "0.25rem" }}>Active Engine</div>
                   </div>
                   <div className="glass-panel" style={{ flex: 1, padding: "1rem", background: "var(--bg-tertiary)" }}>
-                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>Skills Vector</div>
-                    <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--color-purple)", marginTop: "0.25rem" }}>1,536d</div>
+                    <div style={{ fontSize: "0.675rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>Semantic Matcher</div>
+                    <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--color-purple)", marginTop: "0.25rem" }}>pgvector</div>
                   </div>
                 </div>
 
                 <div className="glass-panel" style={{ padding: "1rem", background: "var(--bg-tertiary)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
                     <span style={{ fontSize: "0.8rem", fontWeight: 600 }}>Upskilling Progress</span>
-                    <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--color-emerald)" }}>80% Complete</span>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--color-emerald)" }}>In Progress</span>
                   </div>
                   <div style={{ height: "7px", background: "rgba(0,0,0,0.06)", borderRadius: "999px", overflow: "hidden" }}>
                     <div style={{ height: "100%", width: "80%", background: "var(--color-emerald)", borderRadius: "999px", transition: "width 1s ease" }}></div>
@@ -389,17 +369,10 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
                 <div className="glass-panel" style={{ padding: "0.875rem", background: "var(--bg-tertiary)", display: "flex", alignItems: "center", gap: "0.6rem" }}>
                   <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#22c55e", flexShrink: 0 }}></div>
                   <div style={{ fontSize: "0.775rem", color: "var(--text-secondary)" }}>
-                    <strong>Partner Search:</strong> Matched 8 candidates for "Python/AI Specialist"
+                    <strong>Partner Search:</strong> Matched candidates for "Python/AI Specialist"
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Floating Side Badge */}
-            <div className="glass-panel animate-float-delayed" style={{ position: "absolute", top: "25px", right: "-10px", width: "160px", padding: "0.9rem", background: "var(--bg-secondary)", zIndex: -1, opacity: 0.95, boxShadow: "0 10px 25px rgba(0,0,0,0.05)" }}>
-              <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600 }}>Contract Earnings</div>
-              <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#10b981", margin: "0.2rem 0" }}>+$12,450</div>
-              <span className="badge badge-emerald" style={{ fontSize: "0.65rem", padding: "0.15rem 0.5rem" }}>Escrow Verified</span>
             </div>
           </div>
         </header>
@@ -969,74 +942,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
           })()}
         </section>
 
-        {/* Platform Metrics Section */}
-        <section id="stats" className="stats-grid">
-          <div className="glass-panel stat-card">
-            <div className="stat-number cyan">10,000+</div>
-            <div className="stat-label">Talents Trained</div>
-          </div>
-          <div className="glass-panel stat-card">
-            <div className="stat-number emerald">150+</div>
-            <div className="stat-label">Corporate Partners</div>
-          </div>
-          <div className="glass-panel stat-card">
-            <div className="stat-number purple" style={{ background: "var(--grad-cyan-purple)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>98.7%</div>
-            <div className="stat-label">Vector Match Accuracy</div>
-          </div>
-          <div className="glass-panel stat-card">
-            <div className="stat-number amber">$1.5M+</div>
-            <div className="stat-label">Talent Contracts Paid</div>
-          </div>
-        </section>
 
-        {/* User Testimonials Grid */}
-        <section style={{ margin: "6rem 0" }}>
-          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-            <span className="badge badge-amber" style={{ marginBottom: "1rem", padding: "0.4rem 0.9rem" }}>Ecosystem Success</span>
-            <h2 style={{ fontSize: "2.75rem", marginBottom: "1rem" }}>Trusted by Talents and Enterprises</h2>
-            <p style={{ color: "var(--text-secondary)", maxWidth: "600px", margin: "0 auto", fontSize: "1rem" }}>
-              Hear from developers who advanced their skillsets and team leads who automated their recruitment search loops.
-            </p>
-          </div>
-
-          <div className="testimonials-grid">
-            <div className="glass-panel testimonial-card">
-              <div style={{ display: "flex", gap: "0.25rem", marginBottom: "1.25rem" }}>
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} fill="#fbbf24" stroke="none" />
-                ))}
-              </div>
-              <p className="testimonial-quote">
-                "The Skills & Interests Quizzes completely changed my roadmap. I was struggling to land frontend jobs until the platform highlighted that I lacked TypeScript and WebSockets expertise, recommending the precise modules to resolve the gaps."
-              </p>
-              <div className="testimonial-user">
-                <div className="testimonial-avatar">SL</div>
-                <div>
-                  <div style={{ fontSize: "0.95rem", fontWeight: 700 }}>Sarah Lin</div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Junior Fullstack Dev, formerly Self-Taught</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-panel testimonial-card">
-              <div style={{ display: "flex", gap: "0.25rem", marginBottom: "1.25rem" }}>
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} fill="#fbbf24" stroke="none" />
-                ))}
-              </div>
-              <p className="testimonial-quote">
-                "Hiring engineers used to take weeks of keyword filtering. With EdgeTalent's pgvector similarity search, we posted our technical description and instantly matched three engineers with the exact vector requirements. Highly recommended."
-              </p>
-              <div className="testimonial-user">
-                <div className="testimonial-avatar emerald">DK</div>
-                <div>
-                  <div style={{ fontSize: "0.95rem", fontWeight: 700 }}>David Kross</div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>VP of Engineering at CloudVent</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* FAQs Accordion */}
         <section id="faqs" className="faq-section">
@@ -1097,7 +1003,6 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
             <a href="#features" style={{ color: "var(--text-muted)" }}>Features</a>
             <a href="#pillars" style={{ color: "var(--text-muted)" }}>Pillars</a>
             <a href="#verify-certificate" style={{ color: "var(--text-muted)" }}>Quick Verify</a>
-            <a href="#stats" style={{ color: "var(--text-muted)" }}>Metrics</a>
             <a href="#faqs" style={{ color: "var(--text-muted)" }}>FAQs</a>
           </div>
           <p style={{ marginBottom: "0.5rem" }}>
