@@ -4,6 +4,7 @@ import { useSupabase } from "./context/SupabaseContext";
 
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import RoleOnboarding from "./pages/RoleOnboarding";
 import CertificateVerificationPage from "./pages/CertificateVerificationPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -94,6 +95,7 @@ export default function App(): React.ReactElement {
       />
       <Route path="/verify" element={<CertificateVerificationPage />} />
       <Route path="/verify/:credentialId" element={<CertificateVerificationPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* Onboarding */}
       <Route 

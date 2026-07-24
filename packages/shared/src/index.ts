@@ -16,6 +16,22 @@ export const RegisterSchema = z.object({
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address.")
+});
+
+export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>;
+
+export const ResetPasswordSchema = z.object({
+  password: z.string().min(6, "Password must be at least 6 characters long."),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters long.")
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"]
+});
+
+export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>;
+
 // 2. Profile Schemas
 export const PortfolioLinksSchema = z.object({
   github: z.string().url("Must be a valid URL").or(z.literal("")),

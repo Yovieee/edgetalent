@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { useSupabase } from "../context/SupabaseContext";
-import { LoginSchema, RegisterSchema } from "@edgetalent/shared";
+import { LoginSchema, RegisterSchema, ForgotPasswordSchema } from "@edgetalent/shared";
 import { ArrowLeft } from "lucide-react";
 
 interface AuthPageProps {
   onBack: () => void;
 }
 
+type AuthMode = "login" | "signup" | "forgot";
+
 export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement {
   const { supabase } = useSupabase();
-  const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
@@ -24,7 +26,19 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
     setSuccessMsg("");
 
     try {
-      if (isSignUp) {
+      if (mode === "forgot") {
+        const validationResult = ForgotPasswordSchema.safeParse({ email });
+        if (!validationResult.success) {
+          throw new Error(validationResult.error.errors[0].message);
+        }
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+
+        if (error) throw error;
+        setSuccessMsg("Password reset link sent! Please check your email inbox.");
+      } else if (mode === "signup") {
         // Zod validation for register payload
         const validationResult = RegisterSchema.safeParse({ email, password, fullName });
         if (!validationResult.success) {
@@ -64,6 +78,12 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
     }
   };
 
+  const changeMode = (newMode: AuthMode) => {
+    setMode(newMode);
+    setErrorMsg("");
+    setSuccessMsg("");
+  };
+
   return (
     <div className="animate-fade-in" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh", padding: "2rem" }}>
       <div className="glass-panel" style={{ width: "100%", maxWidth: "450px", padding: "2.5rem 2rem", position: "relative" }}>
@@ -76,10 +96,14 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
         </button>
 
         <h2 style={{ fontSize: "1.75rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "0.5rem" }}>
-          {isSignUp ? "Create Account" : "Welcome Back"}
+          {mode === "signup" ? "Create Account" : mode === "forgot" ? "Forgot Password" : "Welcome Back"}
         </h2>
         <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginBottom: "2rem" }}>
-          {isSignUp ? "Join the EdgeTalent ecosystem today" : "Log in to manage your career or projects"}
+          {mode === "signup"
+            ? "Join the EdgeTalent ecosystem today"
+            : mode === "forgot"
+            ? "Enter your email address to receive a password reset link"
+            : "Log in to manage your career or projects"}
         </p>
 
         {errorMsg && (
@@ -95,7 +119,7 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
         )}
 
         <form onSubmit={handleSubmit}>
-          {isSignUp && (
+          {mode === "signup" && (
             <div className="form-group">
               <label htmlFor="fullName">Full Name</label>
               <input
@@ -105,7 +129,7 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
                 placeholder="John Doe"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                required={isSignUp}
+                required={mode === "signup"}
               />
             </div>
           )}
@@ -123,36 +147,66 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
             />
           </div>
 
-          <div className="form-group" style={{ marginBottom: "2rem" }}>
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              className="form-input"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          {mode !== "forgot" && (
+            <div className="form-group" style={{ marginBottom: mode === "login" ? "0.75rem" : "2rem" }}>
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                className="form-input"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required={mode !== "forgot"}
+              />
+            </div>
+          )}
 
-          <button type="submit" className="btn btn-primary" style={{ width: "100%", marginBottom: "1.5rem" }} disabled={loading}>
-            {loading ? "Processing..." : isSignUp ? "Sign Up" : "Log In"}
+          {mode === "login" && (
+            <div style={{ textAlign: "right", marginBottom: "1.5rem" }}>
+              <button
+                type="button"
+                onClick={() => changeMode("forgot")}
+                style={{ background: "none", border: "none", color: "var(--color-cyan)", cursor: "pointer", fontSize: "0.85rem", fontWeight: "500" }}
+              >
+                Forgot password?
+              </button>
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary" style={{ width: "100%", marginBottom: "1.5rem", marginTop: mode === "forgot" ? "1.5rem" : "0" }} disabled={loading}>
+            {loading
+              ? "Processing..."
+              : mode === "signup"
+              ? "Sign Up"
+              : mode === "forgot"
+              ? "Send Reset Link"
+              : "Log In"}
           </button>
         </form>
 
         <div style={{ textAlign: "center", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
-          {isSignUp ? "Already have an account? " : "New to EdgeTalent? "}
-          <button 
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setErrorMsg("");
-              setSuccessMsg("");
-            }}
-            style={{ background: "none", border: "none", color: "var(--color-cyan)", cursor: "pointer", fontWeight: "600", textDecoration: "underline" }}
-          >
-            {isSignUp ? "Log In" : "Register"}
-          </button>
+          {mode === "forgot" ? (
+            <span>
+              Remember your password?{" "}
+              <button
+                onClick={() => changeMode("login")}
+                style={{ background: "none", border: "none", color: "var(--color-cyan)", cursor: "pointer", fontWeight: "600", textDecoration: "underline" }}
+              >
+                Log In
+              </button>
+            </span>
+          ) : (
+            <span>
+              {mode === "signup" ? "Already have an account? " : "New to EdgeTalent? "}
+              <button 
+                onClick={() => changeMode(mode === "signup" ? "login" : "signup")}
+                style={{ background: "none", border: "none", color: "var(--color-cyan)", cursor: "pointer", fontWeight: "600", textDecoration: "underline" }}
+              >
+                {mode === "signup" ? "Log In" : "Register"}
+              </button>
+            </span>
+          )}
         </div>
 
       </div>
