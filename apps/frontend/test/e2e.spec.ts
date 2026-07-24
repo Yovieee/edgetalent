@@ -414,24 +414,6 @@ test.describe('EdgeTalent Complete E2E User Journeys', () => {
     const appItem = page.locator('h4', { hasText: 'EdgeTalent AI Matching Engine' });
     await expect(appItem).toBeVisible();
 
-    // 9.5 Navigate to Funding Opportunities
-    const fundingTabBtn = page.locator('button', { hasText: 'Funding Opportunities' }).first();
-    await expect(fundingTabBtn).toBeVisible();
-    await fundingTabBtn.click();
-
-    // Verify funding opportunities are displayed
-    const fundingHeader = page.locator('h3', { hasText: 'Funding & Grants Hub' });
-    await expect(fundingHeader).toBeVisible();
-    const fundingOpp = page.locator('h4', { hasText: 'Y Combinator W27 Funding Program' });
-    await expect(fundingOpp).toBeVisible();
-
-    // Open details
-    await page.locator('button', { hasText: 'Read Details & Apply' }).first().click();
-    const detailModalTitle = page.locator('h3', { hasText: 'Y Combinator W27 Funding Program' });
-    await expect(detailModalTitle).toBeVisible();
-    // Close modal
-    await page.locator('#btn-close-funding-modal').click();
-
     // 10. Sign out and return home
     const signOutBtn = page.locator('button', { hasText: 'Sign Out' });
     await signOutBtn.click();

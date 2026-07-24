@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSupabase } from "../../context/SupabaseContext";
 import { 
   LayoutDashboard, Activity, GraduationCap, Briefcase, CheckSquare, 
-  Award, DollarSign, Calendar, User, LogOut, Menu, X 
+  Award, Calendar, User, LogOut, Menu, X 
 } from "lucide-react";
 import logo from "../../assets/logo.png";
 
@@ -36,7 +36,6 @@ export default function TalentLayout(): React.ReactElement {
     { to: "/talent/marketplace", label: "Marketplace", icon: <Briefcase size={20} /> },
     { to: "/talent/gigs", label: "My Gigs", icon: <CheckSquare size={20} /> },
     { to: "/talent/certificates", label: "Certificates", icon: <Award size={20} /> },
-    { to: "/talent/funding", label: "Funding Opportunities", icon: <DollarSign size={20} /> },
     { to: "/talent/events", label: "Events", icon: <Calendar size={20} /> }
   ];
 
@@ -48,7 +47,6 @@ export default function TalentLayout(): React.ReactElement {
     if (path.includes("marketplace")) return "Project Marketplace";
     if (path.includes("gigs")) return "My Gigs";
     if (path.includes("certificates")) return "Certificates";
-    if (path.includes("funding")) return "Funding Opportunities";
     if (path.includes("events")) return "Events Hub";
     if (path.includes("profile")) return "My Profile";
     return "Talent Dashboard";

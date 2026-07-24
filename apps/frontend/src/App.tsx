@@ -17,7 +17,6 @@ import TalentUpskilling from "./pages/talent/TalentUpskilling";
 import TalentMarketplace from "./pages/talent/TalentMarketplace";
 import TalentGigs from "./pages/talent/TalentGigs";
 import TalentCertificates from "./pages/talent/TalentCertificates";
-import TalentFunding from "./pages/talent/TalentFunding";
 import TalentEvents from "./pages/talent/TalentEvents";
 import TalentProfile from "./pages/talent/TalentProfile";
 
@@ -127,7 +126,6 @@ export default function App(): React.ReactElement {
           <Route path="marketplace" element={<TalentMarketplace />} />
           <Route path="gigs" element={<TalentGigs />} />
           <Route path="certificates" element={<TalentCertificates />} />
-          <Route path="funding" element={<TalentFunding />} />
           <Route path="events" element={<TalentEvents />} />
           <Route path="profile" element={<TalentProfile />} />
         </Route>
