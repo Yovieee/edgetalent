@@ -37,7 +37,7 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
         });
 
         if (error) throw error;
-        setSuccessMsg("Password reset link sent! Please check your email inbox.");
+        setSuccessMsg("Password reset link sent! Please check your inbox and spam folder. If you don't receive it, verify that redirect URLs are configured in Supabase.");
       } else if (mode === "signup") {
         // Zod validation for register payload
         const validationResult = RegisterSchema.safeParse({ email, password, fullName });
@@ -72,7 +72,15 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
         if (error) throw error;
       }
     } catch (err: any) {
-      setErrorMsg(err.message || "An authentication error occurred.");
+      let rawMsg = err?.message || "An authentication error occurred.";
+      if (rawMsg.toLowerCase().includes("rate limit") || rawMsg.toLowerCase().includes("over_email_send_rate_limit")) {
+        rawMsg = "Email rate limit exceeded. Please wait a few minutes before requesting another reset link or configure custom SMTP in Supabase.";
+      } else if (rawMsg.toLowerCase().includes("invalid login credentials")) {
+        rawMsg = "Invalid email or password. Please verify your credentials or reset your password.";
+      } else if (rawMsg.toLowerCase().includes("redirect")) {
+        rawMsg = "Password reset URL redirect error. Please ensure redirect URLs are configured in Supabase Dashboard.";
+      }
+      setErrorMsg(rawMsg);
     } finally {
       setLoading(false);
     }

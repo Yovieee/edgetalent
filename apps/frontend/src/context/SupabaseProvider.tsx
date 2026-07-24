@@ -19,11 +19,31 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
         .from("profiles")
         .select("*")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching profile:", error);
         setProfile(null);
+      } else if (!data) {
+        // Profile row missing in public.profiles table, attempt automatic creation
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) {
+          const fallbackProfile = {
+            id: userData.user.id,
+            email: userData.user.email || "",
+            full_name: userData.user.user_metadata?.full_name || userData.user.user_metadata?.name || userData.user.email?.split("@")[0] || "User",
+            role: null
+          };
+          const { data: createdData } = await supabase
+            .from("profiles")
+            .upsert(fallbackProfile)
+            .select("*")
+            .maybeSingle();
+
+          setProfile((createdData as Profile) || (fallbackProfile as any));
+        } else {
+          setProfile(null);
+        }
       } else {
         setProfile(data as Profile);
       }
