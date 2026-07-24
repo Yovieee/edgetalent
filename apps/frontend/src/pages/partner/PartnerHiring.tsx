@@ -42,7 +42,11 @@ export default function PartnerHiring(): React.ReactElement {
       if (error) throw error;
 
       if (data) {
-        const sorted = [...data].sort((a, b) => new Date(b.applied_at).getTime() - new Date(a.applied_at).getTime());
+        const sorted = [...data].sort((a, b) => {
+          const ta = a.applied_at ? new Date(a.applied_at).getTime() : 0;
+          const tb = b.applied_at ? new Date(b.applied_at).getTime() : 0;
+          return tb - ta;
+        });
         setApplications(sorted);
       }
     } catch (e: any) {
@@ -80,7 +84,7 @@ export default function PartnerHiring(): React.ReactElement {
       (app.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       (app.projects?.title || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchStatus =
-      statusFilter === "All" || app.status.toLowerCase() === statusFilter.toLowerCase();
+      statusFilter === "All" || (app.status || "").toLowerCase() === statusFilter.toLowerCase();
     return matchSearch && matchStatus;
   });
 
@@ -144,7 +148,7 @@ export default function PartnerHiring(): React.ReactElement {
         {/* Status Filter Buttons */}
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           {["All", "Applied", "Reviewing", "Shortlisted", "Accepted", "Rejected"].map((status) => {
-            const count = status === "All" ? applications.length : applications.filter(a => a.status.toLowerCase() === status.toLowerCase()).length;
+            const count = status === "All" ? applications.length : applications.filter(a => (a.status || "").toLowerCase() === status.toLowerCase()).length;
             const isActive = statusFilter === status;
             return (
               <button

@@ -369,6 +369,7 @@ async function runE2ETests() {
 
   } catch (err: any) {
     console.error("\n❌ E2E Integration Test failed: ", err.message);
+    process.exit(1);
   } finally {
     // -------------------------------------------------------------
     // Cleanup / Teardown

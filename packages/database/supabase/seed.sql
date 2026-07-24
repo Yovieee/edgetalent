@@ -129,7 +129,7 @@ INSERT INTO auth.users (
 (
   '30000000-0000-0000-0000-000000000001',
   '00000000-0000-0000-0000-000000000000'::uuid,
-  'admin@edgetalent.com',
+  'edgetalentindonesia@gmail.com',
   '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
   NOW(),
   '{"provider":"email","providers":["email"]}'::jsonb,
@@ -248,7 +248,7 @@ VALUES
 (
   '30000000-0000-0000-0000-000000000001',
   'EdgeTalent Master Admin',
-  'admin@edgetalent.com',
+  'edgetalentindonesia@gmail.com',
   'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&auto=format&fit=crop&q=80',
   'admin',
   'System administrator profile responsible for platform oversight and course moderation.',

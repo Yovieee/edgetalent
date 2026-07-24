@@ -51,7 +51,7 @@ export default function TalentOverview(): React.ReactElement {
       // 1. Fetch user applications
       const { data: appData } = await supabase
         .from("applications")
-        .select("*, projects(*, profiles(full_name, email))")
+        .select("*, projects(*, profiles!partner_id(full_name, email))")
         .eq("talent_id", profileId)
         .order("applied_at", { ascending: false });
 

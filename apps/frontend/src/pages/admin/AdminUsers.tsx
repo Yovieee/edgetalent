@@ -67,7 +67,11 @@ export default function AdminUsers(): React.ReactElement {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm("Are you sure you want to delete this user? This will also cascade delete their profile, projects, and applications.")) {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete this profile?\n\nNote: This removes the profile record but NOT the authentication account. The user may still be able to log in. To fully remove access, also delete the user from Supabase Auth dashboard.`
+      )
+    ) {
       return;
     }
     try {

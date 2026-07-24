@@ -60,42 +60,8 @@ ON public.course_enrollments FOR DELETE
 TO authenticated
 USING (auth.uid() = user_id OR public.is_admin());
 
--- Seed developer/talent courses
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM public.courses WHERE title = 'Advanced Frontend Engineering with React & TS') THEN
-    INSERT INTO public.courses (title, description, skills_taught, provider, link)
-    VALUES (
-      'Advanced Frontend Engineering with React & TS',
-      'Master React hooks, custom state management, performance profiling, and enterprise TypeScript applications.',
-      ARRAY['frontend', 'React', 'TypeScript', 'State Management'],
-      'EdgeTalent Academy',
-      ''
-    );
-  END IF;
+-- Courses insertion removed from migration; static UUID courses are managed by seed.sql.
 
-  IF NOT EXISTS (SELECT 1 FROM public.courses WHERE title = 'Enterprise Backend Development with Node.js') THEN
-    INSERT INTO public.courses (title, description, skills_taught, provider, link)
-    VALUES (
-      'Enterprise Backend Development with Node.js',
-      'Deep dive into Node.js, Express, databases, caching, and building scalable API gateways.',
-      ARRAY['backend', 'Node.js', 'Express', 'PostgreSQL', 'Redis'],
-      'EdgeTalent Academy',
-      ''
-    );
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM public.courses WHERE title = 'AI Engineering & Intelligent Systems') THEN
-    INSERT INTO public.courses (title, description, skills_taught, provider, link)
-    VALUES (
-      'AI Engineering & Intelligent Systems',
-      'Learn how to build applications using Large Language Models, embeddings, vector databases, and retrieval-augmented generation.',
-      ARRAY['ai', 'LLM', 'Prompt Engineering', 'Vector Databases', 'Python'],
-      'EdgeTalent Academy',
-      ''
-    );
-  END IF;
-END $$;
 
 -- Seed lessons for all courses
 DO $$

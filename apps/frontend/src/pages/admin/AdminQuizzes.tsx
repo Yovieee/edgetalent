@@ -272,7 +272,11 @@ export default function AdminQuizzes(): React.ReactElement {
                 type="text"
                 required
                 value={quizOption1}
-                onChange={(e) => setQuizOption1(e.target.value)}
+                onChange={(e) => {
+                  const newVal = e.target.value;
+                  if (quizAnswer === quizOption1) setQuizAnswer(newVal);
+                  setQuizOption1(newVal);
+                }}
                 className="form-input"
                 placeholder="Option A"
               />
@@ -283,7 +287,11 @@ export default function AdminQuizzes(): React.ReactElement {
                 type="text"
                 required
                 value={quizOption2}
-                onChange={(e) => setQuizOption2(e.target.value)}
+                onChange={(e) => {
+                  const newVal = e.target.value;
+                  if (quizAnswer === quizOption2) setQuizAnswer(newVal);
+                  setQuizOption2(newVal);
+                }}
                 className="form-input"
                 placeholder="Option B"
               />
@@ -293,7 +301,11 @@ export default function AdminQuizzes(): React.ReactElement {
               <input
                 type="text"
                 value={quizOption3}
-                onChange={(e) => setQuizOption3(e.target.value)}
+                onChange={(e) => {
+                  const newVal = e.target.value;
+                  if (quizAnswer === quizOption3) setQuizAnswer(newVal);
+                  setQuizOption3(newVal);
+                }}
                 className="form-input"
                 placeholder="Option C"
               />
@@ -303,7 +315,11 @@ export default function AdminQuizzes(): React.ReactElement {
               <input
                 type="text"
                 value={quizOption4}
-                onChange={(e) => setQuizOption4(e.target.value)}
+                onChange={(e) => {
+                  const newVal = e.target.value;
+                  if (quizAnswer === quizOption4) setQuizAnswer(newVal);
+                  setQuizOption4(newVal);
+                }}
                 className="form-input"
                 placeholder="Option D"
               />

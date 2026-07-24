@@ -199,7 +199,7 @@ export default function AdminCourses(): React.ReactElement {
       setSelectedLessonId(null);
       setLessonTitle("");
       setLessonContent("");
-      setLessonSequence(lessons.length + 1);
+      setLessonSequence(lessons.length > 0 ? Math.max(...lessons.map(l => l.sequence_order)) + 1 : 1);
       setLessonDuration(10);
     }
     setShowLessonForm(true);

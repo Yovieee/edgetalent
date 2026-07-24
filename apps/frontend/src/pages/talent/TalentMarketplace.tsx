@@ -136,7 +136,7 @@ export default function TalentMarketplace(): React.ReactElement {
                   <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Budget: <b>{project.budget !== null && project.budget !== undefined ? `$${project.budget}` : "Negotiable"}</b></span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
-                  {project.required_skills.map((skill: string, idx: number) => (
+                  {(project.required_skills || []).map((skill: string, idx: number) => (
                     <span key={idx} className="badge badge-purple" style={{ fontSize: "0.7rem" }}>{skill}</span>
                   ))}
                 </div>

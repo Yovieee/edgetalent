@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSupabase } from "../context/SupabaseContext";
 import { ResetPasswordSchema } from "@edgetalent/shared";
@@ -13,6 +13,14 @@ export default function ResetPasswordPage(): React.ReactElement {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        setErrorMsg("Your password reset link has expired or is invalid. Please request a new one.");
+      }
+    });
+  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

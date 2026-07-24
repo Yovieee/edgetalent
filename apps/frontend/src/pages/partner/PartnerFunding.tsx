@@ -8,7 +8,7 @@ export default function PartnerFunding(): React.ReactElement {
 
   const [fundingOpportunities, setFundingOpportunities] = useState<FundingOpportunity[]>([]);
   const [loadingFunding, setLoadingFunding] = useState<boolean>(false);
-  const [searchFundingQuery, setSearchFundingQuery] = useState<string>(" ");
+  const [searchFundingQuery, setSearchFundingQuery] = useState<string>("");
   const [selectedFundingCategory, setSelectedFundingCategory] = useState<string>("All");
   
   // Modal states
@@ -97,7 +97,7 @@ export default function PartnerFunding(): React.ReactElement {
             let fitPercent = 0;
             if (profile && profile.skills) {
               const userSkills = profile.skills.map((s: string) => s.toLowerCase());
-              const text = (opp.title + " " + opp.description + " " + opp.content).toLowerCase();
+              const text = [opp.title, opp.description, opp.content].filter(Boolean).join(" ").toLowerCase();
               let matches = 0;
               userSkills.forEach((s: string) => {
                 if (text.includes(s)) matches++;

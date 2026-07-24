@@ -16,6 +16,7 @@ export default function TalentUpskilling(): React.ReactElement {
   const [loadingCourseLessons, setLoadingCourseLessons] = useState<boolean>(false);
   const [activeLessonIdx, setActiveLessonIdx] = useState<number>(0);
   const [allLessonsSummary, setAllLessonsSummary] = useState<Record<string, number>>({});
+  const [enrollingCourseId, setEnrollingCourseId] = useState<string | null>(null);
 
   const profileId = profile?.id;
   const skillGaps = profile?.skill_gaps;
@@ -35,11 +36,13 @@ export default function TalentUpskilling(): React.ReactElement {
     }
   }, [profileId, supabase]);
 
-  const fetchAllLessonsSummary = useCallback(async () => {
+  const fetchAllLessonsSummary = useCallback(async (courseIds: string[]) => {
+    if (!courseIds || courseIds.length === 0) return;
     try {
       const { data, error } = await supabase
         .from("course_lessons")
-        .select("id, course_id");
+        .select("id, course_id")
+        .in("course_id", courseIds);
       if (!error && data) {
         const counts: Record<string, number> = {};
         data.forEach((lesson: any) => {
@@ -76,12 +79,22 @@ export default function TalentUpskilling(): React.ReactElement {
 
   useEffect(() => {
     loadEnrollments();
-    fetchAllLessonsSummary();
     loadCourses();
-  }, [loadEnrollments, fetchAllLessonsSummary, loadCourses]);
+  }, [loadEnrollments, loadCourses]);
+
+  useEffect(() => {
+    const loadedCourseIds = Array.from(new Set([
+      ...courses.map(c => c.id),
+      ...enrollments.map(e => e.course_id)
+    ])).filter(Boolean);
+    if (loadedCourseIds.length > 0) {
+      fetchAllLessonsSummary(loadedCourseIds);
+    }
+  }, [courses, enrollments, fetchAllLessonsSummary]);
 
   const handleEnrollCourse = async (courseId: string) => {
-    if (!profileId) return;
+    if (!profileId || enrollingCourseId) return;
+    setEnrollingCourseId(courseId);
     try {
       const credId = generateNanoId(8);
       const { error } = await supabase
@@ -95,10 +108,12 @@ export default function TalentUpskilling(): React.ReactElement {
       if (error) {
         alert("Enrollment failed: " + error.message);
       } else {
-        loadEnrollments();
+        await loadEnrollments();
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setEnrollingCourseId(null);
     }
   };
 
@@ -254,9 +269,10 @@ export default function TalentUpskilling(): React.ReactElement {
                     <button
                       className="btn btn-primary"
                       style={{ width: "100%" }}
+                      disabled={enrollingCourseId === course.id}
                       onClick={() => handleEnrollCourse(course.id)}
                     >
-                      Enroll in Course
+                      {enrollingCourseId === course.id ? "Enrolling..." : "Enroll in Course"}
                     </button>
                   )}
                 </div>

@@ -21,7 +21,7 @@ export default function PartnerProjects(): React.ReactElement {
   const [showPostModal, setShowPostModal] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [requiredSkills, setRequiredSkills] = useState<string>(" ");
+  const [requiredSkills, setRequiredSkills] = useState<string>("");
   const [budget, setBudget] = useState<string>("");
   const [scope, setScope] = useState<"short-term" | "medium-term" | "long-term">("short-term");
   const [posting, setPosting] = useState<boolean>(false);
@@ -278,7 +278,7 @@ export default function PartnerProjects(): React.ReactElement {
                                 </div>
                                 <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>{talent.bio}</p>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
-                                  {talent.skills.map((skill: string, idx: number) => (
+                                  {(talent.skills || []).map((skill: string, idx: number) => (
                                     <span key={idx} className="badge badge-emerald" style={{ fontSize: "0.65rem" }}>{skill}</span>
                                   ))}
                                 </div>

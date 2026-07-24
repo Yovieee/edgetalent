@@ -90,6 +90,8 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
     setMode(newMode);
     setErrorMsg("");
     setSuccessMsg("");
+    setPassword("");
+    setFullName("");
   };
 
   return (

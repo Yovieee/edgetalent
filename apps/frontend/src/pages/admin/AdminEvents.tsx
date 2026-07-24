@@ -108,26 +108,30 @@ export default function AdminEvents(): React.ReactElement {
 
   const handleSaveEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
-      title: eventTitle,
-      description: eventDescription,
-      content: eventContent,
-      event_date: eventDate ? new Date(eventDate).toISOString() : "",
-      location: eventLocation,
-      organizer: eventOrganizer,
-      category: eventCategory,
-      capacity: eventCapacity ? parseInt(eventCapacity, 10) : null,
-      link: eventLink || null,
-      organizer_id: profile?.id || null
-    };
-
-    const validate = EventSchema.safeParse(payload);
-    if (!validate.success) {
-      showStatus("Validation Error: " + validate.error.errors[0].message, "error");
-      return;
-    }
-
     try {
+      const parsedDate = new Date(eventDate);
+      if (isNaN(parsedDate.getTime())) throw new Error("Please enter a valid event date.");
+      const isoDate = parsedDate.toISOString();
+
+      const payload = {
+        title: eventTitle,
+        description: eventDescription,
+        content: eventContent,
+        event_date: isoDate,
+        location: eventLocation,
+        organizer: eventOrganizer,
+        category: eventCategory,
+        capacity: eventCapacity ? parseInt(eventCapacity, 10) : null,
+        link: eventLink || null,
+        organizer_id: profile?.id || null
+      };
+
+      const validate = EventSchema.safeParse(payload);
+      if (!validate.success) {
+        showStatus("Validation Error: " + validate.error.errors[0].message, "error");
+        return;
+      }
+
       let error;
       if (editMode && selectedId) {
         const { error: err } = await supabase

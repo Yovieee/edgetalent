@@ -11,7 +11,7 @@ export default function PartnerEvents(): React.ReactElement {
   const [allRegistrations, setAllRegistrations] = useState<any[]>([]);
   
   // Search & Filter state
-  const [searchEventQuery, setSearchEventQuery] = useState<string>(" ");
+  const [searchEventQuery, setSearchEventQuery] = useState<string>("");
   const [selectedEventCategory, setSelectedEventCategory] = useState<string>("All");
   
   // Modal & Loading state
@@ -39,15 +39,15 @@ export default function PartnerEvents(): React.ReactElement {
   }, [supabase]);
 
   const loadEventRegistrations = useCallback(async () => {
+    if (!profileId) return;
     try {
       const { data, error } = await supabase
         .from("event_registrations")
-        .select("*");
+        .select("*")
+        .eq("user_id", profileId);
       if (!error && data) {
         setAllRegistrations(data);
-        if (profileId) {
-          setEventRegistrations(data.filter((r: any) => r.user_id === profileId));
-        }
+        setEventRegistrations(data);
       }
     } catch (e) {
       console.error(e);

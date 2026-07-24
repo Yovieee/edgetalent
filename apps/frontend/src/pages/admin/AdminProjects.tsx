@@ -92,6 +92,11 @@ export default function AdminProjects(): React.ReactElement {
   const openProjectModal = (proj?: ProjectItem) => {
     const defaultPartner = users.find((u) => u.role === "partner")?.id || "";
 
+    if (!proj && !defaultPartner) {
+      showStatus("No partner users found. Please create a partner user first.", "error");
+      return;
+    }
+
     if (proj) {
       setEditMode(true);
       setSelectedId(proj.id);

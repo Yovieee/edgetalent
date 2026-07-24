@@ -39,15 +39,15 @@ export default function TalentEvents(): React.ReactElement {
   }, [supabase]);
 
   const loadEventRegistrations = useCallback(async () => {
+    if (!profileId) return;
     try {
       const { data, error } = await supabase
         .from("event_registrations")
-        .select("*");
+        .select("*")
+        .eq("user_id", profileId);
       if (!error && data) {
         setAllRegistrations(data);
-        if (profileId) {
-          setEventRegistrations(data.filter((r: any) => r.user_id === profileId));
-        }
+        setEventRegistrations(data);
       }
     } catch (e) {
       console.error(e);

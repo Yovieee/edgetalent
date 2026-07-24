@@ -128,6 +128,8 @@ export const CourseEnrollmentSchema = z.object({
   completed_lessons: z.array(z.string().uuid()).default([]),
   completed_at: z.string().nullable().optional(),
   last_accessed_at: z.string().optional(),
+  credential_id: z.string().nullable().optional(),
+  digital_signature: z.string().nullable().optional(),
   created_at: z.string().optional()
 });
 
@@ -176,3 +178,20 @@ export const EventRegistrationSchema = z.object({
 });
 
 export type EventRegistration = z.infer<typeof EventRegistrationSchema>;
+
+// 12. Talent Certificate Schema
+export const TalentCertificateSchema = z.object({
+  id: z.string().uuid().optional(),
+  user_id: z.string().uuid(),
+  name: z.string().min(1, "Certificate name cannot be empty"),
+  issuing_organization: z.string().min(1, "Issuing organization cannot be empty"),
+  issue_date: z.string().min(1, "Issue date cannot be empty"),
+  expiration_date: z.string().nullable().optional(),
+  credential_id: z.string().nullable().optional(),
+  credential_url: z.string().url("Must be a valid URL").or(z.literal("")).nullable().optional(),
+  digital_signature: z.string().nullable().optional(),
+  created_at: z.string().optional()
+});
+
+export type TalentCertificate = z.infer<typeof TalentCertificateSchema>;
+

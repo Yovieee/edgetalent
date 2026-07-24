@@ -139,7 +139,7 @@ export default function PartnerLayout(): React.ReactElement {
                     className="user-profile-popover-item danger"
                     onClick={() => {
                       setIsProfileMenuOpen(false);
-                      signOut().then(() => navigate("/"));
+                      signOut().then(() => navigate("/")).catch(err => console.error("Sign out error:", err));
                     }}
                   >
                     <LogOut size={16} />

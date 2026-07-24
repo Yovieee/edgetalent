@@ -97,7 +97,7 @@ export default function TalentFunding(): React.ReactElement {
             let fitPercent = 0;
             if (profile && profile.skills) {
               const userSkills = profile.skills.map((s: string) => s.toLowerCase());
-              const text = (opp.title + " " + opp.description + " " + opp.content).toLowerCase();
+              const text = [opp.title, opp.description, opp.content].filter(Boolean).join(" ").toLowerCase();
               let matches = 0;
               userSkills.forEach((s: string) => {
                 if (text.includes(s)) matches++;

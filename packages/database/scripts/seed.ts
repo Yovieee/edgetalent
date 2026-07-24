@@ -30,7 +30,11 @@ function getEnv(key: string, fallback: string = ""): string {
 }
 
 const supabaseUrl = getEnv("SUPABASE_URL", getEnv("VITE_SUPABASE_URL", "https://mhafjhtzpgdyalzwbgky.supabase.co"));
-const supabaseKey = getEnv("SUPABASE_SERVICE_ROLE_KEY", getEnv("VITE_SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oYWZqaHR6cGdkeWFsendiZ2t5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MDEzMzQsImV4cCI6MjA5ODk3NzMzNH0.vjG06M3QeZPt4BELgG8zNWHIRgOxU9lM3VGO89_38i8"));
+const supabaseKey = getEnv("SUPABASE_SERVICE_ROLE_KEY");
+if (!supabaseKey) {
+  console.error("❌ SUPABASE_SERVICE_ROLE_KEY is required for seeding. Please set it in .env");
+  process.exit(1);
+}
 
 console.log("🌱 Initializing EdgeTalent High-Quality Database Seeder...");
 console.log(`📍 Supabase Endpoint: ${supabaseUrl}`);
@@ -55,7 +59,7 @@ async function seedDatabase() {
       { id: "20000000-0000-0000-0000-000000000001", email: "contact@nexusailabs.io", full_name: "Nexus AI Labs" },
       { id: "20000000-0000-0000-0000-000000000002", email: "partnerships@quantumpay.com", full_name: "QuantumPay FinTech" },
       { id: "20000000-0000-0000-0000-000000000003", email: "info@elevatehealth.org", full_name: "ElevateHealth Tech" },
-      { id: "30000000-0000-0000-0000-000000000001", email: "admin@edgetalent.com", full_name: "EdgeTalent Master Admin" }
+      { id: "30000000-0000-0000-0000-000000000001", email: "edgetalentindonesia@gmail.com", full_name: "EdgeTalent Master Admin" }
     ];
 
     if (supabase.auth?.admin) {
@@ -174,7 +178,7 @@ async function seedDatabase() {
       {
         id: "30000000-0000-0000-0000-000000000001",
         full_name: "EdgeTalent Master Admin",
-        email: "admin@edgetalent.com",
+        email: "edgetalentindonesia@gmail.com",
         avatar_url: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&auto=format&fit=crop&q=80",
         role: "admin",
         bio: "System administrator profile responsible for platform oversight and course moderation.",

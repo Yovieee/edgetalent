@@ -21,7 +21,7 @@ export default function TalentGigs(): React.ReactElement {
     try {
       const { data, error } = await supabase
         .from("applications")
-        .select("*, projects(*, profiles(full_name, email))")
+        .select("*, projects(*, profiles!partner_id(full_name, email))")
         .eq("talent_id", profileId);
       if (!error && data) setApplications(data);
     } catch (e) {

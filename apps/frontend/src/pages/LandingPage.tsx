@@ -250,7 +250,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps): React.Rea
   const handleQuickVerifySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!verifyIdInput.trim()) return;
-    onNavigate(`verify`);
+    onNavigate(`/verify/${encodeURIComponent(verifyIdInput.trim())}`);
   };
 
   const faqs = [

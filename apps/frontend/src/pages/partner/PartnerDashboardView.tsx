@@ -63,12 +63,7 @@ export default function PartnerDashboardView(): React.ReactElement {
         }
       }
 
-      // 3. Load enterprise course enrollments
-      const { data: courseEnrollments } = await supabase
-        .from("course_enrollments")
-        .select("*, courses(*)")
-        .limit(10);
-      if (courseEnrollments) setEnrollments(courseEnrollments);
+      // 3. Enterprise course enrollments query removed (unscoped)
 
       // 4. Load top AI talent candidates for spotlight
       const { data: talentProfiles } = await supabase
