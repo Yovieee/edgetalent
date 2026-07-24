@@ -28,19 +28,31 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
         // Profile row missing in public.profiles table, attempt automatic creation
         const { data: userData } = await supabase.auth.getUser();
         if (userData?.user) {
+          // Intentionally omit 'role' so upsert never overwrites an existing
+          // admin (or other) role that was set via SQL / promote function.
           const fallbackProfile = {
             id: userData.user.id,
             email: userData.user.email || "",
             full_name: userData.user.user_metadata?.full_name || userData.user.user_metadata?.name || userData.user.email?.split("@")[0] || "User",
-            role: null
           };
           const { data: createdData } = await supabase
             .from("profiles")
-            .upsert(fallbackProfile)
+            .upsert(fallbackProfile, { onConflict: "id" })
             .select("*")
             .maybeSingle();
 
-          setProfile((createdData as Profile) || (fallbackProfile as any));
+          if (createdData) {
+            setProfile(createdData as Profile);
+          } else {
+            // Upsert may have failed due to RLS; retry a plain SELECT
+            // in case the profile actually exists (e.g. created by trigger).
+            const { data: retryData } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", userData.user.id)
+              .maybeSingle();
+            setProfile((retryData as Profile) || null);
+          }
         } else {
           setProfile(null);
         }
