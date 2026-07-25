@@ -88,6 +88,45 @@ INSERT INTO auth.users (
   'authenticated'
 ),
 (
+  '10000000-0000-0000-0000-000000000006',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'budi.santoso@cyberedge.id',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Budi Santoso"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '10000000-0000-0000-0000-000000000007',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'aisha.patel@dataminds.io',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Aisha Patel"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '10000000-0000-0000-0000-000000000008',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'kenji.sato@robotics.jp',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"Kenji Sato"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
   '20000000-0000-0000-0000-000000000001',
   '00000000-0000-0000-0000-000000000000'::uuid,
   'contact@nexusailabs.io',
@@ -121,6 +160,45 @@ INSERT INTO auth.users (
   NOW(),
   '{"provider":"email","providers":["email"]}'::jsonb,
   '{"full_name":"ElevateHealth Tech"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '20000000-0000-0000-0000-000000000004',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'contact@cybershield.tech',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"CyberShield Solutions"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '20000000-0000-0000-0000-000000000005',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'partnerships@datasphere.io',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"DataSphere Analytics"}'::jsonb,
+  NOW(),
+  NOW(),
+  'authenticated',
+  'authenticated'
+),
+(
+  '20000000-0000-0000-0000-000000000006',
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'innovate@edgehardware.io',
+  '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+  NOW(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"full_name":"EdgeHardware Systems"}'::jsonb,
   NOW(),
   NOW(),
   'authenticated',
@@ -207,6 +285,42 @@ VALUES
   ARRAY['React', 'UI/UX Design'],
   ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
 ),
+(
+  '10000000-0000-0000-0000-000000000006',
+  'Budi Santoso',
+  'budi.santoso@cyberedge.id',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80',
+  'talent',
+  'Cybersecurity Specialist & DevSecOps Engineer with 6+ years in penetration testing, smart contract security, and zero-trust cloud infrastructure.',
+  '{"github": "https://github.com/budisantoso-sec", "linkedin": "https://linkedin.com/in/budisantoso-sec"}'::jsonb,
+  ARRAY['Cybersecurity', 'DevSecOps', 'Penetration Testing', 'Solidity', 'Smart Contracts', 'Python', 'Linux', 'Docker'],
+  ARRAY['Flutter', 'React Native'],
+  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
+),
+(
+  '10000000-0000-0000-0000-000000000007',
+  'Aisha Patel',
+  'aisha.patel@dataminds.io',
+  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80',
+  'talent',
+  'Senior Data Scientist & Analytics Engineer specializing in Big Data processing pipelines, Apache Spark, Snowflake, and predictive ML modeling.',
+  '{"github": "https://github.com/aishapatel-data", "linkedin": "https://linkedin.com/in/aishapatel-data", "website": "https://aishapatel.dev"}'::jsonb,
+  ARRAY['Data Science', 'Python', 'SQL', 'Apache Spark', 'Snowflake', 'Machine Learning', 'Pandas', 'Scikit-Learn'],
+  ARRAY['GraphQL', 'Swift'],
+  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
+),
+(
+  '10000000-0000-0000-0000-000000000008',
+  'Kenji Sato',
+  'kenji.sato@robotics.jp',
+  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80',
+  'talent',
+  'Embedded Systems & IoT Engineer developing real-time firmware, C/C++ microcontrollers, and edge AI hardware vision modules.',
+  '{"github": "https://github.com/kenjisato-iot", "linkedin": "https://linkedin.com/in/kenjisato-iot"}'::jsonb,
+  ARRAY['Embedded Systems', 'IoT', 'C++', 'C', 'Rust', 'Raspberry Pi', 'Edge AI', 'RTOS'],
+  ARRAY['React', 'Figma'],
+  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
+),
 -- Partners
 (
   '20000000-0000-0000-0000-000000000001',
@@ -241,6 +355,42 @@ VALUES
   'ElevateHealth leverages digital workflows and AI diagnostics to provide accessible healthcare across emerging markets.',
   '{"website": "https://elevatehealth.org"}'::jsonb,
   ARRAY['HealthTech', 'AI', 'React Native'],
+  ARRAY[]::text[],
+  NULL
+),
+(
+  '20000000-0000-0000-0000-000000000004',
+  'CyberShield Solutions',
+  'contact@cybershield.tech',
+  'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&auto=format&fit=crop&q=80',
+  'partner',
+  'Enterprise cybersecurity and blockchain defense company providing automated vulnerability scanning and audit platforms.',
+  '{"website": "https://cybershield.tech", "linkedin": "https://linkedin.com/company/cybershield-tech"}'::jsonb,
+  ARRAY['Cybersecurity', 'DevSecOps', 'Smart Contracts', 'Python'],
+  ARRAY[]::text[],
+  NULL
+),
+(
+  '20000000-0000-0000-0000-000000000005',
+  'DataSphere Analytics',
+  'partnerships@datasphere.io',
+  'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&auto=format&fit=crop&q=80',
+  'partner',
+  'Next-gen real-time data analytics cloud provider empowering enterprises with intelligent data lakes and business predictive insights.',
+  '{"website": "https://datasphere.io", "linkedin": "https://linkedin.com/company/datasphere-io"}'::jsonb,
+  ARRAY['Data Science', 'Apache Spark', 'Snowflake', 'Python'],
+  ARRAY[]::text[],
+  NULL
+),
+(
+  '20000000-0000-0000-0000-000000000006',
+  'EdgeHardware Systems',
+  'innovate@edgehardware.io',
+  'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=80',
+  'partner',
+  'Hardware accelerator and edge computing vendor building ultra-low-power AI microchips and embedded sensors.',
+  '{"website": "https://edgehardware.io"}'::jsonb,
+  ARRAY['Embedded Systems', 'IoT', 'Edge AI', 'C++'],
   ARRAY[]::text[],
   NULL
 ),
@@ -320,6 +470,36 @@ VALUES
   50000000.00,
   'medium-term',
   ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
+),
+(
+  '40000000-0000-0000-0000-000000000006',
+  '20000000-0000-0000-0000-000000000004',
+  'Automated Smart Contract Vulnerability Scanner & Audit Platform',
+  'Develop an automated static-analysis engine in Python & Rust to detect reentrancy and integer overflow vulnerabilities in Solidity contracts.',
+  ARRAY['Cybersecurity', 'DevSecOps', 'Solidity', 'Smart Contracts', 'Python'],
+  55000000.00,
+  'medium-term',
+  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
+),
+(
+  '40000000-0000-0000-0000-000000000007',
+  '20000000-0000-0000-0000-000000000005',
+  'Real-Time Streaming ETL & Anomaly Detection Pipeline',
+  'Architect a scalable PySpark & Kafka streaming data pipeline to process 10M+ daily events with real-time anomaly detection.',
+  ARRAY['Data Science', 'Python', 'Apache Spark', 'SQL', 'Machine Learning'],
+  65000000.00,
+  'long-term',
+  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
+),
+(
+  '40000000-0000-0000-0000-000000000008',
+  '20000000-0000-0000-0000-000000000006',
+  'Ultra-Low Power Edge AI Vision Firmware',
+  'Optimize MobileNet C++ inference for ARM Cortex-M microcontrollers with sub-10mW power consumption.',
+  ARRAY['Embedded Systems', 'IoT', 'C++', 'Edge AI', 'RTOS'],
+  48000000.00,
+  'medium-term',
+  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
 )
 ON CONFLICT (id) DO UPDATE
 SET title = EXCLUDED.title,
@@ -368,6 +548,34 @@ VALUES
   'shortlisted',
   94.00,
   '{"skills_match": 96, "ui_design": 98}'::jsonb
+),
+(
+  '40000000-0000-0000-0000-000000000006',
+  '10000000-0000-0000-0000-000000000006',
+  'accepted',
+  97.50,
+  '{"skills_match": 100, "security_audit": 95}'::jsonb
+),
+(
+  '40000000-0000-0000-0000-000000000007',
+  '10000000-0000-0000-0000-000000000007',
+  'accepted',
+  98.00,
+  '{"skills_match": 98, "spark_etl": 98}'::jsonb
+),
+(
+  '40000000-0000-0000-0000-000000000008',
+  '10000000-0000-0000-0000-000000000008',
+  'accepted',
+  96.50,
+  '{"skills_match": 96, "firmware_dev": 97}'::jsonb
+),
+(
+  '40000000-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000007',
+  'shortlisted',
+  86.50,
+  '{"skills_match": 85, "ml_experience": 88}'::jsonb
 )
 ON CONFLICT (project_id, talent_id) DO UPDATE
 SET status = EXCLUDED.status,
@@ -512,6 +720,36 @@ VALUES
   'AWS-SAP-773419',
   'https://aws.amazon.com/verification/AWS-SAP-773419',
   'sig_aws_sap_773419_david_kalu'
+),
+(
+  '10000000-0000-0000-0000-000000000006',
+  'Certified Information Systems Security Professional (CISSP)',
+  'ISC2',
+  '2025-01-15',
+  '2028-01-15',
+  'CISSP-991204',
+  'https://www.isc2.org/certifications/cissp',
+  'sig_cissp_991204_budi_santoso'
+),
+(
+  '10000000-0000-0000-0000-000000000007',
+  'Databricks Certified Data Engineer Professional',
+  'Databricks',
+  '2025-05-20',
+  '2027-05-20',
+  'DBX-DEP-441829',
+  'https://credentials.databricks.com/verify/DBX-DEP-441829',
+  'sig_dbx_dep_441829_aisha_patel'
+),
+(
+  '10000000-0000-0000-0000-000000000008',
+  'Arm Certified Engineer - Embedded Systems',
+  'Arm',
+  '2024-10-10',
+  '2027-10-10',
+  'ARM-ECE-552109',
+  'https://arm.com/verification/ARM-ECE-552109',
+  'sig_arm_ece_552109_kenji_sato'
 )
 ON CONFLICT DO NOTHING;
 
@@ -598,7 +836,10 @@ INSERT INTO public.event_registrations (event_id, user_id)
 VALUES
 ('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001'),
 ('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002'),
-('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001')
+('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001'),
+('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000006'),
+('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000007'),
+('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000008')
 ON CONFLICT (event_id, user_id) DO NOTHING;
 
 -- -------------------------------------------------------------------------

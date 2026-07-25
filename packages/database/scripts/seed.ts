@@ -56,9 +56,15 @@ async function seedDatabase() {
       { id: "10000000-0000-0000-0000-000000000003", email: "elena.rostova@uxcraft.design", full_name: "Elena Rostova" },
       { id: "10000000-0000-0000-0000-000000000004", email: "alex.rivera@mobileedge.io", full_name: "Alex Rivera" },
       { id: "10000000-0000-0000-0000-000000000005", email: "david.kalu@cloudops.net", full_name: "David Kalu" },
+      { id: "10000000-0000-0000-0000-000000000006", email: "budi.santoso@cyberedge.id", full_name: "Budi Santoso" },
+      { id: "10000000-0000-0000-0000-000000000007", email: "aisha.patel@dataminds.io", full_name: "Aisha Patel" },
+      { id: "10000000-0000-0000-0000-000000000008", email: "kenji.sato@robotics.jp", full_name: "Kenji Sato" },
       { id: "20000000-0000-0000-0000-000000000001", email: "contact@nexusailabs.io", full_name: "Nexus AI Labs" },
       { id: "20000000-0000-0000-0000-000000000002", email: "partnerships@quantumpay.com", full_name: "QuantumPay FinTech" },
       { id: "20000000-0000-0000-0000-000000000003", email: "info@elevatehealth.org", full_name: "ElevateHealth Tech" },
+      { id: "20000000-0000-0000-0000-000000000004", email: "contact@cybershield.tech", full_name: "CyberShield Solutions" },
+      { id: "20000000-0000-0000-0000-000000000005", email: "partnerships@datasphere.io", full_name: "DataSphere Analytics" },
+      { id: "20000000-0000-0000-0000-000000000006", email: "innovate@edgehardware.io", full_name: "EdgeHardware Systems" },
       { id: "30000000-0000-0000-0000-000000000001", email: "edgetalentindonesia@gmail.com", full_name: "EdgeTalent Master Admin" }
     ];
 
@@ -143,6 +149,42 @@ async function seedDatabase() {
         skills_embedding: mockVector
       },
       {
+        id: "10000000-0000-0000-0000-000000000006",
+        full_name: "Budi Santoso",
+        email: "budi.santoso@cyberedge.id",
+        avatar_url: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80",
+        role: "talent",
+        bio: "Cybersecurity Specialist & DevSecOps Engineer with 6+ years in penetration testing, smart contract security, and zero-trust cloud infrastructure.",
+        portfolio_links: { github: "https://github.com/budisantoso-sec", linkedin: "https://linkedin.com/in/budisantoso-sec" },
+        skills: ["Cybersecurity", "DevSecOps", "Penetration Testing", "Solidity", "Smart Contracts", "Python", "Linux", "Docker"],
+        skill_gaps: ["Flutter", "React Native"],
+        skills_embedding: mockVector
+      },
+      {
+        id: "10000000-0000-0000-0000-000000000007",
+        full_name: "Aisha Patel",
+        email: "aisha.patel@dataminds.io",
+        avatar_url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80",
+        role: "talent",
+        bio: "Senior Data Scientist & Analytics Engineer specializing in Big Data processing pipelines, Apache Spark, Snowflake, and predictive ML modeling.",
+        portfolio_links: { github: "https://github.com/aishapatel-data", linkedin: "https://linkedin.com/in/aishapatel-data", website: "https://aishapatel.dev" },
+        skills: ["Data Science", "Python", "SQL", "Apache Spark", "Snowflake", "Machine Learning", "Pandas", "Scikit-Learn"],
+        skill_gaps: ["GraphQL", "Swift"],
+        skills_embedding: mockVector
+      },
+      {
+        id: "10000000-0000-0000-0000-000000000008",
+        full_name: "Kenji Sato",
+        email: "kenji.sato@robotics.jp",
+        avatar_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80",
+        role: "talent",
+        bio: "Embedded Systems & IoT Engineer developing real-time firmware, C/C++ microcontrollers, and edge AI hardware vision modules.",
+        portfolio_links: { github: "https://github.com/kenjisato-iot", linkedin: "https://linkedin.com/in/kenjisato-iot" },
+        skills: ["Embedded Systems", "IoT", "C++", "C", "Rust", "Raspberry Pi", "Edge AI", "RTOS"],
+        skill_gaps: ["React", "Figma"],
+        skills_embedding: mockVector
+      },
+      {
         id: "20000000-0000-0000-0000-000000000001",
         full_name: "Nexus AI Labs",
         email: "contact@nexusailabs.io",
@@ -173,6 +215,39 @@ async function seedDatabase() {
         bio: "ElevateHealth leverages digital workflows and AI diagnostics to provide accessible healthcare across emerging markets.",
         portfolio_links: { website: "https://elevatehealth.org" },
         skills: ["HealthTech", "AI", "React Native"],
+        skill_gaps: []
+      },
+      {
+        id: "20000000-0000-0000-0000-000000000004",
+        full_name: "CyberShield Solutions",
+        email: "contact@cybershield.tech",
+        avatar_url: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&auto=format&fit=crop&q=80",
+        role: "partner",
+        bio: "Enterprise cybersecurity and blockchain defense company providing automated vulnerability scanning and audit platforms.",
+        portfolio_links: { website: "https://cybershield.tech", linkedin: "https://linkedin.com/company/cybershield-tech" },
+        skills: ["Cybersecurity", "DevSecOps", "Smart Contracts", "Python"],
+        skill_gaps: []
+      },
+      {
+        id: "20000000-0000-0000-0000-000000000005",
+        full_name: "DataSphere Analytics",
+        email: "partnerships@datasphere.io",
+        avatar_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&auto=format&fit=crop&q=80",
+        role: "partner",
+        bio: "Next-gen real-time data analytics cloud provider empowering enterprises with intelligent data lakes and business predictive insights.",
+        portfolio_links: { website: "https://datasphere.io", linkedin: "https://linkedin.com/company/datasphere-io" },
+        skills: ["Data Science", "Apache Spark", "Snowflake", "Python"],
+        skill_gaps: []
+      },
+      {
+        id: "20000000-0000-0000-0000-000000000006",
+        full_name: "EdgeHardware Systems",
+        email: "innovate@edgehardware.io",
+        avatar_url: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=80",
+        role: "partner",
+        bio: "Hardware accelerator and edge computing vendor building ultra-low-power AI microchips and embedded sensors.",
+        portfolio_links: { website: "https://edgehardware.io" },
+        skills: ["Embedded Systems", "IoT", "Edge AI", "C++"],
         skill_gaps: []
       },
       {
@@ -246,6 +321,36 @@ async function seedDatabase() {
         budget: 50000000,
         scope: "medium-term",
         embedding: mockVector
+      },
+      {
+        id: "40000000-0000-0000-0000-000000000006",
+        partner_id: "20000000-0000-0000-0000-000000000004",
+        title: "Automated Smart Contract Vulnerability Scanner & Audit Platform",
+        description: "Develop an automated static-analysis engine in Python & Rust to detect reentrancy and integer overflow vulnerabilities in Solidity contracts.",
+        required_skills: ["Cybersecurity", "DevSecOps", "Solidity", "Smart Contracts", "Python"],
+        budget: 55000000,
+        scope: "medium-term",
+        embedding: mockVector
+      },
+      {
+        id: "40000000-0000-0000-0000-000000000007",
+        partner_id: "20000000-0000-0000-0000-000000000005",
+        title: "Real-Time Streaming ETL & Anomaly Detection Pipeline",
+        description: "Architect a scalable PySpark & Kafka streaming data pipeline to process 10M+ daily events with real-time anomaly detection.",
+        required_skills: ["Data Science", "Python", "Apache Spark", "SQL", "Machine Learning"],
+        budget: 65000000,
+        scope: "long-term",
+        embedding: mockVector
+      },
+      {
+        id: "40000000-0000-0000-0000-000000000008",
+        partner_id: "20000000-0000-0000-0000-000000000006",
+        title: "Ultra-Low Power Edge AI Vision Firmware",
+        description: "Optimize MobileNet C++ inference for ARM Cortex-M microcontrollers with sub-10mW power consumption.",
+        required_skills: ["Embedded Systems", "IoT", "C++", "Edge AI", "RTOS"],
+        budget: 48000000,
+        scope: "medium-term",
+        embedding: mockVector
       }
     ];
 
@@ -292,6 +397,34 @@ async function seedDatabase() {
         status: "shortlisted",
         match_percentage: 94.0,
         match_breakdown: { skills_match: 96, ui_design: 98 }
+      },
+      {
+        project_id: "40000000-0000-0000-0000-000000000006",
+        talent_id: "10000000-0000-0000-0000-000000000006",
+        status: "accepted",
+        match_percentage: 97.5,
+        match_breakdown: { skills_match: 100, security_audit: 95 }
+      },
+      {
+        project_id: "40000000-0000-0000-0000-000000000007",
+        talent_id: "10000000-0000-0000-0000-000000000007",
+        status: "accepted",
+        match_percentage: 98.0,
+        match_breakdown: { skills_match: 98, spark_etl: 98 }
+      },
+      {
+        project_id: "40000000-0000-0000-0000-000000000008",
+        talent_id: "10000000-0000-0000-0000-000000000008",
+        status: "accepted",
+        match_percentage: 96.5,
+        match_breakdown: { skills_match: 96, firmware_dev: 97 }
+      },
+      {
+        project_id: "40000000-0000-0000-0000-000000000001",
+        talent_id: "10000000-0000-0000-0000-000000000007",
+        status: "shortlisted",
+        match_percentage: 86.5,
+        match_breakdown: { skills_match: 85, ml_experience: 88 }
       }
     ];
 
@@ -438,6 +571,36 @@ async function seedDatabase() {
         credential_id: "AWS-SAP-773419",
         credential_url: "https://aws.amazon.com/verification/AWS-SAP-773419",
         digital_signature: "sig_aws_sap_773419_david_kalu"
+      },
+      {
+        user_id: "10000000-0000-0000-0000-000000000006",
+        name: "Certified Information Systems Security Professional (CISSP)",
+        issuing_organization: "ISC2",
+        issue_date: "2025-01-15",
+        expiration_date: "2028-01-15",
+        credential_id: "CISSP-991204",
+        credential_url: "https://www.isc2.org/certifications/cissp",
+        digital_signature: "sig_cissp_991204_budi_santoso"
+      },
+      {
+        user_id: "10000000-0000-0000-0000-000000000007",
+        name: "Databricks Certified Data Engineer Professional",
+        issuing_organization: "Databricks",
+        issue_date: "2025-05-20",
+        expiration_date: "2027-05-20",
+        credential_id: "DBX-DEP-441829",
+        credential_url: "https://credentials.databricks.com/verify/DBX-DEP-441829",
+        digital_signature: "sig_dbx_dep_441829_aisha_patel"
+      },
+      {
+        user_id: "10000000-0000-0000-0000-000000000008",
+        name: "Arm Certified Engineer - Embedded Systems",
+        issuing_organization: "Arm",
+        issue_date: "2024-10-10",
+        expiration_date: "2027-10-10",
+        credential_id: "ARM-ECE-552109",
+        credential_url: "https://arm.com/verification/ARM-ECE-552109",
+        digital_signature: "sig_arm_ece_552109_kenji_sato"
       }
     ];
 
@@ -528,7 +691,10 @@ async function seedDatabase() {
     const rsvps = [
       { event_id: "80000000-0000-0000-0000-000000000001", user_id: "10000000-0000-0000-0000-000000000001" },
       { event_id: "80000000-0000-0000-0000-000000000001", user_id: "10000000-0000-0000-0000-000000000002" },
-      { event_id: "80000000-0000-0000-0000-000000000002", user_id: "10000000-0000-0000-0000-000000000001" }
+      { event_id: "80000000-0000-0000-0000-000000000002", user_id: "10000000-0000-0000-0000-000000000001" },
+      { event_id: "80000000-0000-0000-0000-000000000001", user_id: "10000000-0000-0000-0000-000000000006" },
+      { event_id: "80000000-0000-0000-0000-000000000001", user_id: "10000000-0000-0000-0000-000000000007" },
+      { event_id: "80000000-0000-0000-0000-000000000002", user_id: "10000000-0000-0000-0000-000000000008" }
     ];
 
     const { error: rsvpErr } = await supabase.from("event_registrations").upsert(rsvps, { onConflict: "event_id,user_id" });
