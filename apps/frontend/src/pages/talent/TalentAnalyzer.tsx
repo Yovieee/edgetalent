@@ -8,16 +8,213 @@ interface Question {
   answer: string;
 }
 
+const defaultEnglishQuestions: Question[] = [
+  {
+    id: "eng-1",
+    question: "Select the grammatically correct sentence for professional communication:",
+    options: [
+      "We have received your application and will review it shortly.",
+      "We have received your application and will review it short.",
+      "We received your application and review it shortly.",
+      "We receive your application and reviewing it shortly."
+    ],
+    answer: "We have received your application and will review it shortly."
+  },
+  {
+    id: "eng-2",
+    question: "Choose the word that best fits: 'The software architecture requires a ___ database connection to ensure high availability.'",
+    options: ["resilient", "reluctant", "redundant", "recurrent"],
+    answer: "resilient"
+  },
+  {
+    id: "eng-3",
+    question: "What does the phrase 'hit the ground running' mean in a project setting?",
+    options: [
+      "To start a new project immediately with high energy and full speed",
+      "To run away from a difficult bug",
+      "To test the hardware foundation of a server",
+      "To delay work until full specifications are available"
+    ],
+    answer: "To start a new project immediately with high energy and full speed"
+  },
+  {
+    id: "eng-4",
+    question: "Which sentence uses proper punctuation?",
+    options: [
+      "The team completed the sprint; however, two bugs remained.",
+      "The team completed the sprint, however, two bugs remained.",
+      "The team completed the sprint; however two bugs remained.",
+      "The team completed the sprint however; two bugs remained."
+    ],
+    answer: "The team completed the sprint; however, two bugs remained."
+  },
+  {
+    id: "eng-5",
+    question: "Identify the closest synonym for 'concise':",
+    options: ["Succinct", "Verbose", "Ambiguous", "Elaborate"],
+    answer: "Succinct"
+  }
+];
+
+const defaultIqQuestions: Question[] = [
+  {
+    id: "iq-1",
+    question: "What number comes next in the sequence? 2, 6, 12, 20, 30, ___",
+    options: ["42", "40", "44", "46"],
+    answer: "42"
+  },
+  {
+    id: "iq-2",
+    question: "If all Zips are Zaps, and some Zaps are Zops, which statement MUST be true?",
+    options: [
+      "Some Zips might be Zops",
+      "All Zips are Zops",
+      "No Zips are Zops",
+      "All Zops are Zips"
+    ],
+    answer: "Some Zips might be Zops"
+  },
+  {
+    id: "iq-3",
+    question: "Which number completes the pattern? 3 -> 9, 4 -> 16, 5 -> 25, 6 -> ___",
+    options: ["36", "30", "32", "38"],
+    answer: "36"
+  },
+  {
+    id: "iq-4",
+    question: "A project takes 6 developers 12 days to complete. How many days would it take 9 developers working at the same pace?",
+    options: ["8 days", "6 days", "9 days", "10 days"],
+    answer: "8 days"
+  },
+  {
+    id: "iq-5",
+    question: "Which item does NOT belong in the group: Algorithm, Heuristic, Function, Pseudocode, Molecule?",
+    options: ["Molecule", "Algorithm", "Heuristic", "Pseudocode"],
+    answer: "Molecule"
+  }
+];
+
+const defaultMbtiQuestions: Question[] = [
+  {
+    id: "mbti-1",
+    question: "In a team workspace environment, where do you draw your primary energy from?",
+    options: [
+      "Collaborating actively with teammates and group brainstorming (Extraversion - E)",
+      "Deep focused solo work and independent problem solving (Introversion - I)"
+    ],
+    answer: ""
+  },
+  {
+    id: "mbti-2",
+    question: "When solving complex technical challenges, what is your default perspective?",
+    options: [
+      "Focusing on concrete data, existing facts, and practical step-by-step methods (Sensing - S)",
+      "Exploring abstract concepts, future possibilities, and innovative big-picture frameworks (Intuition - N)"
+    ],
+    answer: ""
+  },
+  {
+    id: "mbti-3",
+    question: "How do you primarily make critical project decisions?",
+    options: [
+      "Analyzing objective logic, technical efficiency, and cause-and-effect criteria (Thinking - T)",
+      "Evaluating human impact, team harmony, and personal/user values (Feeling - F)"
+    ],
+    answer: ""
+  },
+  {
+    id: "mbti-4",
+    question: "How do you prefer to manage project deadlines and workflows?",
+    options: [
+      "Following structured plans, clear schedules, and defined milestones (Judging - J)",
+      "Staying flexible, adapting dynamically as requirements shift, and keeping options open (Perceiving - P)"
+    ],
+    answer: ""
+  }
+];
+
+const defaultDiscQuestions: Question[] = [
+  {
+    id: "disc-1",
+    question: "When facing a high-pressure project obstacle, what is your natural default reaction?",
+    options: [
+      "Take charge directly, drive immediate decisions, and push for results (Dominance - D)",
+      "Rally the team, communicate enthusiastically, and inspire creative ideas (Influence - I)",
+      "Maintain steady composure, support team members, and ensure stability (Steadiness - S)",
+      "Analyze the root cause methodically, review specs, and ensure precision (Conscientiousness - C)"
+    ],
+    answer: ""
+  },
+  {
+    id: "disc-2",
+    question: "What is your primary motivation in a professional team environment?",
+    options: [
+      "Achieving ambitious goals and overcoming tough challenges (Dominance - D)",
+      "Building strong relationships and engaging in collaborative teamwork (Influence - I)",
+      "Creating a predictable, harmonious, and supportive environment (Steadiness - S)",
+      "Delivering high-quality, accurate, and flawless craftsmanship (Conscientiousness - C)"
+    ],
+    answer: ""
+  },
+  {
+    id: "disc-3",
+    question: "How do you handle team communication and feedback?",
+    options: [
+      "Direct, concise, and to-the-point communication (Dominance - D)",
+      "Persuasive, expressive, and optimistic dialogue (Influence - I)",
+      "Patient, empathetic, and attentive listening (Steadiness - S)",
+      "Detailed, structured, and evidence-based reporting (Conscientiousness - C)"
+    ],
+    answer: ""
+  },
+  {
+    id: "disc-4",
+    question: "What workspace atmosphere allows you to perform at your best?",
+    options: [
+      "Fast-paced with high autonomy and competitive challenges (Dominance - D)",
+      "Dynamic, social, and creative collaborative environment (Influence - I)",
+      "Reliable, cooperative team with clear mutual trust (Steadiness - S)",
+      "Organized, systematic environment with high standards of quality (Conscientiousness - C)"
+    ],
+    answer: ""
+  }
+];
+
+const mbtiTitles: Record<string, string> = {
+  INTJ: "The Architect / Strategist",
+  INTP: "The Logician / Innovator",
+  ENTJ: "The Commander / Leader",
+  ENTP: "The Debater / Visionary",
+  INFJ: "The Advocate / Guide",
+  INFP: "The Mediator / Idealist",
+  ENFJ: "The Protagonist / Mentor",
+  ENFP: "The Campaigner / Inspirer",
+  ISTJ: "The Inspector / Administrator",
+  ISFJ: "The Defender / Supporter",
+  ESTJ: "The Executive / Manager",
+  ESFJ: "The Consul / Collaborator",
+  ISTP: "The Virtuoso / Craftsperson",
+  ISFP: "The Adventurer / Artist",
+  ESTP: "The Entrepreneur / Catalyst",
+  ESFP: "The Entertainer / Facilitator"
+};
+
 export default function TalentAnalyzer(): React.ReactElement {
   const { supabase, profile, fetchProfile } = useSupabase();
 
-  // Quiz states
+  // Scored Quiz states
   const [frontendScore, setFrontendScore] = useState<number | null>(null);
   const [backendScore, setBackendScore] = useState<number | null>(null);
   const [aiScore, setAiScore] = useState<number | null>(null);
+  const [englishScore, setEnglishScore] = useState<number | null>(null);
+  const [iqScore, setIqScore] = useState<number | null>(null);
+
+  // Personality & Behavior states
+  const [mbtiResult, setMbtiResult] = useState<{ type: string; title: string } | null>(null);
+  const [discResult, setDiscResult] = useState<{ trait: string; label: string } | null>(null);
 
   // Active quiz-taking states
-  const [activeQuiz, setActiveQuiz] = useState<"frontend" | "backend" | "ai" | "interests" | null>(null);
+  const [activeQuiz, setActiveQuiz] = useState<"frontend" | "backend" | "ai" | "english" | "iq" | "mbti" | "disc" | "interests" | null>(null);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState<number>(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
 
@@ -25,10 +222,18 @@ export default function TalentAnalyzer(): React.ReactElement {
     frontend: Question[];
     backend: Question[];
     ai: Question[];
+    english: Question[];
+    iq: Question[];
+    mbti: Question[];
+    disc: Question[];
   }>({
     frontend: [],
     backend: [],
     ai: [],
+    english: defaultEnglishQuestions,
+    iq: defaultIqQuestions,
+    mbti: defaultMbtiQuestions,
+    disc: defaultDiscQuestions,
   });
 
   // Career Interest states
@@ -51,7 +256,11 @@ export default function TalentAnalyzer(): React.ReactElement {
           const frontend: Question[] = [];
           const backend: Question[] = [];
           const ai: Question[] = [];
-          
+          const english: Question[] = [];
+          const iq: Question[] = [];
+          const mbti: Question[] = [];
+          const disc: Question[] = [];
+
           data.forEach((q: any) => {
             const formatted: Question = {
               id: q.id,
@@ -62,12 +271,20 @@ export default function TalentAnalyzer(): React.ReactElement {
             if (q.category === "frontend") frontend.push(formatted);
             else if (q.category === "backend") backend.push(formatted);
             else if (q.category === "ai") ai.push(formatted);
+            else if (q.category === "english") english.push(formatted);
+            else if (q.category === "iq") iq.push(formatted);
+            else if (q.category === "mbti") mbti.push(formatted);
+            else if (q.category === "disc") disc.push(formatted);
           });
-          
+
           setDbQuestions({
             frontend,
             backend,
             ai,
+            english: english.length > 0 ? english : defaultEnglishQuestions,
+            iq: iq.length > 0 ? iq : defaultIqQuestions,
+            mbti: mbti.length > 0 ? mbti : defaultMbtiQuestions,
+            disc: disc.length > 0 ? disc : defaultDiscQuestions,
           });
         }
       } catch (err) {
@@ -87,7 +304,11 @@ export default function TalentAnalyzer(): React.ReactElement {
     const quizResultsPayload = {
       frontend: frontendScore !== null ? { score: frontendScore } : undefined,
       backend: backendScore !== null ? { score: backendScore } : undefined,
-      ai: aiScore !== null ? { score: aiScore } : undefined
+      ai: aiScore !== null ? { score: aiScore } : undefined,
+      english: englishScore !== null ? { score: englishScore } : undefined,
+      iq: iqScore !== null ? { score: iqScore } : undefined,
+      mbti: mbtiResult !== null ? { result: mbtiResult.type, title: mbtiResult.title } : undefined,
+      disc: discResult !== null ? { trait: discResult.trait, label: discResult.label } : undefined,
     };
 
     const interestsPayload = {
@@ -118,6 +339,8 @@ export default function TalentAnalyzer(): React.ReactElement {
     }
   };
 
+  const hasTakenAnyQuiz = frontendScore !== null || backendScore !== null || aiScore !== null || englishScore !== null || iqScore !== null || mbtiResult !== null || discResult !== null;
+
   return (
     <div className="animate-fade-in">
       {activeQuiz === null ? (
@@ -126,7 +349,7 @@ export default function TalentAnalyzer(): React.ReactElement {
             <div className="glass-panel" style={{ padding: "2rem" }}>
               <h3>Skills & Interests Assessment</h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-                Complete the technical quizzes and define your career interests. Your scores and selections will determine your verified skills, identify upskilling gaps, and unlock project matching in Job Match.
+                Complete technical, language, cognitive, and personality assessments to build your comprehensive candidate profile. Results enhance pgvector embedding precision for highly accurate Job Match alignment.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -208,7 +431,111 @@ export default function TalentAnalyzer(): React.ReactElement {
                   </div>
                 </div>
 
-                {/* Career Interests Card */}
+                {/* English Test Card */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: "1.1rem" }}>English Proficiency Test</h4>
+                    <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                      Evaluate grammar, vocabulary, and business communication. (5 Questions)
+                    </p>
+                  </div>
+                  <div>
+                    {englishScore !== null ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                        <span className={`badge ${englishScore >= 3 ? "badge-emerald" : "badge-rose"}`} style={{ fontSize: "0.8rem" }}>
+                          Score: {englishScore}/5 ({englishScore >= 3 ? "Passed" : "Fail"})
+                        </span>
+                        <button className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setActiveQuiz("english"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-english-retake">
+                          Retake
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => { setActiveQuiz("english"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-english-start">
+                        Start Test
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* IQ Test Card */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: "1.1rem" }}>Cognitive IQ Test</h4>
+                    <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                      Test numerical series, logical deduction, and spatial reasoning. (5 Questions)
+                    </p>
+                  </div>
+                  <div>
+                    {iqScore !== null ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                        <span className={`badge ${iqScore >= 3 ? "badge-emerald" : "badge-rose"}`} style={{ fontSize: "0.8rem" }}>
+                          Score: {iqScore}/5 ({iqScore >= 3 ? "Passed" : "Fail"})
+                        </span>
+                        <button className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setActiveQuiz("iq"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-iq-retake">
+                          Retake
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => { setActiveQuiz("iq"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-iq-start">
+                        Start Test
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* MBTI Test Card */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: "1.1rem" }}>MBTI Personality Test</h4>
+                    <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                      Discover your 4-letter Myers-Briggs personality style for team synergy. (4 Questions)
+                    </p>
+                  </div>
+                  <div>
+                    {mbtiResult !== null ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                        <span className="badge badge-cyan" style={{ fontSize: "0.8rem" }}>
+                          Type: {mbtiResult.type} ({mbtiResult.title})
+                        </span>
+                        <button className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setActiveQuiz("mbti"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-mbti-retake">
+                          Retake
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => { setActiveQuiz("mbti"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-mbti-start">
+                        Start Test
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* DISC Test Card */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)", paddingBottom: "1rem" }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: "1.1rem" }}>DISC Behavioral Assessment</h4>
+                    <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                      Assess Dominance, Influence, Steadiness, and Conscientiousness. (4 Scenarios)
+                    </p>
+                  </div>
+                  <div>
+                    {discResult !== null ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                        <span className="badge badge-emerald" style={{ fontSize: "0.8rem" }}>
+                          {discResult.trait} ({discResult.label})
+                        </span>
+                        <button className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }} onClick={() => { setActiveQuiz("disc"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-disc-retake">
+                          Retake
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="btn btn-primary" style={{ padding: "0.5rem 1rem", fontSize: "0.85rem" }} onClick={() => { setActiveQuiz("disc"); setCurrentQuestionIdx(0); setSelectedAnswers({}); }} id="btn-quiz-disc-start">
+                        Start Assessment
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Career Preferences Card */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.5rem" }}>
                   <div>
                     <h4 style={{ margin: 0, fontSize: "1.1rem" }}>Career Preferences</h4>
@@ -226,23 +553,23 @@ export default function TalentAnalyzer(): React.ReactElement {
             </div>
 
             <div className="glass-panel" style={{ padding: "2rem" }}>
-              <h3>Generate Profile</h3>
+              <h3>Generate Profile & Vectors for Job Match</h3>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "1.5rem" }}>
-                Submit your combined quiz results and preferences to run vector analysis, which computes your profile biography and matches you against Job Match projects.
+                Submit your combined technical scores, English proficiency, IQ, MBTI type, DISC profile, and preferences to build an enriched vector embedding (`skills_embedding`) for precision candidate matching in Job Match.
               </p>
 
               <button
                 className="btn btn-success"
                 style={{ width: "100%" }}
                 onClick={() => runAIAnalysis()}
-                disabled={analyzing || (frontendScore === null && backendScore === null && aiScore === null)}
+                disabled={analyzing || !hasTakenAnyQuiz}
                 id="btn-submit-quiz-interests"
               >
-                {analyzing ? "Generating Profile..." : "Submit Quiz & Interests"}
+                {analyzing ? "Generating Profile & Matching Embeddings..." : "Submit Assessments & Generate Job Match Profile"}
               </button>
-              {(frontendScore === null && backendScore === null && aiScore === null) && (
+              {!hasTakenAnyQuiz && (
                 <p style={{ color: "var(--color-rose)", fontSize: "0.75rem", marginTop: "0.5rem", textAlign: "center" }}>
-                  ⚠️ Please take at least one quiz before submitting.
+                  ⚠️ Please complete at least one assessment test before submitting.
                 </p>
               )}
             </div>
@@ -250,11 +577,11 @@ export default function TalentAnalyzer(): React.ReactElement {
 
           {/* Analyzer Results (Right side) */}
           <div className="glass-panel" style={{ padding: "2rem" }}>
-            <h3>Assessment Results</h3>
+            <h3>Assessment & Profile Results</h3>
             {analyzing ? (
               <div style={{ padding: "3rem 0", textAlign: "center" }}>
-                <p style={{ color: "var(--text-secondary)", marginBottom: "1rem" }}>Generating your verified profiles and computing project match scoring...</p>
-                <div className="badge badge-cyan">Connecting...</div>
+                <p style={{ color: "var(--text-secondary)", marginBottom: "1rem" }}>Generating candidate biography, computing skill vectors, and indexing pgvector similarity...</p>
+                <div className="badge badge-cyan">Processing AI Embedding...</div>
               </div>
             ) : analyzerError ? (
               <div className="badge badge-rose" style={{ display: "block", padding: "1rem" }}>
@@ -282,7 +609,7 @@ export default function TalentAnalyzer(): React.ReactElement {
                 </div>
               </div>
             ) : (
-              <p style={{ color: "var(--text-secondary)" }}>Complete a quiz and submit the form to generate your skill and interest profile.</p>
+              <p style={{ color: "var(--text-secondary)" }}>Complete any assessment test and submit the form to generate your skill and interest profile for Job Match.</p>
             )}
           </div>
         </div>
@@ -344,13 +671,21 @@ export default function TalentAnalyzer(): React.ReactElement {
           </div>
         </div>
       ) : (
-        /* Technical Quiz Taking Panel */
+        /* Assessment Test Taking Panel */
         (() => {
-          const questions = activeQuiz === "frontend" ? dbQuestions.frontend : activeQuiz === "backend" ? dbQuestions.backend : dbQuestions.ai;
+          const questions =
+            activeQuiz === "frontend" ? dbQuestions.frontend :
+            activeQuiz === "backend" ? dbQuestions.backend :
+            activeQuiz === "ai" ? dbQuestions.ai :
+            activeQuiz === "english" ? dbQuestions.english :
+            activeQuiz === "iq" ? dbQuestions.iq :
+            activeQuiz === "mbti" ? dbQuestions.mbti :
+            dbQuestions.disc;
+
           if (!questions || questions.length === 0) {
             return (
               <div className="glass-panel animate-fade-in" style={{ padding: "2.5rem", maxWidth: "700px", margin: "0 auto", textAlign: "center" }}>
-                <h3 style={{ marginBottom: "1rem" }}>Quiz Unavailable</h3>
+                <h3 style={{ marginBottom: "1rem" }}>Assessment Unavailable</h3>
                 <p style={{ color: "var(--text-secondary)", marginBottom: "2rem" }}>
                   No questions are currently loaded for this category. Please check back later.
                 </p>
@@ -363,11 +698,22 @@ export default function TalentAnalyzer(): React.ReactElement {
           const currentQuestion = questions[currentQuestionIdx];
           const progressPct = Math.round((currentQuestionIdx / questions.length) * 100);
 
+          const getCategoryTitle = () => {
+            if (activeQuiz === "frontend") return "Frontend Development Quiz";
+            if (activeQuiz === "backend") return "Backend Development Quiz";
+            if (activeQuiz === "ai") return "AI & Data Science Quiz";
+            if (activeQuiz === "english") return "English Proficiency Test";
+            if (activeQuiz === "iq") return "Cognitive IQ Test";
+            if (activeQuiz === "mbti") return "MBTI Personality Test";
+            if (activeQuiz === "disc") return "DISC Behavioral Assessment";
+            return "Assessment";
+          };
+
           return (
             <div className="glass-panel animate-fade-in" style={{ padding: "2.5rem", maxWidth: "700px", margin: "0 auto" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
                 <span className="badge badge-cyan" style={{ textTransform: "uppercase" }}>
-                  {activeQuiz} Quiz
+                  {getCategoryTitle()}
                 </span>
                 <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: 600 }}>
                   Question {currentQuestionIdx + 1} of {questions.length}
@@ -442,21 +788,64 @@ export default function TalentAnalyzer(): React.ReactElement {
                   <button
                     className="btn btn-success"
                     onClick={() => {
-                      let score = 0;
-                      questions.forEach((q, idx) => {
-                        if (selectedAnswers[idx] === q.answer) {
-                          score++;
+                      if (activeQuiz === "frontend" || activeQuiz === "backend" || activeQuiz === "ai" || activeQuiz === "english" || activeQuiz === "iq") {
+                        let score = 0;
+                        questions.forEach((q, idx) => {
+                          if (selectedAnswers[idx] === q.answer) {
+                            score++;
+                          }
+                        });
+                        if (activeQuiz === "frontend") setFrontendScore(score);
+                        if (activeQuiz === "backend") setBackendScore(score);
+                        if (activeQuiz === "ai") setAiScore(score);
+                        if (activeQuiz === "english") setEnglishScore(score);
+                        if (activeQuiz === "iq") setIqScore(score);
+                      } else if (activeQuiz === "mbti") {
+                        // Compute MBTI
+                        let eScore = 0, iScore = 0, sScore = 0, nScore = 0, tScore = 0, fScore = 0, jScore = 0, pScore = 0;
+                        // Q1: E vs I
+                        if (selectedAnswers[0]?.includes("Extraversion")) eScore++; else iScore++;
+                        // Q2: S vs N
+                        if (selectedAnswers[1]?.includes("Sensing")) sScore++; else nScore++;
+                        // Q3: T vs F
+                        if (selectedAnswers[2]?.includes("Thinking")) tScore++; else fScore++;
+                        // Q4: J vs P
+                        if (selectedAnswers[3]?.includes("Judging")) jScore++; else pScore++;
+
+                        const typeStr = `${eScore >= iScore ? "E" : "I"}${nScore >= sScore ? "N" : "S"}${tScore >= fScore ? "T" : "F"}${jScore >= pScore ? "J" : "P"}`;
+                        const titleStr = mbtiTitles[typeStr] || "The Strategist";
+                        setMbtiResult({ type: typeStr, title: titleStr });
+                      } else if (activeQuiz === "disc") {
+                        // Compute DISC
+                        let dCount = 0, iCount = 0, sCount = 0, cCount = 0;
+                        Object.values(selectedAnswers).forEach((ans) => {
+                          if (ans.includes("Dominance")) dCount++;
+                          else if (ans.includes("Influence")) iCount++;
+                          else if (ans.includes("Steadiness")) sCount++;
+                          else if (ans.includes("Conscientiousness")) cCount++;
+                        });
+                        const maxCount = Math.max(dCount, iCount, sCount, cCount);
+                        let trait = "High D";
+                        let label = "Dominant / Result-Driven Leader";
+                        if (maxCount === iCount) {
+                          trait = "High I";
+                          label = "Influential / Collaborative Communicator";
+                        } else if (maxCount === sCount) {
+                          trait = "High S";
+                          label = "Steady / Supportive Team Player";
+                        } else if (maxCount === cCount) {
+                          trait = "High C";
+                          label = "Conscientious / Precision Specialist";
                         }
-                      });
-                      if (activeQuiz === "frontend") setFrontendScore(score);
-                      if (activeQuiz === "backend") setBackendScore(score);
-                      if (activeQuiz === "ai") setAiScore(score);
+                        setDiscResult({ trait, label });
+                      }
+
                       setActiveQuiz(null);
                     }}
                     disabled={!selectedAnswers[currentQuestionIdx]}
                     id="btn-quiz-finish"
                   >
-                    Finish Quiz
+                    Finish Assessment
                   </button>
                 )}
               </div>

@@ -98,7 +98,7 @@ export type Course = z.infer<typeof CourseSchema>;
 // 6. Quiz Question Schema
 export const QuizQuestionSchema = z.object({
   id: z.string().uuid().optional(),
-  category: z.enum(["frontend", "backend", "ai"]),
+  category: z.enum(["frontend", "backend", "ai", "english", "iq", "mbti", "disc"]),
   question: z.string().min(5, "Question must be at least 5 characters long"),
   options: z.array(z.string()).min(2, "Provide at least two options"),
   answer: z.string().min(1, "Answer cannot be empty"),

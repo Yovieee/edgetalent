@@ -12,7 +12,11 @@ const RequestSchema = z.object({
   quizResults: z.object({
     frontend: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional(),
     backend: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional(),
-    ai: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional()
+    ai: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional(),
+    english: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional(),
+    iq: z.object({ score: z.number(), answers: z.array(z.string()).optional() }).optional(),
+    mbti: z.object({ result: z.string().optional(), title: z.string().optional() }).optional(),
+    disc: z.object({ trait: z.string().optional(), label: z.string().optional() }).optional()
   }).optional().default({}),
   interests: z.object({
     role: z.string().optional().default("Fullstack Developer"),
@@ -77,20 +81,24 @@ serve(async (req) => {
 
     // 1. Call OpenRouter to analyze skill gaps
     const promptSystem = `You are an expert AI Career Coach and Technical Recruiter.
-Analyze the user's technical quiz results and career interests against industry standards for the target role: "${targetRole}".
-Identify verified skills, clear skill gaps, and write a summary bio for semantic search mapping.
+Analyze the user's technical quiz results, language proficiency (English), cognitive reasoning (IQ), MBTI personality type, DISC behavior style, and career interests against industry standards for the target role: "${targetRole}".
+Identify verified skills, clear skill gaps, and write a comprehensive summary bio for semantic candidate matching and vector embedding search.
 You MUST output your response strictly as a JSON object with this exact structure:
 {
   "skills": ["Skill1", "Skill2", "Skill3"],
   "skill_gaps": ["Gap1", "Gap2"],
-  "bio": "A comprehensive summary bio describing their current skill set, target goals, and main upskilling areas."
+  "bio": "A comprehensive summary bio describing their current skill set, cognitive/personality profile, target goals, and main upskilling areas."
 }
 Return ONLY valid JSON. No markdown wrappers.`;
 
-    const promptUser = `User Technical Quiz Results:
+    const promptUser = `User Assessment Results:
 - Frontend Development Quiz Score: ${quizResults?.frontend ? `${quizResults.frontend.score}/5` : "Not Taken"}
 - Backend Development Quiz Score: ${quizResults?.backend ? `${quizResults.backend.score}/5` : "Not Taken"}
 - AI & Data Science Quiz Score: ${quizResults?.ai ? `${quizResults.ai.score}/5` : "Not Taken"}
+- English Proficiency Test Score: ${quizResults?.english ? `${quizResults.english.score}/5` : "Not Taken"}
+- Cognitive IQ Test Score: ${quizResults?.iq ? `${quizResults.iq.score}/5` : "Not Taken"}
+- MBTI Personality Type: ${quizResults?.mbti?.result ? `${quizResults.mbti.result} (${quizResults.mbti.title || ""})` : "Not Taken"}
+- DISC Behavioral Assessment: ${quizResults?.disc?.trait ? `${quizResults.disc.trait} (${quizResults.disc.label || ""})` : "Not Taken"}
 
 User Career Interests:
 - Target Role: ${targetRole}

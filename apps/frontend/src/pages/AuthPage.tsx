@@ -167,7 +167,7 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required={mode !== "forgot"}
+                required
               />
             </div>
           )}

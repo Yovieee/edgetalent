@@ -5,7 +5,7 @@ import Modal from "../../components/Modal";
 
 interface QuizItem {
   id: string;
-  category: "frontend" | "backend" | "ai";
+  category: "frontend" | "backend" | "ai" | "english" | "iq" | "mbti" | "disc";
   question: string;
   options: string[];
   answer: string;
@@ -20,7 +20,7 @@ export default function AdminQuizzes(): React.ReactElement {
   const [statusMsg, setStatusMsg] = useState<{ text: string; type: "success" | "error" | "" }>({ text: "", type: "" });
 
   // Quiz Form Fields
-  const [quizCategory, setQuizCategory] = useState<"frontend" | "backend" | "ai">("frontend");
+  const [quizCategory, setQuizCategory] = useState<"frontend" | "backend" | "ai" | "english" | "iq" | "mbti" | "disc">("frontend");
   const [quizQuestionText, setQuizQuestionText] = useState("");
   const [quizOption1, setQuizOption1] = useState("");
   const [quizOption2, setQuizOption2] = useState("");
@@ -170,12 +170,12 @@ export default function AdminQuizzes(): React.ReactElement {
         <p>Loading quiz questions...</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          {["frontend", "backend", "ai"].map((cat) => {
+          {["frontend", "backend", "ai", "english", "iq", "mbti", "disc"].map((cat) => {
             const filtered = quizzes.filter((q) => q.category === cat);
             return (
               <div key={cat} style={{ border: "1px solid var(--glass-border)", borderRadius: "var(--radius-sm)", padding: "1.5rem" }}>
                 <h4 style={{ textTransform: "uppercase", color: "var(--color-cyan)", marginBottom: "1rem", borderBottom: "1px solid var(--glass-border)", paddingBottom: "0.5rem" }}>
-                  {cat} Development Questions ({filtered.length})
+                  {cat === "frontend" ? "Frontend Development" : cat === "backend" ? "Backend Development" : cat === "ai" ? "AI & Data Science" : cat === "english" ? "English Proficiency" : cat === "iq" ? "Cognitive IQ" : cat === "mbti" ? "MBTI Personality" : "DISC Assessment"} Questions ({filtered.length})
                 </h4>
                 {filtered.length === 0 ? (
                   <p style={{ color: "var(--text-muted)" }}>No questions in this category.</p>
@@ -252,6 +252,10 @@ export default function AdminQuizzes(): React.ReactElement {
               <option value="frontend">Frontend Development</option>
               <option value="backend">Backend Development</option>
               <option value="ai">AI & Data Science</option>
+              <option value="english">English Proficiency</option>
+              <option value="iq">Cognitive IQ</option>
+              <option value="mbti">MBTI Personality</option>
+              <option value="disc">DISC Assessment</option>
             </select>
           </div>
           <div className="form-group">

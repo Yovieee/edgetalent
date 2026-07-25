@@ -8,18 +8,9 @@ import {
   Briefcase,
   GraduationCap,
   PlusCircle,
-  Search,
   Sparkles,
-  ArrowUpRight,
-  TrendingUp,
-  CheckCircle2,
-  Clock,
   DollarSign,
-  UserCheck,
-  ChevronRight,
-  Send,
-  Zap,
-  Award
+  ChevronRight
 } from "lucide-react";
 
 export default function PartnerDashboardView(): React.ReactElement {
@@ -28,7 +19,7 @@ export default function PartnerDashboardView(): React.ReactElement {
 
   const [projects, setProjects] = useState<any[]>([]);
   const [applications, setApplications] = useState<any[]>([]);
-  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [enrollments] = useState<any[]>([]);
   const [topTalent, setTopTalent] = useState<any[]>([]);
   const [fundingOppCount, setFundingOppCount] = useState<number>(0);
   const [loadingOverview, setLoadingOverview] = useState<boolean>(true);
@@ -314,7 +305,7 @@ export default function PartnerDashboardView(): React.ReactElement {
                   background: "var(--bg-primary)",
                   display: "flex",
                   flexDirection: "column",
-                  justify: "space-between",
+                  justifyContent: "space-between",
                   gap: "0.75rem"
                 }}
               >
