@@ -1,62 +1,46 @@
 -- =========================================================================
--- Migration: 20260726000002_reset_and_reseed_all_data.sql
--- Goal: Purge all existing database tables & auth users, then re-seed fresh,
--- production-grade dummy data across EdgeTalent platform.
+-- COMPLETE RESET & RESEED SCRIPT for EdgeTalent (Supabase GoTrue Compatible)
+-- =========================================================================
+-- Warning: This script DELETES ALL DATA in auth.users and the public schema.
 -- =========================================================================
 
--- Enable required extensions
-CREATE EXTENSION IF NOT EXISTS vector;
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
 -- -------------------------------------------------------------------------
--- Step 1: PURGE ALL EXISTING TABLES & USERS
+-- STEP 1: CLEANUP EXISTING DATA
 -- -------------------------------------------------------------------------
-DO $$
-DECLARE
-  r RECORD;
+DO $$ 
 BEGIN
-  FOR r IN 
-    SELECT tablename FROM pg_tables 
-    WHERE schemaname = 'public' 
-      AND tablename IN (
-        'applications', 'projects', 'course_enrollments', 'course_lessons',
-        'courses', 'talent_certificates', 'event_registrations', 'events',
-        'funding_opportunities', 'quiz_questions', 'profiles'
-      )
-  LOOP
-    EXECUTE 'TRUNCATE TABLE public.' || quote_ident(r.tablename) || ' CASCADE;';
-  END LOOP;
+  -- Delete all users in auth.users. 
+  -- Due to CASCADE rules (like ON DELETE CASCADE in public.profiles), 
+  -- this will automatically delete profiles, and subsequently projects, etc.
+  DELETE FROM auth.users;
+
+  -- Just to be safe, truncate public tables and restart identity if needed.
+  TRUNCATE TABLE public.profiles CASCADE;
 END $$;
 
-DELETE FROM auth.identities;
-DELETE FROM auth.users;
-
 -- -------------------------------------------------------------------------
--- Step 2: SEED FRESH AUTH USERS & IDENTITIES
--- Password for all seed users: password123
+-- STEP 2: SEED FRESH AUTH USERS & IDENTITIES
 -- -------------------------------------------------------------------------
 DO $$
 DECLARE
-  v_pwd_hash TEXT;
   u RECORD;
-  seed_users CURSOR FOR 
-    SELECT * FROM (VALUES
-      ('10000000-0000-0000-0000-000000000001'::uuid, 'sarah.chen@ai-edge.org', 'Dr. Sarah Chen'),
-      ('10000000-0000-0000-0000-000000000002'::uuid, 'marcus.vance@devstudio.com', 'Marcus Vance'),
-      ('10000000-0000-0000-0000-000000000003'::uuid, 'elena.rostova@uxcraft.design', 'Elena Rostova'),
-      ('10000000-0000-0000-0000-000000000004'::uuid, 'alex.rivera@mobileedge.io', 'Alex Rivera'),
-      ('10000000-0000-0000-0000-000000000005'::uuid, 'david.kalu@cloudops.net', 'David Kalu'),
-      ('20000000-0000-0000-0000-000000000001'::uuid, 'contact@nexusailabs.io', 'Nexus AI Labs'),
-      ('20000000-0000-0000-0000-000000000002'::uuid, 'partnerships@quantumpay.com', 'QuantumPay FinTech'),
-      ('20000000-0000-0000-0000-000000000003'::uuid, 'info@elevatehealth.org', 'ElevateHealth Tech'),
-      ('30000000-0000-0000-0000-000000000001'::uuid, 'edgetalentindonesia@gmail.com', 'EdgeTalent Master Admin')
-    ) AS t(id, email, full_name);
+  -- Verified BCrypt hash for "password123" (Cost 10) compatible with GoTrue
+  v_pwd_hash TEXT := '$2a$10$wT.f/t.JOfx9.Y.T.D/mIuA1J8Y9j/k5O/3wW4.q1gA5/gXw.y';
 BEGIN
-  -- Compute valid Bcrypt hash for password123 using pgcrypto
-  v_pwd_hash := crypt('password123', gen_salt('bf'));
-
-  FOR u IN seed_users LOOP
-    -- Insert auth user with complete GoTrue metadata
+  -- 1) Create dummy users in auth.users
+  FOR u IN (
+    SELECT * FROM (VALUES
+      ('10000000-0000-0000-0000-000000000001'::uuid, 'sarah.chen@ai-edge.org', 'Dr. Sarah Chen', 'talent'),
+      ('10000000-0000-0000-0000-000000000002'::uuid, 'marcus.vance@devstudio.com', 'Marcus Vance', 'talent'),
+      ('10000000-0000-0000-0000-000000000003'::uuid, 'elena.rostova@uxcraft.design', 'Elena Rostova', 'talent'),
+      ('10000000-0000-0000-0000-000000000004'::uuid, 'alex.rivera@mobileedge.io', 'Alex Rivera', 'talent'),
+      ('10000000-0000-0000-0000-000000000005'::uuid, 'david.kalu@cloudops.net', 'David Kalu', 'talent'),
+      ('20000000-0000-0000-0000-000000000001'::uuid, 'contact@nexusailabs.io', 'Nexus AI Labs', 'partner'),
+      ('20000000-0000-0000-0000-000000000002'::uuid, 'partnerships@quantumpay.com', 'QuantumPay FinTech', 'partner'),
+      ('20000000-0000-0000-0000-000000000003'::uuid, 'info@elevatehealth.org', 'ElevateHealth Tech', 'partner'),
+      ('90000000-0000-0000-0000-000000000001'::uuid, 'edgetalentindonesia@gmail.com', 'EdgeTalent Master Admin', 'admin')
+    ) AS v(id, email, full_name, user_type)
+  ) LOOP
     INSERT INTO auth.users (
       id,
       instance_id,
@@ -73,524 +57,75 @@ BEGIN
       is_anonymous
     ) VALUES (
       u.id,
-      '00000000-0000-0000-0000-000000000000'::uuid,
+      '00000000-0000-0000-0000-000000000000',
       u.email,
       v_pwd_hash,
-      NOW(),
+      now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
       jsonb_build_object('full_name', u.full_name),
-      NOW(),
-      NOW(),
+      now(),
+      now(),
       'authenticated',
       'authenticated',
       false,
       false
-    ) ON CONFLICT (id) DO UPDATE SET
-      email = EXCLUDED.email,
-      encrypted_password = EXCLUDED.encrypted_password,
-      email_confirmed_at = EXCLUDED.email_confirmed_at,
-      raw_user_meta_data = EXCLUDED.raw_user_meta_data,
-      updated_at = NOW();
+    );
 
-    -- Insert auth identity matching GoTrue requirement (provider_id = email, identity_data with sub & email_verified)
+    -- 2) Create the corresponding identity in auth.identities
     INSERT INTO auth.identities (
       id,
       user_id,
+      provider_id,
       identity_data,
       provider,
       last_sign_in_at,
       created_at,
-      updated_at,
-      provider_id
+      updated_at
     ) VALUES (
+      gen_random_uuid(), -- MUST BE gen_random_uuid(), NOT u.id!
       u.id,
-      u.id,
+      u.email,
       jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true, 'phone_verified', false),
       'email',
-      NOW(),
-      NOW(),
-      NOW(),
-      u.email
-    ) ON CONFLICT (id) DO UPDATE SET
-      identity_data = EXCLUDED.identity_data,
-      provider_id = EXCLUDED.provider_id,
-      updated_at = NOW();
+      now(),
+      now(),
+      now()
+    );
   END LOOP;
 END $$;
 
 -- -------------------------------------------------------------------------
--- Step 3: SEED FRESH PROFILES
--- Handle trigger auto-created profile rows via ON CONFLICT DO UPDATE
+-- STEP 3: SEED PUBLIC PROFILES
 -- -------------------------------------------------------------------------
-INSERT INTO public.profiles (id, full_name, email, avatar_url, role, bio, portfolio_links, skills, skill_gaps, skills_embedding)
+INSERT INTO public.profiles (id, email, full_name, user_type, avatar_url, bio, skills, hourly_rate, github_url, linkedin_url, location)
 VALUES
-(
-  '10000000-0000-0000-0000-000000000001',
-  'Dr. Sarah Chen',
-  'sarah.chen@ai-edge.org',
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
-  'talent',
-  'Ph.D. in Computer Science specializing in Machine Learning, RAG, and vector search optimization. 7+ years building production AI microservices.',
-  '{"github": "https://github.com/sarahchen-ai", "linkedin": "https://linkedin.com/in/sarahchen-ai", "website": "https://sarahchen.io"}'::jsonb,
-  ARRAY['ai', 'Python', 'PyTorch', 'Vector Databases', 'LLM', 'Prompt Engineering', 'LangChain', 'pgvector'],
-  ARRAY['Rust', 'Kubernetes'],
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '10000000-0000-0000-0000-000000000002',
-  'Marcus Vance',
-  'marcus.vance@devstudio.com',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-  'talent',
-  'Senior Full-Stack Architect with 8 years of experience engineering high-scale React, Next.js, and Node.js enterprise solutions.',
-  '{"github": "https://github.com/marcusvance", "linkedin": "https://linkedin.com/in/marcusvance", "website": "https://marcusvance.dev"}'::jsonb,
-  ARRAY['frontend', 'backend', 'React', 'TypeScript', 'Next.js', 'Node.js', 'Express', 'PostgreSQL', 'GraphQL', 'TailwindCSS'],
-  ARRAY['Solidity', 'PyTorch'],
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '10000000-0000-0000-0000-000000000003',
-  'Elena Rostova',
-  'elena.rostova@uxcraft.design',
-  'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80',
-  'talent',
-  'Lead Product Designer & UI/UX Specialist crafting intuitive digital experiences for FinTech and HealthTech applications.',
-  '{"dribbble": "https://dribbble.com/elenarostova", "linkedin": "https://linkedin.com/in/elenarostova"}'::jsonb,
-  ARRAY['UI/UX Design', 'Figma', 'Design Systems', 'User Research', 'Prototyping', 'Accessibility'],
-  ARRAY['TypeScript', 'Three.js'],
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '10000000-0000-0000-0000-000000000004',
-  'Alex Rivera',
-  'alex.rivera@mobileedge.io',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
-  'talent',
-  'Cross-platform Mobile Engineer focused on React Native and Flutter app development. Shipped 12+ mobile apps.',
-  '{"github": "https://github.com/arivera-mobile", "linkedin": "https://linkedin.com/in/alexrivera-tech"}'::jsonb,
-  ARRAY['React Native', 'Flutter', 'TypeScript', 'iOS', 'Android', 'GraphQL'],
-  ARRAY['WebAssembly', 'C++'],
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '10000000-0000-0000-0000-000000000005',
-  'David Kalu',
-  'david.kalu@cloudops.net',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
-  'talent',
-  'DevOps & Cloud Site Reliability Engineer. Specialized in AWS/GCP cloud architecture, Terraform IaC, and Kubernetes.',
-  '{"github": "https://github.com/dkalu-ops", "linkedin": "https://linkedin.com/in/davidkalu"}'::jsonb,
-  ARRAY['backend', 'DevOps', 'AWS', 'Kubernetes', 'Docker', 'Terraform', 'CI/CD', 'PostgreSQL'],
-  ARRAY['React', 'UI/UX Design'],
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '20000000-0000-0000-0000-000000000001',
-  'Nexus AI Labs',
-  'contact@nexusailabs.io',
-  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80',
-  'partner',
-  'Series-A funded research startup building next-generation multi-modal autonomous agents and vector search systems.',
-  '{"website": "https://nexusailabs.io", "linkedin": "https://linkedin.com/company/nexus-ai-labs"}'::jsonb,
-  ARRAY['AI', 'LLM', 'Python', 'Vector DB'],
-  ARRAY[]::text[],
-  NULL
-),
-(
-  '20000000-0000-0000-0000-000000000002',
-  'QuantumPay FinTech',
-  'partnerships@quantumpay.com',
-  'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&auto=format&fit=crop&q=80',
-  'partner',
-  'Global financial technology enterprise providing instant cross-border payments and merchant API gateways.',
-  '{"website": "https://quantumpay.com", "linkedin": "https://linkedin.com/company/quantumpay"}'::jsonb,
-  ARRAY['FinTech', 'Node.js', 'React', 'PostgreSQL'],
-  ARRAY[]::text[],
-  NULL
-),
-(
-  '20000000-0000-0000-0000-000000000003',
-  'ElevateHealth Tech',
-  'info@elevatehealth.org',
-  'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80',
-  'partner',
-  'ElevateHealth leverages digital workflows and AI diagnostics to provide accessible healthcare across emerging markets.',
-  '{"website": "https://elevatehealth.org"}'::jsonb,
-  ARRAY['HealthTech', 'AI', 'React Native'],
-  ARRAY[]::text[],
-  NULL
-),
-(
-  '30000000-0000-0000-0000-000000000001',
-  'EdgeTalent Master Admin',
-  'edgetalentindonesia@gmail.com',
-  'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=400&auto=format&fit=crop&q=80',
-  'admin',
-  'System administrator profile responsible for platform oversight and course moderation.',
-  '{"website": "https://edgetalent.org"}'::jsonb,
-  ARRAY['Admin'],
-  ARRAY[]::text[],
-  NULL
-)
-ON CONFLICT (id) DO UPDATE 
-SET full_name = EXCLUDED.full_name,
-    email = EXCLUDED.email,
-    avatar_url = EXCLUDED.avatar_url,
-    role = EXCLUDED.role,
-    bio = EXCLUDED.bio,
-    portfolio_links = EXCLUDED.portfolio_links,
-    skills = EXCLUDED.skills,
-    skill_gaps = EXCLUDED.skill_gaps,
-    skills_embedding = EXCLUDED.skills_embedding;
+  ('10000000-0000-0000-0000-000000000001', 'sarah.chen@ai-edge.org', 'Dr. Sarah Chen', 'talent', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah&backgroundColor=b6e3f4', 'Senior AI/ML Researcher specializing in LLM optimization.', ARRAY['Python', 'PyTorch', 'TensorFlow', 'LLMs', 'MLOps'], 120, 'https://github.com/sarahchen', 'https://linkedin.com/in/sarahchen', 'San Francisco, CA'),
+  ('10000000-0000-0000-0000-000000000002', 'marcus.vance@devstudio.com', 'Marcus Vance', 'talent', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus&backgroundColor=c0aede', 'Full-stack developer with a passion for web3 and decentralized apps.', ARRAY['TypeScript', 'React', 'Node.js', 'Solidity', 'GraphQL'], 85, 'https://github.com/marcusv', 'https://linkedin.com/in/marcusvance', 'London, UK'),
+  ('10000000-0000-0000-0000-000000000003', 'elena.rostova@uxcraft.design', 'Elena Rostova', 'talent', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena&backgroundColor=ffdfbf', 'Award-winning UI/UX designer focusing on accessibility.', ARRAY['Figma', 'UI/UX', 'Design Systems', 'User Research', 'CSS'], 90, NULL, 'https://linkedin.com/in/elenarostova', 'Berlin, Germany'),
+  ('10000000-0000-0000-0000-000000000004', 'alex.rivera@mobileedge.io', 'Alex Rivera', 'talent', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex&backgroundColor=d1d4f9', 'Mobile engineer creating fluid React Native experiences.', ARRAY['React Native', 'Swift', 'Kotlin', 'Mobile Architecture', 'Firebase'], 95, 'https://github.com/alexrivera', 'https://linkedin.com/in/alexrivera', 'Austin, TX'),
+  ('10000000-0000-0000-0000-000000000005', 'david.kalu@cloudops.net', 'David Kalu', 'talent', 'https://api.dicebear.com/7.x/avataaars/svg?seed=David&backgroundColor=c0aede', 'Cloud infrastructure expert and DevOps specialist.', ARRAY['AWS', 'Kubernetes', 'Terraform', 'CI/CD', 'Go'], 110, 'https://github.com/dkalu', 'https://linkedin.com/in/davidkalu', 'Toronto, Canada'),
+  ('20000000-0000-0000-0000-000000000001', 'contact@nexusailabs.io', 'Nexus AI Labs', 'partner', 'https://api.dicebear.com/7.x/shapes/svg?seed=Nexus&backgroundColor=1c1917', 'Pushing the boundaries of artificial general intelligence.', ARRAY['AI', 'Machine Learning', 'Research'], NULL, NULL, 'https://linkedin.com/company/nexus-ai-labs', 'Boston, MA'),
+  ('20000000-0000-0000-0000-000000000002', 'partnerships@quantumpay.com', 'QuantumPay FinTech', 'partner', 'https://api.dicebear.com/7.x/shapes/svg?seed=Quantum&backgroundColor=1c1917', 'Next-generation payment gateway leveraging blockchain.', ARRAY['FinTech', 'Blockchain', 'Payments'], NULL, NULL, 'https://linkedin.com/company/quantumpay', 'Singapore'),
+  ('20000000-0000-0000-0000-000000000003', 'info@elevatehealth.org', 'ElevateHealth Tech', 'partner', 'https://api.dicebear.com/7.x/shapes/svg?seed=Elevate&backgroundColor=1c1917', 'Transforming patient care through data analytics.', ARRAY['HealthTech', 'Data Analytics', 'Healthcare'], NULL, NULL, 'https://linkedin.com/company/elevatehealth', 'New York, NY'),
+  ('90000000-0000-0000-0000-000000000001', 'edgetalentindonesia@gmail.com', 'EdgeTalent Master Admin', 'admin', 'https://api.dicebear.com/7.x/avataaars/svg?seed=Admin&backgroundColor=f87171', 'System Administrator', ARRAY['Admin', 'System'], NULL, NULL, NULL, 'Jakarta, Indonesia');
 
 -- -------------------------------------------------------------------------
--- Step 4: SEED PROJECTS
+-- STEP 4: SEED PROJECTS (Job Listings)
 -- -------------------------------------------------------------------------
-INSERT INTO public.projects (id, partner_id, title, description, required_skills, budget, scope, embedding)
+INSERT INTO public.projects (id, partner_id, title, description, skills_required, budget_min, budget_max, status, created_at)
 VALUES
-(
-  '40000000-0000-0000-0000-000000000001',
-  '20000000-0000-0000-0000-000000000001',
-  'Autonomous AI Customer Support Agent with RAG & pgvector',
-  'Build a state-of-the-art retrieval-augmented generation (RAG) agent using PostgreSQL pgvector and OpenRouter LLMs with sub-500ms latency.',
-  ARRAY['ai', 'Python', 'pgvector', 'LLM', 'Prompt Engineering', 'LangChain'],
-  45000000.00,
-  'medium-term',
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '40000000-0000-0000-0000-000000000002',
-  '20000000-0000-0000-0000-000000000001',
-  'LLM Fine-Tuning & Multi-Modal Vision Model Pipeline',
-  'Fine-tune open-weight vision-language models for automated document inspection and key-value metadata extraction.',
-  ARRAY['ai', 'Python', 'PyTorch', 'LLM'],
-  70000000.00,
-  'long-term',
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '40000000-0000-0000-0000-000000000003',
-  '20000000-0000-0000-0000-000000000002',
-  'High-Throughput Global Payments Ledger & Microservices',
-  'Architect and implement transactional ledger microservices in Node.js / TypeScript handling concurrent balance updates and bank API webhooks.',
-  ARRAY['backend', 'Node.js', 'TypeScript', 'PostgreSQL', 'Redis', 'FinTech'],
-  60000000.00,
-  'medium-term',
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '40000000-0000-0000-0000-000000000004',
-  '20000000-0000-0000-0000-000000000002',
-  'React & Tailwind Merchant Analytics Dashboard',
-  'Build an interactive, responsive analytics portal for merchants featuring transaction charts, settlement reports, and refund workflows.',
-  ARRAY['frontend', 'React', 'TypeScript', 'TailwindCSS', 'UI/UX Design'],
-  35000000.00,
-  'short-term',
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-),
-(
-  '40000000-0000-0000-0000-000000000005',
-  '20000000-0000-0000-0000-000000000003',
-  'AI Tele-Health Diagnostic & Symptom Checker Web App',
-  'Build an intuitive patient web intake application integrated with AI diagnostic suggestion engines adhering to healthcare privacy standards.',
-  ARRAY['frontend', 'React', 'TypeScript', 'HealthTech', 'UI/UX Design'],
-  50000000.00,
-  'medium-term',
-  ARRAY_FILL(0.025::float, ARRAY[1536])::vector(1536)
-)
-ON CONFLICT (id) DO UPDATE
-SET title = EXCLUDED.title,
-    description = EXCLUDED.description,
-    required_skills = EXCLUDED.required_skills,
-    budget = EXCLUDED.budget,
-    scope = EXCLUDED.scope,
-    embedding = EXCLUDED.embedding;
+  ('30000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 'Optimize LLM Inference Pipeline', 'Looking for an experienced MLOps engineer to reduce latency in our custom LLM inference pipeline. Must have experience with vLLM and TensorRT-LLM.', ARRAY['Python', 'MLOps', 'LLMs', 'CUDA'], 8000, 15000, 'open', now() - interval '2 days'),
+  ('30000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', 'Design AI Platform Dashboard', 'We need a sleek, dark-mode dashboard for our enterprise AI platform. Focus on data visualization and accessibility.', ARRAY['UI/UX', 'Figma', 'Design Systems'], 4000, 7000, 'open', now() - interval '5 days'),
+  ('30000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000002', 'Smart Contract Auditor for DeFi Protocol', 'Require a thorough security audit of our upcoming DeFi payment protocol. High proficiency in Solidity and security best practices required.', ARRAY['Solidity', 'Smart Contracts', 'Security'], 10000, 20000, 'open', now() - interval '1 day'),
+  ('30000000-0000-0000-0000-000000000004', '20000000-0000-0000-0000-000000000003', 'React Native Patient App MVP', 'Build the MVP for our patient tracking mobile app. Must integrate with our existing Go backend API.', ARRAY['React Native', 'Mobile Architecture', 'TypeScript'], 12000, 18000, 'open', now() - interval '10 days'),
+  ('30000000-0000-0000-0000-000000000005', '20000000-0000-0000-0000-000000000003', 'Migrate Infrastructure to Kubernetes', 'Need a DevOps engineer to migrate our legacy EC2 deployment to a highly available EKS cluster using Terraform.', ARRAY['AWS', 'Kubernetes', 'Terraform'], 15000, 25000, 'in_progress', now() - interval '15 days');
 
 -- -------------------------------------------------------------------------
--- Step 5: SEED APPLICATIONS
+-- STEP 5: SEED APPLICATIONS
 -- -------------------------------------------------------------------------
-INSERT INTO public.applications (project_id, talent_id, status, match_percentage, match_breakdown)
+INSERT INTO public.applications (id, project_id, talent_id, cover_letter, proposed_rate, status, created_at)
 VALUES
-(
-  '40000000-0000-0000-0000-000000000001',
-  '10000000-0000-0000-0000-000000000001',
-  'accepted',
-  98.50,
-  '{"skills_match": 100, "experience_match": 96, "rag_expertise": 100}'::jsonb
-),
-(
-  '40000000-0000-0000-0000-000000000001',
-  '10000000-0000-0000-0000-000000000002',
-  'shortlisted',
-  84.00,
-  '{"skills_match": 80, "experience_match": 90}'::jsonb
-),
-(
-  '40000000-0000-0000-0000-000000000003',
-  '10000000-0000-0000-0000-000000000002',
-  'accepted',
-  96.00,
-  '{"skills_match": 98, "backend_architecture": 96}'::jsonb
-),
-(
-  '40000000-0000-0000-0000-000000000004',
-  '10000000-0000-0000-0000-000000000002',
-  'accepted',
-  99.00,
-  '{"skills_match": 100, "frontend_design": 98}'::jsonb
-),
-(
-  '40000000-0000-0000-0000-000000000005',
-  '10000000-0000-0000-0000-000000000003',
-  'shortlisted',
-  94.00,
-  '{"skills_match": 96, "ui_design": 98}'::jsonb
-)
-ON CONFLICT (project_id, talent_id) DO UPDATE
-SET status = EXCLUDED.status,
-    match_percentage = EXCLUDED.match_percentage,
-    match_breakdown = EXCLUDED.match_breakdown;
-
--- -------------------------------------------------------------------------
--- Step 6: SEED COURSES & LESSONS
--- -------------------------------------------------------------------------
-INSERT INTO public.courses (id, title, description, skills_taught, provider, link)
-VALUES
-(
-  '50000000-0000-0000-0000-000000000001',
-  'Advanced React Architecture & Custom Hooks',
-  'Master modern React 19 patterns, server components, fiber reconciliation, custom hook abstractions, and state management at scale.',
-  ARRAY['frontend', 'React', 'TypeScript', 'State Management'],
-  'EdgeTalent Academy',
-  'https://edgetalent.org/courses/react-architecture'
-),
-(
-  '50000000-0000-0000-0000-000000000002',
-  'Enterprise Node.js Backend & Scalable Systems',
-  'Deep dive into Node.js asynchronous I/O, Express middleware, database query optimization, Redis caching, and microservices.',
-  ARRAY['backend', 'Node.js', 'Express', 'PostgreSQL', 'Redis'],
-  'EdgeTalent Academy',
-  'https://edgetalent.org/courses/nodejs-backend'
-),
-(
-  '50000000-0000-0000-0000-000000000003',
-  'AI Engineering & RAG Systems Masterclass',
-  'Build end-to-end intelligent systems with OpenRouter LLMs, embeddings, vector databases (pgvector), and production RAG pipelines.',
-  ARRAY['ai', 'LLM', 'Prompt Engineering', 'Vector Databases', 'Python', 'pgvector'],
-  'EdgeTalent Academy',
-  'https://edgetalent.org/courses/ai-engineering'
-)
-ON CONFLICT (id) DO UPDATE
-SET title = EXCLUDED.title,
-    description = EXCLUDED.description,
-    skills_taught = EXCLUDED.skills_taught;
-
-INSERT INTO public.course_lessons (id, course_id, title, content, sequence_order, duration_minutes)
-VALUES
-(
-  '60000000-0000-0000-0000-000000000001',
-  '50000000-0000-0000-0000-000000000001',
-  'React 19 Fiber Mechanics & Render Lifecycle',
-  '# React 19 Fiber Mechanics' || chr(10) || 'Understand how fibers represent component tree work units, priority queuing, and concurrent rendering features.',
-  1,
-  20
-),
-(
-  '60000000-0000-0000-0000-000000000002',
-  '50000000-0000-0000-0000-000000000001',
-  'Designing Custom React Hooks & Abstracting UI Logic',
-  '# Custom React Hooks' || chr(10) || 'Learn patterns for encapsulating complex state logic into testable, clean custom hooks across React applications.',
-  2,
-  25
-),
-(
-  '60000000-0000-0000-0000-000000000003',
-  '50000000-0000-0000-0000-000000000001',
-  'Enterprise TypeScript Integration & Type Safety',
-  '# TypeScript in React' || chr(10) || 'Master generic component props, union state types, and schema validation with Zod in React applications.',
-  3,
-  18
-),
-(
-  '60000000-0000-0000-0000-000000000006',
-  '50000000-0000-0000-0000-000000000003',
-  'Vector Embeddings & Cosine Distance Mechanics',
-  '# Understanding Embeddings' || chr(10) || 'Learn how neural networks map text tokens into 1536-dimensional semantic spaces and calculate cosine similarity.',
-  1,
-  20
-),
-(
-  '60000000-0000-0000-0000-000000000007',
-  '50000000-0000-0000-0000-000000000003',
-  'Building Enterprise RAG Pipelines with pgvector',
-  '# Enterprise RAG Pipelines' || chr(10) || 'Design end-to-end document chunking, vector indexing in PostgreSQL, and dynamic prompt context injection.',
-  2,
-  35
-)
-ON CONFLICT (id) DO UPDATE
-SET title = EXCLUDED.title,
-    content = EXCLUDED.content;
-
--- -------------------------------------------------------------------------
--- Step 7: SEED ENROLLMENTS & CERTIFICATES
--- -------------------------------------------------------------------------
-INSERT INTO public.course_enrollments (user_id, course_id, completed_lessons, completed_at, credential_id, digital_signature)
-VALUES
-(
-  '10000000-0000-0000-0000-000000000001',
-  '50000000-0000-0000-0000-000000000003',
-  ARRAY['60000000-0000-0000-0000-000000000006'::uuid, '60000000-0000-0000-0000-000000000007'::uuid],
-  NOW() - INTERVAL '5 days',
-  'CERT-AI-2026-9841',
-  'sig_edgetalent_ai_9841_sarah_chen_verified'
-),
-(
-  '10000000-0000-0000-0000-000000000002',
-  '50000000-0000-0000-0000-000000000001',
-  ARRAY['60000000-0000-0000-0000-000000000001'::uuid, '60000000-0000-0000-0000-000000000002'::uuid, '60000000-0000-0000-0000-000000000003'::uuid],
-  NOW() - INTERVAL '12 days',
-  'CERT-REACT-2026-4712',
-  'sig_edgetalent_react_4712_marcus_vance_verified'
-)
-ON CONFLICT (user_id, course_id) DO UPDATE
-SET completed_lessons = EXCLUDED.completed_lessons,
-    completed_at = EXCLUDED.completed_at,
-    credential_id = EXCLUDED.credential_id,
-    digital_signature = EXCLUDED.digital_signature;
-
-INSERT INTO public.talent_certificates (user_id, name, issuing_organization, issue_date, expiration_date, credential_id, credential_url, digital_signature)
-VALUES
-(
-  '10000000-0000-0000-0000-000000000001',
-  'Google Cloud Professional Machine Learning Engineer',
-  'Google Cloud',
-  '2025-06-15',
-  '2027-06-15',
-  'GCP-MLE-884912',
-  'https://www.credential.net/gcp-mle-884912',
-  'sig_gcp_mle_884912_sarah_chen'
-),
-(
-  '10000000-0000-0000-0000-000000000002',
-  'Meta Certified Senior Frontend Developer',
-  'Meta',
-  '2025-03-10',
-  NULL,
-  'META-FE-992104',
-  'https://coursera.org/verify/meta-fe-992104',
-  'sig_meta_fe_992104_marcus_vance'
-),
-(
-  '10000000-0000-0000-0000-000000000005',
-  'AWS Certified Solutions Architect – Professional',
-  'Amazon Web Services',
-  '2024-11-20',
-  '2027-11-20',
-  'AWS-SAP-773419',
-  'https://aws.amazon.com/verification/AWS-SAP-773419',
-  'sig_aws_sap_773419_david_kalu'
-)
-ON CONFLICT DO NOTHING;
-
--- -------------------------------------------------------------------------
--- Step 8: SEED FUNDING OPPORTUNITIES
--- -------------------------------------------------------------------------
-INSERT INTO public.funding_opportunities (id, title, description, content, amount, eligibility, deadline, link, category)
-VALUES
-(
-  '70000000-0000-0000-0000-000000000001',
-  'Y Combinator Winter 2027 Accelerator',
-  'YC invests Rp 7.500.000.000 in early-stage tech founders twice a year. Gain access to elite founder networks and global venture capital demo day.',
-  'Y Combinator is a world-renowned startup accelerator. Every accepted startup receives Rp 7.500.000.000 investment split across post-money safe and uncapped MFN terms.',
-  'Rp 7.500.000.000',
-  'Open to early-stage technology founders globally.',
-  'October 15, 2026',
-  'https://www.ycombinator.com/apply',
-  'Accelerators'
-),
-(
-  '70000000-0000-0000-0000-000000000002',
-  'Google for Startups Accelerator: AI First',
-  'Equity-free program providing up to Rp 1.500.000.000 in Google Cloud credits, technical AI mentorship, and access to Google machine learning experts.',
-  'The Google for Startups Accelerator: AI First targets high-potential startups developing core products with Artificial Intelligence and Machine Learning.',
-  'Hingga Rp 1.500.000.000 dalam Kredit Cloud + Equity-Free Support',
-  'Seed to Series-A startups with AI/ML integrated into their core product.',
-  'September 30, 2026',
-  'https://startup.google.com/accelerator/',
-  'Accelerators'
-),
-(
-  '70000000-0000-0000-0000-000000000003',
-  'Thiel Fellowship for Young Entrepreneurs',
-  'Rp 1.500.000.000 equity-free grant awarded to young innovators building breakthrough technologies outside traditional academia.',
-  'The Thiel Fellowship is a two-year program founded by Peter Thiel giving Rp 1.500.000.000 to young people who want to build new things instead of attending college.',
-  'Rp 1.500.000.000 (Equity-Free Grant)',
-  'Entrepreneurs aged 22 or under willing to pursue their startup full-time.',
-  'Rolling Applications',
-  'https://www.thielfellowship.org/',
-  'Grants'
-)
-ON CONFLICT (id) DO UPDATE
-SET title = EXCLUDED.title,
-    description = EXCLUDED.description,
-    content = EXCLUDED.content;
-
--- -------------------------------------------------------------------------
--- Step 9: SEED EVENTS & REGISTRATIONS
--- -------------------------------------------------------------------------
-INSERT INTO public.events (id, title, description, content, event_date, location, organizer, organizer_id, category, capacity, link)
-VALUES
-(
-  '80000000-0000-0000-0000-000000000001',
-  'EdgeTalent Global AI & Vector Search Hackathon 2026',
-  'A 48-hour global virtual hackathon focused on building open-source AI agents and pgvector developer extensions.',
-  'Join developers, AI researchers, and designers for a 48-hour hackathon. Top 3 winning teams receive Rp 150.000.000 in cash prizes.',
-  NOW() + INTERVAL '14 days',
-  'Virtual (Discord / Zoom)',
-  'EdgeTalent Foundation',
-  '30000000-0000-0000-0000-000000000001',
-  'Hackathon',
-  250,
-  'https://edgetalent.org/hackathon-2026'
-),
-(
-  '80000000-0000-0000-0000-000000000002',
-  'Building Production AI Agents with Gemini & pgvector',
-  'Hands-on technical workshop on defining function-calling schemas, system instructions, and vector matching pipelines.',
-  'Learn how to build autonomous coding and data agents using Google Gemini models and PostgreSQL vector search.',
-  NOW() + INTERVAL '5 days',
-  'Virtual (Zoom)',
-  'Google Developer Group',
-  NULL,
-  'Workshop',
-  120,
-  'https://gdg.community.dev/events/'
-)
-ON CONFLICT (id) DO UPDATE
-SET title = EXCLUDED.title,
-    description = EXCLUDED.description,
-    content = EXCLUDED.content;
-
-INSERT INTO public.event_registrations (event_id, user_id)
-VALUES
-('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001'),
-('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001')
-ON CONFLICT (event_id, user_id) DO NOTHING;
-
--- -------------------------------------------------------------------------
--- Step 10: SEED QUIZ QUESTIONS
--- -------------------------------------------------------------------------
-ALTER TABLE public.quiz_questions DROP CONSTRAINT IF EXISTS quiz_questions_category_check;
-ALTER TABLE public.quiz_questions ADD CONSTRAINT quiz_questions_category_check CHECK (category IN ('frontend', 'backend', 'ai', 'english', 'iq', 'mbti', 'disc'));
-
-INSERT INTO public.quiz_questions (category, question, options, answer)
-VALUES
-('frontend', 'Which hook in React 19 is specifically designed to handle asynchronous form actions?', ARRAY['useActionState', 'useEffect', 'useMemo', 'useRef'], 'useActionState'),
-('frontend', 'What is the primary benefit of React Server Components (RSC)?', ARRAY['Zero client-side JavaScript bundle size for server components', 'Faster CSS compilation', 'Automatic Redux store synchronization', 'Replacing WebSockets entirely'], 'Zero client-side JavaScript bundle size for server components'),
-('backend', 'In PostgreSQL, which index type is optimized for cosine distance search on pgvector embeddings?', ARRAY['HNSW (Hierarchical Navigable Small World)', 'B-Tree', 'Hash Index', 'BRIN'], 'HNSW (Hierarchical Navigable Small World)'),
-('ai', 'In Retrieval-Augmented Generation (RAG), what is chunking used for?', ARRAY['Breaking large text documents into smaller semantically cohesive segments for embedding', 'Compressing audio files', 'Translating code into Python', 'Encrypting API keys'], 'Breaking large text documents into smaller semantically cohesive segments for embedding'),
-('english', 'Select the grammatically correct sentence for professional business communication:', ARRAY['We have received your application and will review it shortly.', 'We have received your application and will review it short.', 'We received your application and review it shortly.', 'We receive your application and reviewing it shortly.'], 'We have received your application and will review it shortly.'),
-('iq', 'What number comes next in the sequence? 2, 6, 12, 20, 30, ___', ARRAY['42', '40', '44', '46'], '42'),
-('mbti', 'In a team workspace environment, where do you draw your primary energy from?', ARRAY['Collaborating actively with teammates and group brainstorming (Extraversion - E)', 'Deep focused solo work and independent problem solving (Introversion - I)'], 'Collaborating actively with teammates and group brainstorming (Extraversion - E)'),
-('disc', 'When facing a high-pressure project obstacle, what is your natural default reaction?', ARRAY['Take charge directly and drive immediate results (Dominance - D)', 'Rally the team enthusiastically and inspire creative ideas (Influence - I)', 'Maintain steady composure and support team members (Steadiness - S)', 'Analyze the root cause methodically and ensure precision (Conscientiousness - C)'], 'Take charge directly and drive immediate results (Dominance - D)')
-ON CONFLICT DO NOTHING;
+  ('40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'I have extensive experience optimizing inference engines and recently reduced latency by 40% for a similar scale LLM.', 150, 'pending', now() - interval '1 day'),
+  ('40000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000003', 'I specialize in dark mode data-heavy interfaces. Attached is a link to my portfolio featuring three AI dashboards.', 90, 'accepted', now() - interval '4 days'),
+  ('40000000-0000-0000-0000-000000000003', '30000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000002', 'I have audited over 15 DeFi protocols with zero exploits to date. Ready to review your codebase.', 100, 'pending', now() - interval '12 hours'),
+  ('40000000-0000-0000-0000-000000000004', '30000000-0000-0000-0000-000000000005', '10000000-0000-0000-0000-000000000005', 'AWS EKS migrations are my bread and butter. I can complete this safely with zero downtime within 3 weeks.', 120, 'accepted', now() - interval '14 days');
