@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "test:e2e": "npx tsx test/e2e-test.ts",
-    "seed": "npx tsx scripts/seed.ts"
+    "seed": "npx tsx scripts/seed.ts",
+    "delete-users": "npx tsx scripts/delete-users.ts"
   },
   "dependencies": {
     "@edgetalent/shared": "workspace:*",
