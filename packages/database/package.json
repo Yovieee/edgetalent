@@ -5,6 +5,7 @@
   "scripts": {
     "test:e2e": "npx tsx test/e2e-test.ts",
     "seed": "npx tsx scripts/seed.ts",
+    "seed-new-users": "npx tsx scripts/seed-new-users.ts",
     "delete-users": "npx tsx scripts/delete-users.ts"
   },
   "dependencies": {
