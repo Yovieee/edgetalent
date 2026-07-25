@@ -15,6 +15,8 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [fullName, setFullName] = useState<string>("");
+  const [role, setRole] = useState<string>("talent");
+  const [newPassword, setNewPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
@@ -41,12 +43,29 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
           throw new Error(validationResult.error.errors[0].message);
         }
 
+        // Attempt manual password reset via RPC first
+        if (newPassword && newPassword.length >= 6) {
+          const { data: rpcData, error: rpcError } = await supabase.rpc("reset_user_password_manual", {
+            p_email: email,
+            p_new_password: newPassword,
+          });
+
+          if (!rpcError && rpcData?.success) {
+            setSuccessMsg("Password reset successfully! You can now log in with your new password.");
+            setMode("login");
+            setPassword(newPassword);
+            setNewPassword("");
+            return;
+          }
+        }
+
+        // Fallback to standard email link reset
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
 
         if (error) throw error;
-        setSuccessMsg("Password reset link sent! Please check your inbox and spam folder. If you don't receive it, verify that redirect URLs are configured in Supabase.");
+        setSuccessMsg("Password reset link sent! Please check your inbox and spam folder.");
       } else if (mode === "signup") {
         // Zod validation for register payload
         const validationResult = RegisterSchema.safeParse({ email, password, fullName });
@@ -54,18 +73,40 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
           throw new Error(validationResult.error.errors[0].message);
         }
 
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-            },
-          },
+        // Attempt manual user creation via RPC
+        const { data: rpcData, error: rpcError } = await supabase.rpc("create_manual_user", {
+          p_email: email,
+          p_password: password,
+          p_full_name: fullName,
+          p_role: role,
         });
 
-        if (error) throw error;
-        setSuccessMsg("Registration successful! Check your email or try logging in.");
+        if (rpcError || (rpcData && !rpcData.success)) {
+          const rpcErrMsg = rpcError?.message || rpcData?.message;
+          // Fallback to standard Supabase auth signUp if RPC function is unavailable
+          if (rpcErrMsg && rpcErrMsg.includes("function") && rpcErrMsg.includes("does not exist")) {
+            const { error: signUpErr } = await supabase.auth.signUp({
+              email,
+              password,
+              options: { data: { full_name: fullName } },
+            });
+            if (signUpErr) throw signUpErr;
+            setSuccessMsg("Registration successful! Try logging in.");
+          } else {
+            throw new Error(rpcErrMsg || "Failed to create user account.");
+          }
+        } else {
+          // Immediately sign in user after manual creation
+          const { error: signInErr } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (signInErr) {
+            setSuccessMsg("Account created! Please log in with your credentials.");
+            setMode("login");
+          }
+        }
       } else {
         // Zod validation for login payload
         const validationResult = LoginSchema.safeParse({ email, password });
@@ -92,15 +133,13 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
       }
 
       if (!rawMsg || rawMsg === "{}" || rawMsg === "[object Object]") {
-        rawMsg = "Invalid email or password. Please verify your credentials or ensure the SQL seed migration has been executed in your Supabase Dashboard.";
+        rawMsg = "Invalid email or password. Please verify your credentials or check connection.";
       }
 
       if (rawMsg.toLowerCase().includes("rate limit") || rawMsg.toLowerCase().includes("over_email_send_rate_limit")) {
-        rawMsg = "Email rate limit exceeded. Please wait a few minutes before requesting another reset link or configure custom SMTP in Supabase.";
+        rawMsg = "Email rate limit exceeded. You can reset your password directly by entering your new password below.";
       } else if (rawMsg.toLowerCase().includes("invalid login credentials")) {
-        rawMsg = "Invalid email or password. Please verify your credentials or run the database SQL seed script to create test accounts.";
-      } else if (rawMsg.toLowerCase().includes("redirect")) {
-        rawMsg = "Password reset URL redirect error. Please ensure redirect URLs are configured in Supabase Dashboard.";
+        rawMsg = "Invalid email or password. Please verify your credentials.";
       }
       setErrorMsg(rawMsg);
     } finally {
@@ -114,6 +153,7 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
     setSuccessMsg("");
     setPassword("");
     setFullName("");
+    setNewPassword("");
   };
 
   return (
@@ -134,7 +174,7 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
           {mode === "signup"
             ? "Join the EdgeTalent ecosystem today"
             : mode === "forgot"
-            ? "Enter your email address to receive a password reset link"
+            ? "Reset your password directly or request a link"
             : "Log in to manage your career or projects"}
         </p>
 
@@ -152,18 +192,35 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
 
         <form onSubmit={handleSubmit}>
           {mode === "signup" && (
-            <div className="form-group">
-              <label htmlFor="fullName">Full Name</label>
-              <input
-                id="fullName"
-                type="text"
-                className="form-input"
-                placeholder="John Doe"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required={mode === "signup"}
-              />
-            </div>
+            <>
+              <div className="form-group">
+                <label htmlFor="fullName">Full Name</label>
+                <input
+                  id="fullName"
+                  type="text"
+                  className="form-input"
+                  placeholder="John Doe"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required={mode === "signup"}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="role">Account Role</label>
+                <select
+                  id="role"
+                  className="form-input"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <option value="talent">Talent / Developer</option>
+                  <option value="partner">Partner / Enterprise</option>
+                  <option value="admin">Administrator</option>
+                </select>
+              </div>
+            </>
           )}
 
           <div className="form-group">
@@ -194,6 +251,20 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
             </div>
           )}
 
+          {mode === "forgot" && (
+            <div className="form-group" style={{ marginBottom: "1.5rem" }}>
+              <label htmlFor="newPassword">New Password (Instant Manual Reset)</label>
+              <input
+                id="newPassword"
+                type="password"
+                className="form-input"
+                placeholder="Enter new password (min 6 chars)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+          )}
+
           {mode === "login" && (
             <div style={{ textAlign: "right", marginBottom: "1.5rem" }}>
               <button
@@ -206,13 +277,13 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary" style={{ width: "100%", marginBottom: "1.5rem", marginTop: mode === "forgot" ? "1.5rem" : "0" }} disabled={loading}>
+          <button type="submit" className="btn btn-primary" style={{ width: "100%", marginBottom: "1.5rem", marginTop: mode === "forgot" ? "1rem" : "0" }} disabled={loading}>
             {loading
               ? "Processing..."
               : mode === "signup"
               ? "Sign Up"
               : mode === "forgot"
-              ? "Send Reset Link"
+              ? newPassword ? "Reset Password Instantly" : "Send Reset Link"
               : "Log In"}
           </button>
         </form>
@@ -245,3 +316,4 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
     </div>
   );
 }
+
