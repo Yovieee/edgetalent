@@ -571,7 +571,7 @@ VALUES
   NOW() + INTERVAL '14 days',
   'Virtual (Discord / Zoom)',
   'EdgeTalent Foundation',
-  '30000000-0000-0000-0000-000000000001',
+  NULL,
   'Hackathon',
   250,
   'https://edgetalent.org/hackathon-2026'
@@ -588,17 +588,51 @@ VALUES
   'Workshop',
   120,
   'https://gdg.community.dev/events/'
+),
+(
+  '80000000-0000-0000-0000-000000000003',
+  'FinTech & High-Throughput Microservices Tech Talk 2026',
+  'An interactive developer tech talk and networking session on building fault-tolerant transactional ledgers and realtime payment gateways.',
+  'Join senior backend engineers and architects from QuantumPay to discuss scaling distributed databases, Redis caching, and zero-downtime microservices deployments.',
+  NOW() + INTERVAL '21 days',
+  'Jakarta Tech Hub & Virtual (Zoom)',
+  'QuantumPay FinTech',
+  NULL,
+  'Networking',
+  180,
+  'https://quantumpay.com/events/tech-talk-2026'
+),
+(
+  '80000000-0000-0000-0000-000000000004',
+  'AI in Healthcare & Digital Diagnostics Masterclass',
+  'Explores machine learning applications in clinical triage, medical image processing, and secure telehealth workflows.',
+  'Join ElevateHealth experts for a masterclass on ethical AI models, patient data privacy, and real-time medical diagnostic integration.',
+  NOW() + INTERVAL '9 days',
+  'Virtual (Google Meet)',
+  'ElevateHealth Tech',
+  NULL,
+  'Webinar',
+  150,
+  'https://elevatehealth.org/events/ai-masterclass'
 )
 ON CONFLICT (id) DO UPDATE
 SET title = EXCLUDED.title,
     description = EXCLUDED.description,
-    content = EXCLUDED.content;
+    content = EXCLUDED.content,
+    event_date = EXCLUDED.event_date,
+    location = EXCLUDED.location,
+    organizer = EXCLUDED.organizer,
+    category = EXCLUDED.category,
+    capacity = EXCLUDED.capacity,
+    link = EXCLUDED.link;
 
 INSERT INTO public.event_registrations (event_id, user_id)
 VALUES
 ('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001'),
 ('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002'),
-('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001')
+('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001'),
+('80000000-0000-0000-0000-000000000003', '10000000-0000-0000-0000-000000000002'),
+('80000000-0000-0000-0000-000000000004', '10000000-0000-0000-0000-000000000003')
 ON CONFLICT (event_id, user_id) DO NOTHING;
 
 -- -------------------------------------------------------------------------

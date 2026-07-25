@@ -502,7 +502,7 @@ async function seedDatabase() {
         event_date: new Date(Date.now() + 86400000 * 14).toISOString(),
         location: "Virtual (Discord / Zoom)",
         organizer: "EdgeTalent Foundation",
-        organizer_id: "30000000-0000-0000-0000-000000000001",
+        organizer_id: null,
         category: "Hackathon",
         capacity: 250,
         link: "https://edgetalent.org/hackathon-2026"
@@ -515,9 +515,36 @@ async function seedDatabase() {
         event_date: new Date(Date.now() + 86400000 * 5).toISOString(),
         location: "Virtual (Zoom)",
         organizer: "Google Developer Group",
+        organizer_id: null,
         category: "Workshop",
         capacity: 120,
         link: "https://gdg.community.dev/events/"
+      },
+      {
+        id: "80000000-0000-0000-0000-000000000003",
+        title: "FinTech & High-Throughput Microservices Tech Talk 2026",
+        description: "An interactive developer tech talk and networking session on building fault-tolerant transactional ledgers and realtime payment gateways.",
+        content: "Join senior backend engineers and architects from QuantumPay to discuss scaling distributed databases, Redis caching, and zero-downtime microservices deployments.",
+        event_date: new Date(Date.now() + 86400000 * 21).toISOString(),
+        location: "Jakarta Tech Hub & Virtual (Zoom)",
+        organizer: "QuantumPay FinTech",
+        organizer_id: null,
+        category: "Networking",
+        capacity: 180,
+        link: "https://quantumpay.com/events/tech-talk-2026"
+      },
+      {
+        id: "80000000-0000-0000-0000-000000000004",
+        title: "AI in Healthcare & Digital Diagnostics Masterclass",
+        description: "Explores machine learning applications in clinical triage, medical image processing, and secure telehealth workflows.",
+        content: "Join ElevateHealth experts for a masterclass on ethical AI models, patient data privacy, and real-time medical diagnostic integration.",
+        event_date: new Date(Date.now() + 86400000 * 9).toISOString(),
+        location: "Virtual (Google Meet)",
+        organizer: "ElevateHealth Tech",
+        organizer_id: null,
+        category: "Webinar",
+        capacity: 150,
+        link: "https://elevatehealth.org/events/ai-masterclass"
       }
     ];
 
@@ -528,7 +555,9 @@ async function seedDatabase() {
     const rsvps = [
       { event_id: "80000000-0000-0000-0000-000000000001", user_id: "10000000-0000-0000-0000-000000000001" },
       { event_id: "80000000-0000-0000-0000-000000000001", user_id: "10000000-0000-0000-0000-000000000002" },
-      { event_id: "80000000-0000-0000-0000-000000000002", user_id: "10000000-0000-0000-0000-000000000001" }
+      { event_id: "80000000-0000-0000-0000-000000000002", user_id: "10000000-0000-0000-0000-000000000001" },
+      { event_id: "80000000-0000-0000-0000-000000000003", user_id: "10000000-0000-0000-0000-000000000002" },
+      { event_id: "80000000-0000-0000-0000-000000000004", user_id: "10000000-0000-0000-0000-000000000003" }
     ];
 
     const { error: rsvpErr } = await supabase.from("event_registrations").upsert(rsvps, { onConflict: "event_id,user_id" });
