@@ -23,13 +23,17 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
 
       if (error) {
         console.error("Error fetching profile:", error);
+        if (error.code === "PGRST301" || error.code === "user_not_found" || error.message?.includes("sub claim") || error.message?.includes("user_not_found")) {
+          await supabase.auth.signOut().catch(() => {});
+          setSession(null);
+          setProfile(null);
+          return;
+        }
         setProfile(null);
       } else if (!data) {
         // Profile row missing in public.profiles table, attempt automatic creation
         const { data: userData } = await supabase.auth.getUser();
         if (userData?.user) {
-          // Intentionally omit 'role' so upsert never overwrites an existing
-          // admin (or other) role that was set via SQL / promote function.
           const fallbackProfile = {
             id: userData.user.id,
             email: userData.user.email || "",
@@ -44,8 +48,6 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
           if (createdData) {
             setProfile(createdData as Profile);
           } else {
-            // Upsert may have failed due to RLS; retry a plain SELECT
-            // in case the profile actually exists (e.g. created by trigger).
             const { data: retryData } = await supabase
               .from("profiles")
               .select("*")
@@ -65,13 +67,23 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
   };
 
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session: activeSession } }) => {
-      setSession(activeSession);
-      if (activeSession?.user) {
-        fetchProfile(activeSession.user.id).finally(() => setLoading(false));
-      } else {
+    // Verify active user against Auth API to purge stale JWTs from wiped databases
+    supabase.auth.getUser().then(({ data: userData, error: userError }) => {
+      if (userError || !userData?.user) {
+        // Stale token detected; clear localStorage session
+        supabase.auth.signOut().catch(() => {});
+        setSession(null);
+        setProfile(null);
         setLoading(false);
+      } else {
+        supabase.auth.getSession().then(({ data: { session: activeSession } }) => {
+          setSession(activeSession);
+          if (activeSession?.user) {
+            fetchProfile(activeSession.user.id).finally(() => setLoading(false));
+          } else {
+            setLoading(false);
+          }
+        });
       }
     });
 

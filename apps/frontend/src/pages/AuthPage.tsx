@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSupabase } from "../context/SupabaseContext";
 import { LoginSchema, RegisterSchema, ForgotPasswordSchema } from "@edgetalent/shared";
 import { ArrowLeft } from "lucide-react";
@@ -18,6 +18,15 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
+
+  useEffect(() => {
+    // Clear stale session token from browser if unauthenticated
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        supabase.auth.signOut().catch(() => {});
+      }
+    });
+  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,11 +81,24 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
         if (error) throw error;
       }
     } catch (err: any) {
-      let rawMsg = err?.message || "An authentication error occurred.";
+      console.error("Authentication error:", err);
+      let rawMsg = "";
+      if (typeof err === "string") {
+        rawMsg = err;
+      } else if (err?.message && typeof err.message === "string") {
+        rawMsg = err.message;
+      } else if (err?.error_description && typeof err.error_description === "string") {
+        rawMsg = err.error_description;
+      }
+
+      if (!rawMsg || rawMsg === "{}" || rawMsg === "[object Object]") {
+        rawMsg = "Invalid email or password. Please verify your credentials or ensure the SQL seed migration has been executed in your Supabase Dashboard.";
+      }
+
       if (rawMsg.toLowerCase().includes("rate limit") || rawMsg.toLowerCase().includes("over_email_send_rate_limit")) {
         rawMsg = "Email rate limit exceeded. Please wait a few minutes before requesting another reset link or configure custom SMTP in Supabase.";
       } else if (rawMsg.toLowerCase().includes("invalid login credentials")) {
-        rawMsg = "Invalid email or password. Please verify your credentials or reset your password.";
+        rawMsg = "Invalid email or password. Please verify your credentials or run the database SQL seed script to create test accounts.";
       } else if (rawMsg.toLowerCase().includes("redirect")) {
         rawMsg = "Password reset URL redirect error. Please ensure redirect URLs are configured in Supabase Dashboard.";
       }
