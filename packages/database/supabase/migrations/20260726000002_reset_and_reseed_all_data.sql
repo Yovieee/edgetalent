@@ -4,8 +4,9 @@
 -- production-grade dummy data across EdgeTalent platform.
 -- =========================================================================
 
--- Enable vector extension
+-- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- -------------------------------------------------------------------------
 -- Step 1: PURGE ALL EXISTING TABLES & USERS
@@ -36,6 +37,7 @@ DELETE FROM auth.users;
 -- -------------------------------------------------------------------------
 DO $$
 DECLARE
+  v_pwd_hash TEXT;
   u RECORD;
   seed_users CURSOR FOR 
     SELECT * FROM (VALUES
@@ -50,6 +52,9 @@ DECLARE
       ('30000000-0000-0000-0000-000000000001'::uuid, 'edgetalentindonesia@gmail.com', 'EdgeTalent Master Admin')
     ) AS t(id, email, full_name);
 BEGIN
+  -- Compute valid Bcrypt hash for password123 using PostgreSQL pgcrypto extension
+  v_pwd_hash := crypt('password123', gen_salt('bf'));
+
   FOR u IN seed_users LOOP
     -- Insert auth user if not exists
     INSERT INTO auth.users (
@@ -69,7 +74,7 @@ BEGIN
       u.id,
       '00000000-0000-0000-0000-000000000000'::uuid,
       u.email,
-      '$2a$10$g1kK4E8sN07Mv1S5W0KzOO8b.X7M/E6f9qJ7X7V0/V1M1/V1M1/V1',
+      v_pwd_hash,
       NOW(),
       '{"provider":"email","providers":["email"]}'::jsonb,
       jsonb_build_object('full_name', u.full_name),
@@ -559,7 +564,6 @@ SET title = EXCLUDED.title,
 INSERT INTO public.event_registrations (event_id, user_id)
 VALUES
 ('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001'),
-('80000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002'),
 ('80000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001')
 ON CONFLICT (event_id, user_id) DO NOTHING;
 
