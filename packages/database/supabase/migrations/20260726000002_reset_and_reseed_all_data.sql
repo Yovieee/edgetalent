@@ -52,11 +52,11 @@ DECLARE
       ('30000000-0000-0000-0000-000000000001'::uuid, 'edgetalentindonesia@gmail.com', 'EdgeTalent Master Admin')
     ) AS t(id, email, full_name);
 BEGIN
-  -- Compute valid Bcrypt hash for password123 using PostgreSQL pgcrypto extension
+  -- Compute valid Bcrypt hash for password123 using pgcrypto
   v_pwd_hash := crypt('password123', gen_salt('bf'));
 
   FOR u IN seed_users LOOP
-    -- Insert auth user if not exists
+    -- Insert auth user with complete GoTrue metadata
     INSERT INTO auth.users (
       id,
       instance_id,
@@ -69,7 +69,8 @@ BEGIN
       updated_at,
       role,
       aud,
-      is_sso_user
+      is_sso_user,
+      is_anonymous
     ) VALUES (
       u.id,
       '00000000-0000-0000-0000-000000000000'::uuid,
@@ -82,10 +83,16 @@ BEGIN
       NOW(),
       'authenticated',
       'authenticated',
+      false,
       false
-    ) ON CONFLICT (id) DO NOTHING;
+    ) ON CONFLICT (id) DO UPDATE SET
+      email = EXCLUDED.email,
+      encrypted_password = EXCLUDED.encrypted_password,
+      email_confirmed_at = EXCLUDED.email_confirmed_at,
+      raw_user_meta_data = EXCLUDED.raw_user_meta_data,
+      updated_at = NOW();
 
-    -- Insert auth identity matching GoTrue requirement (provider_id = email)
+    -- Insert auth identity matching GoTrue requirement (provider_id = email, identity_data with sub & email_verified)
     INSERT INTO auth.identities (
       id,
       user_id,
@@ -98,13 +105,16 @@ BEGIN
     ) VALUES (
       u.id,
       u.id,
-      jsonb_build_object('sub', u.id::text, 'email', u.email),
+      jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true, 'phone_verified', false),
       'email',
       NOW(),
       NOW(),
       NOW(),
       u.email
-    ) ON CONFLICT (id) DO NOTHING;
+    ) ON CONFLICT (id) DO UPDATE SET
+      identity_data = EXCLUDED.identity_data,
+      provider_id = EXCLUDED.provider_id,
+      updated_at = NOW();
   END LOOP;
 END $$;
 
