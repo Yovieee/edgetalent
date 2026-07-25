@@ -42,18 +42,44 @@ async function run() {
   const testFullName = "Test Manual User";
   const testRole = "partner";
 
-  const { data, error } = await supabase.rpc("create_manual_user", {
+  const { data: createData, error: createError } = await supabase.rpc("create_manual_user", {
     p_email: testEmail,
     p_password: testPassword,
     p_full_name: testFullName,
     p_role: testRole,
   });
 
-  if (error) {
-    console.error("RPC error (migration might need to be applied in Supabase dashboard):", error);
+  if (createError) {
+    console.error("create_manual_user error:", createError);
   } else {
-    console.log("RPC result:", data);
+    console.log("create_manual_user result:", createData);
+  }
+
+  console.log("Testing login_manual_user RPC function...");
+  const { data: loginData, error: loginError } = await supabase.rpc("login_manual_user", {
+    p_email: testEmail,
+    p_password: testPassword,
+  });
+
+  if (loginError) {
+    console.error("login_manual_user error:", loginError);
+  } else {
+    console.log("login_manual_user result:", loginData);
+  }
+
+  console.log("Testing reset_user_password_manual RPC function...");
+  const newPassword = "NewPassword123!";
+  const { data: resetData, error: resetError } = await supabase.rpc("reset_user_password_manual", {
+    p_email: testEmail,
+    p_new_password: newPassword,
+  });
+
+  if (resetError) {
+    console.error("reset_user_password_manual error:", resetError);
+  } else {
+    console.log("reset_user_password_manual result:", resetData);
   }
 }
 
 run().catch(console.error);
+

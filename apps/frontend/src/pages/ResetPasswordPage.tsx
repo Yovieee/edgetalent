@@ -5,22 +5,15 @@ import { ResetPasswordSchema } from "@edgetalent/shared";
 import { KeyRound, ArrowLeft, CheckCircle2 } from "lucide-react";
 
 export default function ResetPasswordPage(): React.ReactElement {
-  const { supabase } = useSupabase();
+  const { session, resetPassword } = useSupabase();
   const navigate = useNavigate();
   
+  const [email, setEmail] = useState<string>(session?.user?.email || "");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        setErrorMsg("Your password reset link has expired or is invalid. Please request a new one.");
-      }
-    });
-  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,26 +21,25 @@ export default function ResetPasswordPage(): React.ReactElement {
     setErrorMsg("");
 
     try {
+      if (!email) {
+        throw new Error("Please enter your account email address.");
+      }
+
       // Validate input using Zod schema
       const validationResult = ResetPasswordSchema.safeParse({ password, confirmPassword });
       if (!validationResult.success) {
         throw new Error(validationResult.error.errors[0].message);
       }
 
-      // Update password via Supabase Auth
-      const { error } = await supabase.auth.updateUser({
-        password: password,
-      });
-
-      if (error) throw error;
-
+      await resetPassword(email, password);
       setIsSuccess(true);
     } catch (err: any) {
-      setErrorMsg(err.message || "Failed to reset password. Please try again or request a new reset link.");
+      setErrorMsg(err.message || "Failed to reset password. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "80vh", padding: "2rem" }}>
@@ -108,6 +100,19 @@ export default function ResetPasswordPage(): React.ReactElement {
             )}
 
             <form onSubmit={handleSubmit}>
+              <div className="form-group" style={{ marginBottom: "1.25rem" }}>
+                <label htmlFor="reset-email">Account Email</label>
+                <input
+                  id="reset-email"
+                  type="email"
+                  className="form-input"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
               <div className="form-group" style={{ marginBottom: "1.25rem" }}>
                 <label htmlFor="new-password">New Password</label>
                 <input

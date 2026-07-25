@@ -1,15 +1,22 @@
 import React, { useState, useEffect, ReactNode } from "react";
-import { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabaseClient";
 import { SupabaseContext } from "./SupabaseContext";
 import { Profile } from "@edgetalent/shared";
+import {
+  AuthSession,
+  getStoredSession,
+  clearSession,
+  loginManual,
+  registerManual,
+  resetPasswordManual,
+} from "../utils/auth";
 
 interface SupabaseProviderProps {
   children: ReactNode;
 }
 
 export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -23,21 +30,20 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
 
       if (error) {
         console.error("Error fetching profile:", error);
-        if (error.code === "PGRST301" || error.code === "user_not_found" || error.message?.includes("sub claim") || error.message?.includes("user_not_found")) {
-          await supabase.auth.signOut().catch(() => {});
-          setSession(null);
-          setProfile(null);
-          return;
-        }
         setProfile(null);
       } else if (!data) {
-        // Profile row missing in public.profiles table, attempt automatic creation
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user) {
-          const fallbackProfile = {
-            id: userData.user.id,
-            email: userData.user.email || "",
-            full_name: userData.user.user_metadata?.full_name || userData.user.user_metadata?.name || userData.user.email?.split("@")[0] || "User",
+        // Fallback profile if row is missing in public.profiles table
+        const currentSession = getStoredSession();
+        if (currentSession?.user) {
+          const fallbackProfile: Profile = {
+            id: currentSession.user.id,
+            email: currentSession.user.email || "",
+            full_name: currentSession.user.full_name || currentSession.user.email.split("@")[0],
+            role: (currentSession.user.role as any) || "talent",
+            avatar_url: currentSession.user.avatar_url || "",
+            bio: "",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           };
           const { data: createdData } = await supabase
             .from("profiles")
@@ -45,16 +51,7 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
             .select("*")
             .maybeSingle();
 
-          if (createdData) {
-            setProfile(createdData as Profile);
-          } else {
-            const { data: retryData } = await supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", userData.user.id)
-              .maybeSingle();
-            setProfile((retryData as Profile) || null);
-          }
+          setProfile((createdData as Profile) || fallbackProfile);
         } else {
           setProfile(null);
         }
@@ -67,54 +64,65 @@ export const SupabaseProvider: React.FC<SupabaseProviderProps> = ({ children }) 
   };
 
   useEffect(() => {
-    // Verify active user against Auth API to purge stale JWTs from wiped databases
-    supabase.auth.getUser().then(({ data: userData, error: userError }) => {
-      if (userError || !userData?.user) {
-        // Stale token detected; clear localStorage session
-        supabase.auth.signOut().catch(() => {});
-        setSession(null);
-        setProfile(null);
-        setLoading(false);
-      } else {
-        supabase.auth.getSession().then(({ data: { session: activeSession } }) => {
-          setSession(activeSession);
-          if (activeSession?.user) {
-            fetchProfile(activeSession.user.id).finally(() => setLoading(false));
-          } else {
-            setLoading(false);
-          }
-        });
-      }
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, currentSession) => {
-        setSession(currentSession);
-        if (currentSession?.user) {
-          await fetchProfile(currentSession.user.id);
-        } else {
-          setProfile(null);
-        }
-        setLoading(false);
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    const activeSession = getStoredSession();
+    if (activeSession?.user) {
+      setSession(activeSession);
+      fetchProfile(activeSession.user.id).finally(() => setLoading(false));
+    } else {
+      setSession(null);
+      setProfile(null);
+      setLoading(false);
+    }
   }, []);
+
+  const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const { session: newSession, profile: userProfile } = await loginManual(email, password);
+      setSession(newSession);
+      setProfile(userProfile);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUp = async (email: string, password: string, fullName: string, role: string) => {
+    setLoading(true);
+    try {
+      const { session: newSession, profile: userProfile } = await registerManual(email, password, fullName, role);
+      setSession(newSession);
+      setProfile(userProfile);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signOut = async () => {
     setLoading(true);
-    await supabase.auth.signOut();
+    clearSession();
     setSession(null);
     setProfile(null);
     setLoading(false);
   };
 
+  const resetPassword = async (email: string, newPassword: string) => {
+    await resetPasswordManual(email, newPassword);
+  };
+
   return (
-    <SupabaseContext.Provider value={{ supabase, session, profile, loading, fetchProfile, signOut }}>
+    <SupabaseContext.Provider
+      value={{
+        supabase,
+        session,
+        profile,
+        loading,
+        fetchProfile,
+        signIn,
+        signUp,
+        signOut,
+        resetPassword,
+      }}
+    >
       {children}
     </SupabaseContext.Provider>
   );

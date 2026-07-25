@@ -10,7 +10,7 @@ interface AuthPageProps {
 type AuthMode = "login" | "signup" | "forgot";
 
 export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement {
-  const { supabase } = useSupabase();
+  const { signIn, signUp, resetPassword } = useSupabase();
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -20,15 +20,6 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
-
-  useEffect(() => {
-    // Clear stale session token from browser if unauthenticated
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        supabase.auth.signOut().catch(() => {});
-      }
-    });
-  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,102 +34,36 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
           throw new Error(validationResult.error.errors[0].message);
         }
 
-        // Attempt manual password reset via RPC first
-        if (newPassword && newPassword.length >= 6) {
-          const { data: rpcData, error: rpcError } = await supabase.rpc("reset_user_password_manual", {
-            p_email: email,
-            p_new_password: newPassword,
-          });
-
-          if (!rpcError && rpcData?.success) {
-            setSuccessMsg("Password reset successfully! You can now log in with your new password.");
-            setMode("login");
-            setPassword(newPassword);
-            setNewPassword("");
-            return;
-          }
+        const pwdToSet = newPassword || password;
+        if (!pwdToSet || pwdToSet.length < 6) {
+          throw new Error("Please enter a new password (min 6 characters).");
         }
 
-        // Fallback to standard email link reset
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/reset-password`,
-        });
-
-        if (error) throw error;
-        setSuccessMsg("Password reset link sent! Please check your inbox and spam folder.");
+        await resetPassword(email, pwdToSet);
+        setSuccessMsg("Password reset successfully! You can now log in with your new password.");
+        setMode("login");
+        setPassword(pwdToSet);
+        setNewPassword("");
       } else if (mode === "signup") {
-        // Zod validation for register payload
         const validationResult = RegisterSchema.safeParse({ email, password, fullName });
         if (!validationResult.success) {
           throw new Error(validationResult.error.errors[0].message);
         }
 
-        // Attempt manual user creation via RPC
-        const { data: rpcData, error: rpcError } = await supabase.rpc("create_manual_user", {
-          p_email: email,
-          p_password: password,
-          p_full_name: fullName,
-          p_role: role,
-        });
-
-        if (rpcError || (rpcData && !rpcData.success)) {
-          const rpcErrMsg = rpcError?.message || rpcData?.message;
-          // Fallback to standard Supabase auth signUp if RPC function is unavailable
-          if (rpcErrMsg && rpcErrMsg.includes("function") && rpcErrMsg.includes("does not exist")) {
-            const { error: signUpErr } = await supabase.auth.signUp({
-              email,
-              password,
-              options: { data: { full_name: fullName } },
-            });
-            if (signUpErr) throw signUpErr;
-            setSuccessMsg("Registration successful! Try logging in.");
-          } else {
-            throw new Error(rpcErrMsg || "Failed to create user account.");
-          }
-        } else {
-          // Immediately sign in user after manual creation
-          const { error: signInErr } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-
-          if (signInErr) {
-            setSuccessMsg("Account created! Please log in with your credentials.");
-            setMode("login");
-          }
-        }
+        await signUp(email, password, fullName, role);
+        setSuccessMsg("Registration successful! You are now logged in.");
       } else {
-        // Zod validation for login payload
         const validationResult = LoginSchema.safeParse({ email, password });
         if (!validationResult.success) {
           throw new Error(validationResult.error.errors[0].message);
         }
 
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
+        await signIn(email, password);
       }
     } catch (err: any) {
       console.error("Authentication error:", err);
-      let rawMsg = "";
-      if (typeof err === "string") {
-        rawMsg = err;
-      } else if (err?.message && typeof err.message === "string") {
-        rawMsg = err.message;
-      } else if (err?.error_description && typeof err.error_description === "string") {
-        rawMsg = err.error_description;
-      }
-
+      let rawMsg = typeof err === "string" ? err : err?.message || "Authentication failed.";
       if (!rawMsg || rawMsg === "{}" || rawMsg === "[object Object]") {
-        rawMsg = "Invalid email or password. Please verify your credentials or check connection.";
-      }
-
-      if (rawMsg.toLowerCase().includes("rate limit") || rawMsg.toLowerCase().includes("over_email_send_rate_limit")) {
-        rawMsg = "Email rate limit exceeded. You can reset your password directly by entering your new password below.";
-      } else if (rawMsg.toLowerCase().includes("invalid login credentials")) {
         rawMsg = "Invalid email or password. Please verify your credentials.";
       }
       setErrorMsg(rawMsg);
@@ -146,6 +71,7 @@ export default function AuthPage({ onBack }: AuthPageProps): React.ReactElement 
       setLoading(false);
     }
   };
+
 
   const changeMode = (newMode: AuthMode) => {
     setMode(newMode);
